@@ -1,0 +1,236 @@
+:root {
+    --bg-primary: #1a0033;
+    --bg-secondary: #2d004d;
+    --text-primary: #e6ccff;
+    --text-secondary: #b366ff;
+    --accent: #9900cc;
+    --highlight: #ff33ff;
+}
+
+body {
+    font-family: 'Fira Code', monospace;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    padding: 2rem 0;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--accent);
+}
+
+.profile-img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+}
+
+h1, h2, h3 {
+    color: var(--highlight);
+}
+
+nav a {
+    color: var(--text-secondary);
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: var(--highlight);
+}
+
+.skills-grid, .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.skill-item, .project-card {
+    background-color: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.skill-item p, .project-title {
+    margin: 0;
+}
+
+.skill-item span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+}
+
+.project-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+}
+
+.project-description {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.project-link {
+    display: inline-block;
+    background-color: var(--accent);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.project-link:hover {
+    background-color: var(--highlight);
+}
+
+.github-stats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.github-stats img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.social-links a {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: var(--highlight);
+}
+
+.donate-section {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.donate-button {
+    display: inline-block;
+    background-color: var(--accent);
+    color: var(--text-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.donate-button:hover {
+    background-color: var(--highlight);
+}
+
+.code-block {
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 2rem;
+    overflow-x: auto;
+}
+
+pre {
+    font-family: 'Fira Code', monospace;
+    color: var(--text-primary);
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.contact-form input, .contact-form textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: 'Fira Code', monospace;
+}
+
+.contact-form button {
+    background-color: var(--accent);
+    color: var(--text-primary);
+    padding: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.contact-form button:hover {
+    background-color: var(--highlight);
+}
+
+.code-showcase {
+    margin-top: 2rem;
+    background: #1e1e1e;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.code-showcase h2 {
+    color: var(--highlight);
+    margin-bottom: 1rem;
+}
+
+.code-container {
+    background: #1b0683;
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+code {
+    font-family: 'Fira Code', monospace;
+    font-size: 1rem;
+    color: #f009c5;
+}
+
+@media (max-width: 768px) {
+    .skills-grid, .projects-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .github-stats {
+        flex-direction: column;
+    }
+}

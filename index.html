@@ -1,11 +1,112 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <script>
-        window.location.href = "https://github.com/Amitminer/";
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmitxD - Developer Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="AmitxD's Developer Portfolio showcasing projects, skills, and more.">
+    <meta name="keywords" content="AmitxD, Developer, Portfolio, GitHub, Projects, Skills">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
 </head>
 <body>
-    <p>If you are not redirected, <a href="https://github.com/Amitminer/">click here</a>.</p>
+    <header>
+        <div class="container">
+            <img src="https://cdn.discordapp.com/avatars/814660125511778315/16e05dcff9b78f7166ec285e58fdfd85.png?size=1024" alt="AmitxD" class="profile-img">
+            <h1>AmitxD</h1>
+            <p>Self-taught Developer from India</p>
+            <nav>
+                <a href="#about">About</a>
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#github">GitHub</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="about">
+            <h2>About Me</h2>
+            <p>Hello! I'm AmitxD, a passionate self-taught developer from India. I love creating innovative solutions and exploring new technologies. My journey in the world of programming has been exciting, and I'm always eager to learn more. I'm driven by a curiosity for problem-solving and a desire to make a positive impact through technology.</p>
+        </section>
+
+        <section id="skills">
+            <h2>Skills</h2>
+            <div class="skills-grid" id="skills-container">
+                <!-- Skills will be dynamically added here -->
+            </div>
+        </section>
+
+        <section id="projects">
+            <h2>Projects</h2>
+            <div class="projects-grid" id="projects-container">
+                <!-- Projects will be dynamically added here -->
+            </div>
+        </section>
+
+        <section id="github">
+            <h2>GitHub Stats</h2>
+            <div class="github-stats">
+                <img src="https://github-readme-stats.vercel.app/api?username=Amitminer&show_icons=true&theme=radical" alt="GitHub Stats">
+                <img src="https://github-readme-streak-stats.herokuapp.com/?user=Amitminer&theme=radical" alt="GitHub Streak">
+                <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Amitminer&layout=compact&theme=radical" alt="Top Languages">
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>Connect with Me</h2>
+            <div class="social-links">
+                <a href="https://github.com/Amitminer" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://discord.com/users/814660125511778315" target="_blank" title="Discord"><i class="fab fa-discord"></i></a>
+                <a href="https://account.xbox.com/en-in/profile?gamertag=Amitminer" target="_blank" title="Xbox"><i class="fab fa-xbox"></i></a>
+                <a href="https://www.instagram.com/amitminer" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+            <form action="https://formspree.io/f/mldrereq" method="POST" class="contact-form">
+                <input type="email" name="email" placeholder="Your Email" required>
+                <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </section>
+
+        <section class="donate-section">
+            <h2>Support My Work</h2>
+            <a href="https://www.buymeacoffee.com/amitxd" class="donate-button">Buy Me a Coffee</a>
+        </section>
+
+        <section class="code-showcase">
+    <h2>Code Sample</h2>
+    <div class="code-window">
+        <div class="window-controls">
+            <span class="control red"></span>
+            <span class="control yellow"></span>
+            <span class="control green"></span>
+        </div>
+        <pre><code class="language-javascript">
+const coder = {
+    name: 'Master Coder',
+    skills: ['Cpp', "Python", "PHP"],
+    hardWorker: false,
+    problemSolver: true,
+    hireable: function() {
+        return (
+            this.hardWorker &&
+            this.problemSolver &&
+            this.skills.length >= 5
+        );
+    }
+}
+        </code></pre>
+    </div>
+</section>
+    </main>
+
+    <script src="script.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-cpp.min.js"></script>
 </body>
 </html>
