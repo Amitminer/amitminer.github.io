@@ -5,9 +5,9 @@ const skillsData = [
   { name: "HTML/CSS", level: "Intermediate" },
   { name: "JavaScript", level: "Intermediate" },
   { name: "Git", level: "Intermediate" },
-  { name: "Problem-solving", level: "Advanced" },
-  { name: "Teamwork", level: "Intermediate" },
-  { name: "Communication", level: "Intermediate" },
+  { name: "Problem-solving", level: "Intermediate" },
+  { name: "Teamwork", level: "Beginner" },
+  { name: "Communication", level: "Beginner" },
 ];
 
 function populateSkills() {
