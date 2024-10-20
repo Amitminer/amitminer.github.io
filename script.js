@@ -62,9 +62,21 @@ async function populateProjects() {
   }
 }
 
+function setupMobileMenu() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const mainNav = document.querySelector('.main-nav');
+
+    if (menuToggle && mainNav) {
+        menuToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+        });
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   populateSkills();
   populateProjects();
+  setupMobileMenu();
 });
 
 document.querySelectorAll(".control").forEach((control) => {
