@@ -1,0 +1,124 @@
+:root {
+    --bg-primary: #1a0033;
+    --bg-secondary: #2d004d;
+    --text-primary: #e6ccff;
+    --text-secondary: #b366ff;
+    --accent: #9900cc;
+    --highlight: #ff33ff;
+}
+
+.app-container {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* General Body and Layout */
+body {
+    font-family: 'Fira Code', monospace;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px;
+}
+
+/* Header Section */
+header {
+    text-align: center;
+    padding: 2rem 0;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--accent);
+}
+
+.profile-img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 2px solid var(--accent);
+}
+
+h1, h2, h3 {
+    color: var(--highlight);
+}
+
+/* Navigation Section (Header Menu) */
+nav a {
+    color: var(--text-secondary); /* Default link color */
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: var(--highlight); /* Hover effect */
+}
+
+.menu-toggle {
+    display: none;
+}
+
+/* About Section */
+.about-section {
+    padding: 2rem;
+    background-color: var(--bg-secondary);
+}
+
+/* Mobile Navigation Menu */
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .menu-toggle span {
+        display: block;
+        width: 25px;
+        height: 3px;
+        background-color: var(--text-primary);
+        margin: 5px 0;
+    }
+
+    .main-nav {
+        display: none;
+        flex-direction: column;
+        left: 0;
+        width: 100%;
+        background-color: var(--bg-secondary);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .main-nav.active {
+        display: flex;
+    }
+
+    .main-nav a {
+        padding: 10px 0;
+        text-align: center;
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+    .main-nav a:hover {
+        background-color: var(--highlight);
+    }
+}
+
+
+.message-sent {
+    margin-top: 1rem;
+    color: #4caf50; /* Green color for success */
+    font-size: 1.2rem;
+  }
+ 

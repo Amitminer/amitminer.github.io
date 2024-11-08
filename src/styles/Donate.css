@@ -1,0 +1,21 @@
+/* Donation Section */
+.donate-section {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.donate-button {
+    display: inline-block;
+    background-color: var(--accent);
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+}
+
+.donate-button:hover {
+    background-color: var(--highlight);
+}

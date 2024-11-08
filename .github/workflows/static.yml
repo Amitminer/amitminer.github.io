@@ -1,43 +1,61 @@
-# Simple workflow for deploying static content to GitHub Pages
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # Trigger the workflow on push to the main branch
   push:
     branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# Set permissions for the GitHub token
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Run only one deployment at a time, without canceling in-progress jobs
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
+      # Checkout the repository
+      - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Pages
+
+      # Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Specify the Node.js version you are using (e.g., 16 or 18)
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the project (assuming you are using React with Vite or similar)
+      - name: Build project
+        run: npm run build  # Ensure this command builds your project (change it if needed)
+
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
         uses: actions/configure-pages@v3
-      - name: Upload artifact
+
+      # Upload the build output to GitHub Pages
+      - name: Upload build artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          # Upload entire repository
-          path: '.'
+          path: ./dist  # Replace 'dist' with your actual build output folder if different
+
+      # Deploy the artifact to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
