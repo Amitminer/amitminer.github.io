@@ -1,7 +1,7 @@
 :root {
     --bg-primary: #1a0033;
-    --bg-secondary: #2d004d;
-    --text-primary: #e6ccff;
+    --bg-secondary: #2d004d;  /* This could stay or be adjusted */
+    --text-primary: #ffffff;  /* Lighter text for better contrast */
     --text-secondary: #b366ff;
     --accent: #9900cc;
     --highlight: #ff33ff;

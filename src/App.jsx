@@ -1,25 +1,39 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import './App.css';
 
-import Header from './components/Header';
-import About from './components/About';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import GitHub from './components/GitHub';
-import Contact from './components/Contact';
-import Donate from './components/Donate';
+const Header = lazy(() => import('./components/Header'));
+const About = lazy(() => import('./components/About'));
+const Skills = lazy(() => import('./components/Skills'));
+const Projects = lazy(() => import('./components/Projects'));
+const GitHub = lazy(() => import('./components/GitHub'));
+const Contact = lazy(() => import('./components/Contact'));
+const Donate = lazy(() => import('./components/Donate'));
 
 const App = () => {
   return (
     <div className="app-container">
-      <Header />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Header />
+      </Suspense>
       <main className="container">
-        <About />
-        <Skills />
-        <Projects />
-        <GitHub />
-        <Contact />
-        <Donate />
+        <Suspense fallback={<div>Loading About...</div>}>
+          <About />
+        </Suspense>
+        <Suspense fallback={<div>Loading Skills...</div>}>
+          <Skills />
+        </Suspense>
+        <Suspense fallback={<div>Loading Projects...</div>}>
+          <Projects />
+        </Suspense>
+        <Suspense fallback={<div>Loading GitHub...</div>}>
+          <GitHub />
+        </Suspense>
+        <Suspense fallback={<div>Loading Contact...</div>}>
+          <Contact />
+        </Suspense>
+        <Suspense fallback={<div>Loading Donate...</div>}>
+          <Donate />
+        </Suspense>
       </main>
     </div>
   );
