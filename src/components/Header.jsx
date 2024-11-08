@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import pfp from "../assets/pfp.png";
+import pfp from "../assets/pfp.webp";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
