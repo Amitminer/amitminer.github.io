@@ -3,18 +3,16 @@ name: Deploy static content to Pages
 on:
   # Trigger the workflow on push to the main branch
   push:
-    branches: ["main"]
+    branches: ["dev"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Set permissions for the GitHub token
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Run only one deployment at a time, without canceling in-progress jobs
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -25,37 +23,35 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    
+
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up Node.js environment
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Specify the Node.js version you are using (e.g., 16 or 18)
+          node-version: '18'
 
-      # Install dependencies
-      - name: Install dependencies
-        run: npm install
+      # Remove node_modules and package-lock.json to avoid dependency issues
+      - name: Clean npm cache and install dependencies
+        run: |
+          rm -rf node_modules
+          rm -f package-lock.json
+          npm cache clean --force
+          npm install
 
-      # Build the project (assuming you are using React with Vite or similar)
       - name: Build project
-        run: npm run build  # Ensure this command builds your project (change it if needed)
+        run: npm run build
 
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v3
 
-      # Upload the build output to GitHub Pages
       - name: Upload build artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./dist  # Replace 'dist' with your actual build output folder if different
+          path: ./dist 
 
-      # Deploy the artifact to GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
