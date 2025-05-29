@@ -12,10 +12,10 @@ const About = () => {
   const [showCursor, setShowCursor] = useState(true);
 
   const firstParagraph =
-    "Hey! I'm AmitxD (also known as Amitminer), a self-taught developer from India who’s super into tech and building cool stuff. I love learning on my own and experimenting with new ideas—coding has been a fun and exciting journey so far.";
+    "Hey! I'm AmitxD (also known as Amitminer), a self-taught developer from India who’s passionate about tech and building cool things. I love learning independently and experimenting with new ideas—coding has been an exciting and rewarding journey so far.";
 
   const secondParagraph =
-    "I'm really into solving problems and figuring out how things work. I like building things that actually help people. Outside of coding, I mess around with new frameworks, contribute to open-source when I can, and sometimes share what I’ve learned with others.";
+    "I'm deeply interested in solving problems and understanding how things work. I enjoy building tools that make a real difference. Outside of coding, I explore new frameworks, contribute to open-source when I can, and share what I learn with others.";
 
   // === Visibility Trigger (Intersection Observer) ===
   useEffect(() => {
