@@ -1,24 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * GitHub API proxy endpoint
- * 
- * Usage examples:
- * 1. Fetch user repos:
- *    GET {BackendURL}?endpoint=/users/username/repos
- * 
- * 2. Fetch specific repo:
- *    GET {BackendURL}?endpoint=/repos/username/repo-name
- * 
- * 3. Fetch with caching:
- *    GET {BackendURL}?endpoint=/users/username/repos&cache=true
- * 
- * 4. Fetch skills (with specific cache):
- *    GET {BackendURL}?endpoint=/users/username/repos&cache=skills
- * 
- * Query Parameters:
- * - endpoint: Required. The GitHub API endpoint to proxy (must start with /)
- * - cache: Set to 'true' or 'skills' to enable caching
+ * Proxies GET requests to the GitHub API with optional in-memory caching.
+ *
+ * Accepts a required `endpoint` query parameter specifying the GitHub API path to fetch, and an optional `cache` parameter to enable caching for up to 14 days. Handles GitHub API errors and network issues, returning appropriate HTTP status codes and error messages.
+ *
+ * @returns A {@link NextResponse} containing the proxied GitHub API response data or an error message.
+ *
+ * @remark
+ * - Returns 400 if the `endpoint` parameter is missing.
+ * - Returns 429 if the GitHub API rate limit is exceeded.
+ * - Returns 404 if the requested repository is not found.
+ * - Returns 503 for network connectivity issues.
+ * - Returns 500 for other errors.
  */
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);

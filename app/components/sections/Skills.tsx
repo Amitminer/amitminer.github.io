@@ -207,6 +207,13 @@ const Skills = () => {
       }
     }
 
+    /**
+     * Fetches GitHub repositories for the configured user, aggregates language usage statistics, and updates the skills state with the top six languages by byte count.
+     *
+     * Filters repositories to include only recent, non-fork, non-empty repos updated within the last year. Fetches language data for these repos in batches, aggregates byte counts per language, and calculates each language's percentage share among the top six. Updates the loading progress during the process and caches the resulting skill data in session storage for future use.
+     *
+     * @throws {Error} If fetching repositories fails, the data structure is invalid, or no language data is found.
+     */
     async function fetchAndCalculateSkills() {
       try {
         setError(null)

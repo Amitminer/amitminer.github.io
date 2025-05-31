@@ -12,7 +12,11 @@ export const metadata: Metadata = {
   description: 'Self-taught developer passionate about creating innovative solutions',
 };
 
-// Root layout component that wraps all pages
+/**
+ * Provides the root layout structure for all pages, including global styles, header, footer, and main content area.
+ *
+ * @param children - The page content to be rendered within the main section of the layout.
+ */
 export default function RootLayout({
   children,
 }: {
