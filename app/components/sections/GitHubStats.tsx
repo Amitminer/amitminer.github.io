@@ -20,7 +20,7 @@ import {
   AlertCircle,
 } from "lucide-react"
 import { BackendURL, GithubUsername } from "@/app/utils/Links"
-import type { GitHubStats, GitHubEvent, CachedData, DetailCardProps, StatCardProps, CacheUtils, GitHubRepoInfo } from "@/app/lib/types"
+import type { GitHubStats, GitHubEvent, CachedData, DetailCardProps, StatCardProps, CacheUtils, GitHubRepoInfo, PushEventPayload } from "@/app/lib/types"
 
 // Constants
 const REPOS_PER_PAGE = 80;
@@ -137,7 +137,12 @@ const GitHubStatsComponent = () => {
     const timeoutId = setTimeout(() => controller.abort(), timeout)
 
     try {
-      const response = await fetch(`${BackendURL}?endpoint=${endpoint}&cache=true`, {
+      const params = new URLSearchParams({
+        endpoint,
+        cache: 'true'
+      });
+
+      const response = await fetch(`${BackendURL}?${params.toString()}`, {
         headers: {
           "Cache-Control": "max-age=300", // 5 minutes browser cache
           "Accept": "application/json",
@@ -213,7 +218,8 @@ const GitHubStatsComponent = () => {
       const eventTime = eventDate.getTime()
 
       if (eventTime > currentYearStart && event.type === "PushEvent") {
-        totalCommits += event.payload?.commits?.length || 1
+        const pushEvent = event as { type: "PushEvent"; payload: PushEventPayload };
+        totalCommits += pushEvent.payload.commits?.length || 1
       }
 
       if (eventTime > oneMonthAgo) {

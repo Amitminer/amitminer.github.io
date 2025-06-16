@@ -85,17 +85,15 @@ const Projects = () => {
    */
   const fetchGitHubData = async (endpoint: string): Promise<any> => {
     try {
-      const response = await fetch(`${BackendURL}?endpoint=${endpoint}`);
-
+      const response = await fetch(`${BackendURL}?endpoint=${endpoint}&cache=true`);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-        throw new Error(errorData.error || "Failed to fetch GitHub data");
+        throw new Error(`API Error ${response.status}`);
       }
 
-      return await response.json();
+      return response.json();
     } catch (error) {
-      console.error("GitHub API Error:", error);
+      console.error('Error fetching GitHub data:', error);
       throw error;
     }
   }

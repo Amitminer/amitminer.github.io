@@ -76,9 +76,7 @@ const Contact = () => {
     }
 
     return () => {
-      if (contactRef.current) {
-        observer.unobserve(contactRef.current);
-      }
+      observer.disconnect();
     };
   }, []);
 
@@ -92,17 +90,13 @@ const Contact = () => {
         className: "bg-gradient-to-r from-green-500 to-emerald-600 text-white border-none",
       });
 
-      // Reset form
+      // Reset form using state
       setState(prev => ({
         ...prev,
         formState: { email: '', message: '' },
         errors: {},
         isSubmitting: false
       }));
-
-      // Clear form fields
-      if (emailRef.current) emailRef.current.value = '';
-      if (messageRef.current) messageRef.current.value = '';
     }
 
     if (formspreeState.errors && Object.keys(formspreeState.errors).length > 0) {
