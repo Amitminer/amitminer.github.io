@@ -1,11 +1,11 @@
 /**
  * BackgroundAnimation Component
  * 
- * Performance optimizations:
- * - Reduced element count
- * - Static elements (no DOM recreation)
- * - CSS-only animations
- * - Mobile-friendly performance
+ * A dynamic background animation system that creates:
+ * - Floating particles with random sizes and movements
+ * - Geometric shapes (squares, circles, triangles)
+ * - Floating code snippets from Rust
+ * - Pulsing dots with gradient effects
  */
 
 "use client"
