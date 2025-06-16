@@ -4,8 +4,8 @@
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 10, 5, 20;
-  --background-end-rgb: 5, 2, 10;
+  --background-start-rgb: 15, 10, 25;
+  --background-end-rgb: 10, 5, 20;
 
   /* Cyberpunk colors */
   --primary: 326, 100%, 60%; /* Neon Pink */
@@ -16,13 +16,17 @@
   --muted: 265, 30%, 20%;
   --muted-foreground: 0, 0%, 70%;
 
-  /* Stats colors */
-  --stats-php: 326, 100%, 60%;
-  --stats-cpp: 195, 100%, 50%;
-  --stats-python: 285, 100%, 65%;
-  --stats-rust: 35, 100%, 50%;
-  --stats-typescript: 155, 100%, 50%;
-  --stats-javascript: 55, 100%, 50%;
+  /* Enhanced Stats colors */
+  --stats-php: 326, 100%, 60%; /* Neon Pink */
+  --stats-cpp: 195, 100%, 50%; /* Cyan */
+  --stats-python: 285, 100%, 65%; /* Purple */
+  --stats-rust: 35, 100%, 50%; /* Orange */
+  --stats-typescript: 155, 100%, 50%; /* Mint */
+  --stats-javascript: 55, 100%, 50%; /* Yellow */
+  --stats-java: 0, 100%, 50%; /* Red */
+  --stats-go: 200, 100%, 50%; /* Blue */
+  --stats-ruby: 340, 100%, 50%; /* Ruby */
+  --stats-swift: 200, 100%, 50%; /* Swift Blue */
 }
 
 @layer base {
@@ -35,10 +39,13 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+  background: linear-gradient(135deg, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
 }
 
 @layer components {
@@ -51,7 +58,7 @@ body {
   }
 
   .nav-link::after {
-    @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 bg-[#00FFFF] transition-all duration-300;
+    @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#FF1493] to-[#00FFFF] transition-all duration-300;
   }
 
   .nav-link:hover::after {
@@ -59,24 +66,121 @@ body {
   }
 
   .project-card {
-    @apply bg-secondary/50 backdrop-blur-sm rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#00FFFF]/20 border border-[#FF1493]/10 hover:border-[#00FFFF]/30;
+    @apply bg-secondary/50 backdrop-blur-sm rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#00FFFF]/30 border-2 border-[#FF1493]/20 hover:border-[#FFD700]/50;
   }
 
   .stat-card {
-    @apply bg-secondary/50 backdrop-blur-sm rounded-xl p-6 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#00FFFF]/20 border border-[#FF1493]/10 hover:border-[#00FFFF]/30;
+    @apply bg-secondary/50 backdrop-blur-sm rounded-xl p-6 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-[#FFD700]/30 border-2 border-[#FF1493]/20 hover:border-[#FFD700]/50;
   }
 
   .contact-input {
-    @apply w-full bg-secondary/50 backdrop-blur-sm border border-[#FF1493]/20 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-[#00FFFF]/50 transition-all duration-300 placeholder:text-white/50;
+    @apply w-full bg-secondary/50 backdrop-blur-sm border border-[#FF1493]/20 rounded-xl p-4 text-white focus:outline-none focus:ring-2 focus:ring-[#FFD700]/50 transition-all duration-300 placeholder:text-white/50;
   }
 
   .social-icon {
-    @apply p-4 text-white/70 hover:text-[#00FFFF] transition-all duration-300 hover:bg-[#FF1493]/20 rounded-full transform hover:scale-110;
+    @apply p-4 text-white/70 hover:text-[#FFD700] transition-all duration-300 hover:bg-[#FF1493]/20 rounded-full transform hover:scale-110;
   }
 
   .loading-shimmer {
     @apply animate-pulse bg-gradient-to-r from-secondary/50 via-secondary/30 to-secondary/50 bg-[length:200%_100%];
     animation: shimmer 1.5s infinite;
+  }
+
+  /* Skeleton loading components */
+  .skeleton {
+    @apply animate-pulse bg-gradient-to-r from-gray-300/20 to-gray-300/10 rounded;
+    background: linear-gradient(90deg, rgba(255, 20, 147, 0.1) 25%, rgba(0, 255, 255, 0.05) 50%, rgba(255, 20, 147, 0.1) 75%);
+    background-size: 200% 100%;
+    animation: skeletonShimmer 2s ease-in-out infinite;
+  }
+
+  .skeleton-image {
+    @apply skeleton rounded-full relative overflow-hidden;
+  }
+
+  .skeleton-text {
+    @apply skeleton h-4 w-full mb-2;
+  }
+
+  .skeleton-title {
+    @apply skeleton h-8 w-3/4 mb-4;
+  }
+
+  .skeleton-button {
+    @apply skeleton h-12 w-full rounded-lg;
+  }
+
+  /* New background animation classes */
+  .floating-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .particle {
+    position: absolute;
+    background: linear-gradient(45deg, #ff1493, #00ffff);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .grid-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: 0;
+  }
+
+  .wave-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 20, 147, 0.1) 50%, transparent 70%);
+    animation: wave 8s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  .floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+  }
+
+  .floating-shape {
+    position: absolute;
+    border: 1px solid;
+    animation: floatShape 8s ease-in-out infinite;
+    opacity: 0.4;
+  }
+
+  .code-snippet {
+    position: absolute;
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    color: #00ffff;
+    opacity: 0.2;
+    animation: codeFloat 10s linear infinite;
+  }
+
+  .pulsing-dot {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, #ff1493, transparent);
+    border-radius: 50%;
+    animation: pulse 3s ease-in-out infinite;
   }
 }
 
@@ -90,12 +194,25 @@ body {
   }
 }
 
+/* New skeleton shimmer animation with cyberpunk colors */
+@keyframes skeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Enhanced fade-in animation with transform */
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -130,6 +247,77 @@ body {
   }
 }
 
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+@keyframes gridMove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: translateX(-100%) skewX(0deg);
+  }
+  50% {
+    transform: translateX(100%) skewX(5deg);
+  }
+}
+
+@keyframes floatShape {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-30px) rotate(180deg);
+    opacity: 0.7;
+  }
+}
+
+@keyframes codeFloat {
+  0% {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(-100px) translateX(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* Animation utility classes */
 .fade-in {
   animation: fadeIn 0.8s ease-in-out forwards;
 }
@@ -184,6 +372,51 @@ body {
   animation: expandWidth 1s ease-out 0.5s both;
 }
 
+/* New skeleton and loading animation classes */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-skeleton-shimmer {
+  animation: skeletonShimmer 2s ease-in-out infinite;
+}
+
+/* Animation delays for staggered loading */
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animation-delay-600 {
+  animation-delay: 600ms;
+}
+
+/* Ensure delayed animations start invisible and fill forwards */
+.animation-delay-100,
+.animation-delay-200,
+.animation-delay-300,
+.animation-delay-400,
+.animation-delay-500,
+.animation-delay-600 {
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
 /* Ensure tabular numbers for consistent spacing */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
@@ -201,5 +434,18 @@ body {
 
   .contact-input {
     @apply p-3;
+  }
+
+  .particle {
+    animation-duration: 4s;
+  }
+
+  .wave-animation {
+    animation-duration: 6s;
+  }
+
+  /* Faster skeleton animations on mobile for better UX */
+  .skeleton {
+    animation-duration: 1.5s;
   }
 }

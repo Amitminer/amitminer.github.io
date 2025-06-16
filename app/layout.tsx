@@ -4,7 +4,13 @@ import { Inter } from 'next/font/google';
 import Header from '@/app/components/layout/Header';
 import Footer from '@/app/components/layout/Footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  weight: ['300', '400', '500', '600', '700', '800'],
+  fallback: ['system-ui', 'arial']
+});
 
 // SEO metadata for the entire website
 export const metadata: Metadata = {

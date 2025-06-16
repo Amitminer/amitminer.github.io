@@ -1,6 +1,6 @@
 import Hero from '@/app/components/sections/Hero';
 import About from '@/app/components/sections/About';
-import Skills from '@/app/components/sections/Skills';
+import TechStack from '@/app/components/sections/TechStack';
 import GitHubStats from '@/app/components/sections/GitHubStats';
 import Projects from '@/app/components/sections/Projects';
 import Languages from '@/app/components/sections/Languages';
@@ -10,7 +10,6 @@ import Support from '@/app/components/sections/Support';
 // The main Home component which renders the landing page
 export default function Home() {
   return (
-    // Flex container to vertically stack all sections and center them
     <div className="flex flex-col items-center w-full">
       {/* Hero/Banner section */}
       <Hero />
@@ -18,8 +17,8 @@ export default function Home() {
       {/* About me section */}
       <About />
       
-      {/* Skills section */}
-      <Skills />
+      {/* Technology Stack section */}
+      <TechStack />
       
       {/* GitHub statistics section (e.g., activity, commits, etc.) */}
       <GitHubStats />
@@ -27,7 +26,7 @@ export default function Home() {
       {/* Projects portfolio section */}
       <Projects />
       
-      {/* Languages I speak or code in */}
+      {/* Top Programming Languages section */}
       <Languages />
       
       {/* Contact form or info section */}
@@ -37,4 +36,4 @@ export default function Home() {
       <Support />
     </div>
   );
-}
+} 

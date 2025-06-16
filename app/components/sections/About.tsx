@@ -1,185 +1,284 @@
+/**
+ * About Component
+ * 
+ * A dynamic and interactive "About Me" section that features:
+ * - Typewriter effect for text animation
+ * - Intersection Observer for scroll-based animations
+ * - Floating particles and decorative elements
+ * - Responsive design with gradient effects
+ * - Skeleton loading state
+ * 
+ * Key Features:
+ * - Progressive text reveal with typewriter effect
+ * - Blinking cursor animation
+ * - Scroll-triggered animations
+ * - Highlighted name mentions
+ * - Decorative particle animations
+ * - Gradient text and border effects
+ * - Skeleton loading state
+ */
+
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { TypewriterState } from '@/app/lib/types';
+import { useEffect, useRef, useState, useCallback } from 'react';
+
+// Constants
+const TYPING_DELAY = 8; // ms between characters for first paragraph
+const SECOND_TYPING_DELAY = 5; // ms between characters for second paragraph
+const CURSOR_BLINK_DELAY = 500; // ms between cursor blinks
+const LOADING_DELAY = 1000; // ms for loading state
+const PARTICLE_COUNT = 5;
+
+// Content
+const CONTENT = {
+  firstParagraph: "Hello! I'm AmitxD, also Amitminer, a passionate self-taught developer from India. I love creating innovative solutions and exploring new technologies. My journey in the world of programming has been exciting, and I'm always eager to learn more.",
+  secondParagraph: "I'm driven by a curiosity for problem-solving and a desire to make a positive impact through technology. When I'm not coding, you can find me exploring new frameworks, contributing to open-source projects, or sharing my knowledge with the community."
+};
 
 const About = () => {
+  // === Refs and State Management ===
   const aboutRef = useRef<HTMLDivElement>(null);
-
   const [isVisible, setIsVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [secondIndex, setSecondIndex] = useState(0);
-  const [showSecondParagraph, setShowSecondParagraph] = useState(false);
-  const [showCursor, setShowCursor] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [typewriterState, setTypewriterState] = useState<TypewriterState>({
+    currentIndex: 0,
+    secondIndex: 0,
+    showCursor: true
+  });
 
-  const firstParagraph =
-    "Hey! I'm AmitxD (also known as Amitminer), a self-taught developer from India who’s passionate about tech and building cool things. I love learning independently and experimenting with new ideas—coding has been an exciting and rewarding journey so far.";
+  // === Effects ===
 
-  const secondParagraph =
-    "I'm deeply interested in solving problems and understanding how things work. I enjoy building tools that make a real difference. Outside of coding, I explore new frameworks, contribute to open-source when I can, and share what I learn with others.";
-
-  // === Visibility Trigger (Intersection Observer) ===
+  /**
+   * Intersection Observer Effect
+   * Triggers animations when the section comes into view
+   */
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
           entry.target.classList.add('slide-up');
+          setTimeout(() => setIsLoading(false), LOADING_DELAY);
         }
       },
       { threshold: 0.1 }
     );
 
-    if (aboutRef.current) observer.observe(aboutRef.current);
+    const currentRef = aboutRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
     return () => {
-      if (aboutRef.current) observer.unobserve(aboutRef.current);
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
     };
   }, []);
 
-  // === Blinking Cursor ===
+  /**
+   * Cursor Blinking Animation
+   */
   useEffect(() => {
-    const interval = setInterval(() => setShowCursor((prev) => !prev), 500);
+    const interval = setInterval(() => {
+      setTypewriterState(prev => ({ ...prev, showCursor: !prev.showCursor }));
+    }, CURSOR_BLINK_DELAY);
+
     return () => clearInterval(interval);
   }, []);
 
-  // === First Paragraph Typewriter Effect ===
+  /**
+   * First Paragraph Typewriter Effect
+   */
   useEffect(() => {
-    if (isVisible && currentIndex < firstParagraph.length) {
+    if (isVisible && typewriterState.currentIndex < CONTENT.firstParagraph.length) {
       const timeout = setTimeout(() => {
-        setCurrentIndex((prev) => prev + 1);
-      }, 7);
-      return () => clearTimeout(timeout);
-    } else if (isVisible && currentIndex >= firstParagraph.length && !showSecondParagraph) {
-      const timeout = setTimeout(() => setShowSecondParagraph(true), 200);
+        setTypewriterState(prev => ({
+          ...prev,
+          currentIndex: prev.currentIndex + 1
+        }));
+      }, TYPING_DELAY);
+
       return () => clearTimeout(timeout);
     }
-  }, [isVisible, currentIndex, showSecondParagraph, firstParagraph.length]);
+  }, [isVisible, typewriterState.currentIndex]);
 
-  // === Second Paragraph Typewriter Effect ===
+  /**
+   * Second Paragraph Typewriter Effect
+   */
   useEffect(() => {
-    if (showSecondParagraph && secondIndex < secondParagraph.length) {
+    const isFirstParagraphComplete = typewriterState.currentIndex >= CONTENT.firstParagraph.length;
+    
+    if (isVisible && isFirstParagraphComplete && typewriterState.secondIndex < CONTENT.secondParagraph.length) {
       const timeout = setTimeout(() => {
-        setSecondIndex((prev) => prev + 1);
-      }, 7);
+        setTypewriterState(prev => ({
+          ...prev,
+          secondIndex: prev.secondIndex + 1
+        }));
+      }, SECOND_TYPING_DELAY);
+
       return () => clearTimeout(timeout);
     }
-  }, [showSecondParagraph, secondIndex, secondParagraph.length]);
+  }, [isVisible, typewriterState.currentIndex, typewriterState.secondIndex]);
 
-  // === Typewriter Render Function ===
-  const renderTextWithTypewriter = (text: string, idx: number) =>
-    text.split('').map((char, i) => {
-      const revealed = i < idx;
-      const slice = text.slice(i, i + 9);
-      const isHighlighted = slice.startsWith('AmitxD') || slice.startsWith('Amitminer');
+  // === Helper Functions ===
 
-      const className = [
-        'transition-all duration-300',
-        revealed
-          ? isHighlighted
-            ? 'text-pink-500 font-bold opacity-100'
-            : 'text-foreground opacity-100'
-          : 'text-muted-foreground/30 opacity-50',
-      ].join(' ');
+  /**
+   * Renders text with typewriter effect and special highlighting
+   */
+  const renderTextWithTypewriter = useCallback((text: string, currentIdx: number) => {
+    return text.split('').map((char, index) => {
+      const isRevealed = index < currentIdx;
+      const isHighlighted =
+        (text.slice(index, index + 6) === 'AmitxD') ||
+        (text.slice(index, index + 9) === 'Amitminer');
+
+      let className = 'transition-all duration-300 ';
+      if (isRevealed) {
+        className += isHighlighted ? 'text-pink-500 font-bold opacity-100' : 'text-foreground opacity-100';
+      } else {
+        className += 'text-muted-foreground/30 opacity-50';
+      }
 
       return (
         <span
-          key={i}
+          key={index}
           className={className}
-          style={{ transitionDelay: revealed ? `${i * 2}ms` : '0ms' }}
+          style={{ transitionDelay: isRevealed ? `${index * 2}ms` : '0ms' }}
         >
           {char}
         </span>
       );
     });
+  }, []);
 
-  // === Cursor Logic ===
-  const showFirstCursor = currentIndex < firstParagraph.length || (!showSecondParagraph && showCursor);
-  const showSecondCursor = showSecondParagraph && secondIndex < secondParagraph.length && showCursor;
+  // === Animation State Checks ===
+  const isFirstParagraphComplete = typewriterState.currentIndex >= CONTENT.firstParagraph.length;
+  const isSecondParagraphComplete = typewriterState.secondIndex >= CONTENT.secondParagraph.length;
+  const showFirstCursor = !isFirstParagraphComplete && typewriterState.showCursor;
+  const showSecondCursor = isFirstParagraphComplete && !isSecondParagraphComplete && typewriterState.showCursor;
 
+  // === Skeleton Loading Component ===
+  const SkeletonLoader = useCallback(() => (
+    <div className="max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-sm border border-pink-500/10">
+      {/* Title Skeleton */}
+      <div className="h-8 w-48 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded-lg animate-pulse mb-8 mx-auto" />
+      
+      {/* First Paragraph Skeleton */}
+      <div className="space-y-3 mb-6">
+        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-3/4" />
+        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
+        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-5/6" />
+      </div>
+      
+      {/* Second Paragraph Skeleton */}
+      <div className="space-y-3">
+        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-2/3" />
+        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
+        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-4/5" />
+      </div>
+    </div>
+  ), []);
+
+  // === JSX ===
   return (
     <section
       id="about"
       ref={aboutRef}
-      className="py-10 sm:py-20 w-full opacity-0 relative overflow-hidden"
+      className="py-20 w-full opacity-0 relative overflow-hidden"
     >
-      {/* === Floating Background Dots === */}
+      {/* Floating Particles Background */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(5)].map((_, i) => (
+        {[...Array(PARTICLE_COUNT)].map((_, i) => (
           <div
             key={i}
-            className={`absolute w-1 h-1 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full ${isVisible ? 'animate-bounce' : 'opacity-0'
-              }`}
+            className={`absolute w-1 h-1 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full
+              ${isVisible ? 'animate-bounce' : 'opacity-0'}`}
             style={{
               left: `${20 + i * 15}%`,
               top: `${30 + i * 10}%`,
               animationDelay: `${i * 0.2}s`,
-              animationDuration: '2s',
+              animationDuration: '2s'
             }}
           />
         ))}
       </div>
 
-      {/* === Main Content === */}
       <div className="container mx-auto px-4 md:px-6 relative z-10">
+        {/* Section Title with Gradient Effect */}
         <h2
-          className={`text-3xl md:text-4xl font-bold mb-14 gradient-text text-center transition-all duration-700 transform ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-            }`}
+          className={`text-3xl md:text-4xl font-bold mb-12 gradient-text text-center transition-all duration-700 transform ${
+            isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          }`}
         >
           About me
         </h2>
 
-        <div
-          className={`max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-sm 
-            border border-pink-500/10 hover:border-pink-500/30 transition-all duration-500 
-            hover:shadow-2xl hover:shadow-pink-500/5 transform ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+        {/* Show Skeleton or Content */}
+        {isLoading ? (
+          <SkeletonLoader />
+        ) : (
+          <div
+            className={`max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-sm
+              border border-pink-500/10 hover:border-pink-500/30 transition-all duration-500
+              hover:shadow-2xl hover:shadow-pink-500/5 transform ${
+              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
             }`}
-          style={{ transitionDelay: '0.2s' }}
-        >
-          {/* === First Paragraph === */}
-          <div className="text-lg leading-relaxed mb-6 min-h-[80px] sm:min-h-[120px] relative">
-            {renderTextWithTypewriter(firstParagraph, currentIndex)}
-            {showFirstCursor && <span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>}
-          </div>
-
-          {/* === Second Paragraph === */}
-          {showSecondParagraph && (
-            <div
-              className={`text-lg leading-relaxed transition-all duration-300 relative ${showSecondParagraph ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                }`}
-            >
-              {renderTextWithTypewriter(secondParagraph, secondIndex)}
-              {showSecondCursor && <span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>}
+            style={{ transitionDelay: '0.2s' }}
+          >
+            {/* First Paragraph with Typewriter Effect */}
+            <div className="text-base leading-relaxed relative">
+              {renderTextWithTypewriter(CONTENT.firstParagraph, typewriterState.currentIndex)}
+              {showFirstCursor && (
+                <span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>
+              )}
             </div>
-          )}
 
-          {/* === Completion Indicator === */}
-          {secondIndex >= secondParagraph.length && (
-            <div className="mt-6 flex justify-center animate-fade-in">
-              <div className="flex space-x-1">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-2 h-2 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full animate-pulse"
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  />
-                ))}
+            {/* Second Paragraph with Typewriter Effect */}
+            <div className="text-base leading-relaxed relative mt-4">
+              {renderTextWithTypewriter(CONTENT.secondParagraph, typewriterState.secondIndex)}
+              {showSecondCursor && (
+                <span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>
+              )}
+            </div>
+
+            {/* Completion Indicator */}
+            {isFirstParagraphComplete && isSecondParagraphComplete && (
+              <div className="mt-6 flex justify-center animate-fade-in">
+                <div className="flex space-x-1">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-2 h-2 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full animate-pulse"
+                      style={{ animationDelay: `${i * 0.1}s` }}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
-        {/* === Decorative Shapes === */}
+        {/* Decorative Elements */}
         {isVisible && (
           <>
+            {/* Spinning Circle */}
             <div
-              className="absolute top-1/4 left-10 w-6 h-6 border-2 border-pink-500/30 rounded-full animate-spin transition-all duration-700 transform"
+              className="absolute top-1/4 left-10 w-6 h-6 border-2 border-pink-500/30 rounded-full
+                animate-spin transition-all duration-700 transform"
               style={{ transitionDelay: '0.5s', animationDuration: '6s' }}
             />
+            {/* Pulsing Dot */}
             <div
-              className="absolute bottom-1/4 right-10 w-4 h-4 bg-cyan-500/20 rounded-full animate-ping transition-all duration-700"
+              className="absolute bottom-1/4 right-10 w-4 h-4 bg-cyan-500/20 rounded-full
+                animate-ping transition-all duration-700"
               style={{ transitionDelay: '0.6s', animationDuration: '2s' }}
             />
+            {/* Rotating Square */}
             <div
-              className="absolute top-1/2 right-20 w-8 h-8 border border-cyan-500/20 rotate-45 animate-pulse transition-all duration-700"
+              className="absolute top-1/2 right-20 w-8 h-8 border border-cyan-500/20
+                rotate-45 animate-pulse transition-all duration-700"
               style={{ transitionDelay: '0.7s', animationDuration: '1.5s' }}
             />
           </>
