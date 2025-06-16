@@ -18,7 +18,7 @@
 
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import Image from "next/image"
 import { ArrowUpRight, Star, GitFork, AlertCircle, Code, Eye, Calendar, RefreshCw } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
@@ -27,40 +27,173 @@ import { BackendURL, GithubUsername, PinnedRepoApiUrl } from "@/app/utils/Links"
 import DefaultBanner from "@/app/assets/default_banner.jpg"
 import type { PinnedRepoAPI } from "@/app/lib/types"
 
-// Skeleton component for loading states
+// ===== CACHING SYSTEM =====
+class RequestCache {
+  private cache = new Map<string, { data: any; timestamp: number; promise?: Promise<any> }>();
+  private readonly TTL = 5 * 60 * 1000; // 5 minutes
+
+  async get<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+    const cached = this.cache.get(key);
+    const now = Date.now();
+
+    // Return cached data if still valid
+    if (cached && (now - cached.timestamp) < this.TTL) {
+      return cached.data;
+    }
+
+    // Return ongoing promise if request is in flight
+    if (cached?.promise) {
+      return cached.promise;
+    }
+
+    // Start new request
+    const promise = fetcher().then(data => {
+      this.cache.set(key, { data, timestamp: now });
+      return data;
+    }).catch(error => {
+      this.cache.delete(key); // Remove failed request from cache
+      throw error;
+    });
+
+    this.cache.set(key, { data: null, timestamp: now, promise });
+    return promise;
+  }
+
+  clear() {
+    this.cache.clear();
+  }
+}
+
+const requestCache = new RequestCache();
+
+// ===== OPTIMIZED IMAGE UTILITIES =====
+/**
+ * Smart image URL generation with fallback strategy
+ */
+const generateOptimalImageUrl = (repoName: string, owner: string = GithubUsername): string => {
+  // Use GitHub's OpenGraph service directly (faster than weserv.nl proxy)
+  return `https://opengraph.githubassets.com/1/${owner}/${repoName}`;
+};
+
+/**
+ * Preload critical images for better perceived performance
+ */
+const preloadCriticalImages = (projects: (PinnedProject | GitHubRepo)[], count: number = 3) => {
+  if (typeof window === 'undefined') return;
+  
+  projects.slice(0, count).forEach((project, index) => {
+    const imageUrl = 'html_url' in project 
+      ? generateOptimalImageUrl(project.name)
+      : project.image;
+    
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = imageUrl;
+    link.fetchPriority = index === 0 ? 'high' : 'low';
+    document.head.appendChild(link);
+  });
+};
+
+// ===== OPTIMIZED API FUNCTIONS =====
+/**
+ * Enhanced GitHub API fetcher with caching and error handling
+ */
+const fetchGitHubData = async (endpoint: string): Promise<any> => {
+  return requestCache.get(`github-${endpoint}`, async () => {
+    const response = await fetch(`${BackendURL}?endpoint=${endpoint}`);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+      throw new Error(errorData.error || `HTTP ${response.status}: Failed to fetch GitHub data`);
+    }
+    
+    return response.json();
+  });
+};
+
+/**
+ * Enhanced pinned repos fetcher with caching
+ */
+const fetchPinnedRepos = async (): Promise<PinnedRepoAPI[]> => {
+  return requestCache.get(`pinned-${GithubUsername}`, async () => {
+    const response = await fetch(`${PinnedRepoApiUrl}${GithubUsername}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch pinned repositories: ${response.status}`);
+    }
+    
+    return response.json();
+  });
+};
+
+/**
+ * Batch fetch repository details with intelligent fallbacks
+ */
+const fetchReposBatch = async (repos: PinnedRepoAPI[]): Promise<PinnedProject[]> => {
+  // Process repos in parallel with individual error handling
+  const results = await Promise.allSettled(
+    repos.map(async (repo): Promise<PinnedProject> => {
+      try {
+        const fullRepoData = await fetchGitHubData(`/repos/${repo.author}/${repo.name}`);
+        return {
+          name: repo.name,
+          description: fullRepoData.description || repo.description || "No description available",
+          image: generateOptimalImageUrl(repo.name, repo.author),
+          url: `https://github.com/${repo.author}/${repo.name}`,
+          stars: fullRepoData.stargazers_count || repo.stars || 0,
+          forks: fullRepoData.forks_count || repo.forks || 0,
+          issues: fullRepoData.open_issues_count || 0,
+          updated_at: fullRepoData.updated_at || repo.updated_at || null,
+        };
+      } catch (error) {
+        // Fallback to basic pinned repo data
+        console.warn(`Failed to fetch details for ${repo.name}, using basic data:`, error);
+        return {
+          name: repo.name,
+          description: repo.description || "No description available",
+          image: generateOptimalImageUrl(repo.name, repo.author),
+          url: `https://github.com/${repo.author}/${repo.name}`,
+          stars: repo.stars || 0,
+          forks: repo.forks || 0,
+          issues: 0,
+          updated_at: repo.updated_at || null,
+        };
+      }
+    })
+  );
+
+  // Extract successful results and log any failures
+  return results
+    .filter((result): result is PromiseFulfilledResult<PinnedProject> => result.status === 'fulfilled')
+    .map(result => result.value);
+};
+
+// ===== SKELETON COMPONENT =====
 const ProjectCardSkeleton = () => (
   <div className="group bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl overflow-hidden h-full flex flex-col animate-pulse">
-    {/* Project Banner Section */}
     <div className="relative w-full h-40 sm:h-44 md:h-48 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-gray-700/20 to-gray-700/10" />
     </div>
-
-    {/* Project Info Section */}
     <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow">
-      {/* Project Title */}
       <div className="h-6 bg-gray-700/50 rounded w-3/4 mb-2" />
-
-      {/* Project Description */}
       <div className="space-y-2 mb-3 sm:mb-4 flex-grow">
         <div className="h-4 bg-gray-700/50 rounded w-full" />
         <div className="h-4 bg-gray-700/50 rounded w-5/6" />
       </div>
-
-      {/* Project Meta Info */}
       <div className="flex items-center justify-between mb-3">
         <div className="h-4 bg-gray-700/50 rounded w-24" />
       </div>
-
-      {/* View Project Button */}
       <div className="mt-auto">
         <div className="h-10 bg-gray-700/50 rounded-lg w-full" />
       </div>
     </div>
   </div>
-)
+);
 
+// ===== MAIN COMPONENT =====
 const Projects = () => {
-  // === State Management ===
+  // ===== STATE MANAGEMENT =====
   const [state, setState] = useState<ProjectsState>({
     featuredProjects: [],
     recentProjects: [],
@@ -73,120 +206,79 @@ const Projects = () => {
     showAll: false
   });
 
+  const [enhancing, setEnhancing] = useState(false);
   const projectsRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // === API Functions ===
-  /**
-   * Fetches data from the custom backend API
-   * @param endpoint - The GitHub API endpoint to fetch from
-   * @returns The JSON response data
-   * @throws Error if the API request fails
-   */
-  const fetchGitHubData = async (endpoint: string): Promise<any> => {
+  // ===== OPTIMIZED DATA FETCHING =====
+  const fetchInitialData = useCallback(async () => {
     try {
-      const response = await fetch(`${BackendURL}?endpoint=${endpoint}`);
+      setState(prev => ({ ...prev, loading: true, error: null }));
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("API Error:", errorData);
-        throw new Error(errorData.error || "Failed to fetch GitHub data");
+      // Phase 1: Fetch all basic data in parallel
+      const [pinnedRepos, recentData] = await Promise.allSettled([
+        fetchPinnedRepos(),
+        fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=12`) // Get a few more initially
+      ]);
+
+      // Handle pinned repos
+      const pinnedData = pinnedRepos.status === 'fulfilled' ? pinnedRepos.value : [];
+      
+      // Handle recent repos
+      const recentRepos = recentData.status === 'fulfilled' ? recentData.value : [];
+
+      // Phase 2: Create basic featured projects (fast display)
+      const basicFeaturedProjects: PinnedProject[] = pinnedData.map(repo => ({
+        name: repo.name,
+        description: repo.description || "Loading details...",
+        image: generateOptimalImageUrl(repo.name, repo.author),
+        url: `https://github.com/${repo.author}/${repo.name}`,
+        stars: repo.stars || 0,
+        forks: repo.forks || 0,
+        issues: 0,
+        updated_at: repo.updated_at || null,
+      }));
+
+      // Show basic data immediately
+      setState(prev => ({
+        ...prev,
+        featuredProjects: basicFeaturedProjects,
+        recentProjects: recentRepos.slice(0, 6), // Show 6 initially
+        loading: false,
+        error: null
+      }));
+
+      // Preload critical images
+      preloadCriticalImages([...basicFeaturedProjects, ...recentRepos.slice(0, 3)]);
+
+      // Phase 3: Enhance featured projects in background
+      if (pinnedData.length > 0) {
+        setEnhancing(true);
+        try {
+          const enhancedProjects = await fetchReposBatch(pinnedData);
+          setState(prev => ({
+            ...prev,
+            featuredProjects: enhancedProjects
+          }));
+        } catch (error) {
+          console.warn('Failed to enhance projects, keeping basic data:', error);
+        } finally {
+          setEnhancing(false);
+        }
       }
 
-      return await response.json();
     } catch (error) {
-      console.error("GitHub API Error:", error);
-      throw error;
+      console.error('Failed to fetch initial data:', error);
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: error instanceof Error ? error.message : "Failed to fetch projects"
+      }));
     }
-  }
-
-  /**
-   * Fetches pinned repositories from the berrysauce API
-   * @returns Array of pinned repository data
-   * @throws Error if the API request fails
-   */
-  const fetchPinnedRepos = async (): Promise<PinnedRepoAPI[]> => {
-    try {
-      const response = await fetch(`${PinnedRepoApiUrl}${GithubUsername}`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch pinned repositories");
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Pinned Repos API Error:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * Converts a PinnedRepoAPI object to PinnedProject format
-   * @param pinnedRepo - The pinned repository data
-   * @returns Formatted project data
-   */
-  const convertPinnedToProject = (pinnedRepo: PinnedRepoAPI): PinnedProject => ({
-    name: pinnedRepo.name,
-    description: pinnedRepo.description || "No description available",
-    image: `https://opengraph.githubassets.com/1/${pinnedRepo.author}/${pinnedRepo.name}`,
-    url: `https://github.com/${pinnedRepo.author}/${pinnedRepo.name}`,
-    stars: pinnedRepo.stars,
-    forks: pinnedRepo.forks,
-    issues: 0,
-    updated_at: pinnedRepo.updated_at || null,
-  });
-
-  // === Data Fetching Effects ===
-  /**
-   * Fetches both featured and recent projects on component mount
-   * Handles error states and loading states
-   */
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch featured projects
-        const pinnedRepos = await fetchPinnedRepos();
-        const projectData = await Promise.all(
-          pinnedRepos.map(async (pinnedRepo) => {
-            try {
-              const fullRepoData = await fetchGitHubData(`/repos/${pinnedRepo.author}/${pinnedRepo.name}`);
-              return {
-                ...convertPinnedToProject(pinnedRepo),
-                description: fullRepoData.description || pinnedRepo.description || "No description available",
-                issues: fullRepoData.open_issues_count || 0,
-                updated_at: fullRepoData.updated_at,
-              };
-            } catch (error) {
-              console.warn(`Failed to fetch details for ${pinnedRepo.name}, using pinned data:`, error);
-              return convertPinnedToProject(pinnedRepo);
-            }
-          })
-        );
-
-        // Fetch initial recent projects
-        const recentData = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=6`);
-
-        setState(prev => ({
-          ...prev,
-          featuredProjects: projectData,
-          recentProjects: recentData,
-          loading: false,
-          error: null
-        }));
-      } catch (error) {
-        setState(prev => ({
-          ...prev,
-          loading: false,
-          error: error instanceof Error ? error.message : "Failed to fetch projects"
-        }));
-      }
-    };
-
-    fetchData();
   }, []);
 
-  // === Load More Functionality ===
-  const handleShowMore = async () => {
+  // ===== LOAD MORE FUNCTIONALITY =====
+  const handleShowMore = useCallback(async () => {
     if (state.showAll || state.allRecentProjects.length > 0) {
       setState(prev => ({ ...prev, showAll: !prev.showAll }));
       return;
@@ -194,7 +286,7 @@ const Projects = () => {
 
     setState(prev => ({ ...prev, loadingMore: true }));
     try {
-      const data = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=100`);
+      const data = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=50`); // Reduced from 100
       setState(prev => ({
         ...prev,
         allRecentProjects: data,
@@ -208,9 +300,13 @@ const Projects = () => {
         error: error instanceof Error ? error.message : "Failed to load more projects"
       }));
     }
-  };
+  }, [state.showAll, state.allRecentProjects.length]);
 
-  // === Animation Effects ===
+  // ===== EFFECTS =====
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -230,72 +326,56 @@ const Projects = () => {
     return () => observer.disconnect();
   }, []);
 
-  // === Helper Functions ===
-  /**
-   * Format date to relative time
-   */
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = Math.abs(now.getTime() - date.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  // ===== HELPER FUNCTIONS =====
+  const formatDate = useCallback((dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 1) return "1 day ago"
-    if (diffDays < 30) return `${diffDays} days ago`
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`
-    return `${Math.floor(diffDays / 365)} years ago`
-  }
+    if (diffDays === 1) return "1 day ago";
+    if (diffDays < 30) return `${diffDays} days ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return `${Math.floor(diffDays / 365)} years ago`;
+  }, []);
 
-  // === Component Sub-Components ===
-  /**
-   * ProjectCard Component
-   * Renders a single project card with image, stats, and actions
-   * @param project - The project data (either PinnedProject or GitHubRepo)
-   * @param featured - Whether this is a featured project
-   */
-  const ProjectCard = ({ project, featured = false }: { project: PinnedProject | GitHubRepo; featured?: boolean }) => {
-    // Handle different project types
-    const isGitHubRepo = "html_url" in project
-    const projectName = project.name
-    const projectDescription = project.description || "No description available"
-    const projectUrl = isGitHubRepo ? project.html_url : project.url
-    const projectStars = isGitHubRepo ? project.stargazers_count : project.stars
-    const projectForks = isGitHubRepo ? project.forks_count : project.forks
-    const projectIssues = isGitHubRepo ? project.open_issues_count : project.issues
-    const projectLanguage = isGitHubRepo ? project.language : null
-    const projectUpdated = isGitHubRepo ? project.updated_at : (project as PinnedProject).updated_at
-    const projectImage = isGitHubRepo
-      ? `https://opengraph.githubassets.com/1/${GithubUsername}/${project.name}`
-      : project.image
+  // ===== PROJECT CARD COMPONENT =====
+  const ProjectCard = useCallback(({ project, featured = false }: { project: PinnedProject | GitHubRepo; featured?: boolean }) => {
+    const isGitHubRepo = "html_url" in project;
+    const projectName = project.name;
+    const projectDescription = project.description || "No description available";
+    const projectUrl = isGitHubRepo ? project.html_url : project.url;
+    const projectStars = isGitHubRepo ? project.stargazers_count : project.stars;
+    const projectForks = isGitHubRepo ? project.forks_count : project.forks;
+    const projectIssues = isGitHubRepo ? project.open_issues_count : project.issues;
+    const projectLanguage = isGitHubRepo ? project.language : null;
+    const projectUpdated = isGitHubRepo ? project.updated_at : (project as PinnedProject).updated_at;
+    
+    const imageUrl = isGitHubRepo
+      ? generateOptimalImageUrl(project.name)
+      : (project as PinnedProject).image;
 
-    /**
-     * Handles image loading errors by adding the URL to failed images set
-     * @param imageUrl - The URL of the failed image
-     */
-    const handleImageError = (imageUrl: string) => {
+    const handleImageError = useCallback((imageUrl: string) => {
       setState(prev => ({ ...prev, failedImages: new Set([...prev.failedImages, imageUrl]) }));
-    }
+    }, []);
 
     return (
       <div className="group bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl overflow-hidden hover:border-[#00FFFF]/50 transition-all duration-300 hover:shadow-lg hover:shadow-[#00FFFF]/10 hover:-translate-y-1 h-full flex flex-col">
-        {/* Project Banner Section */}
         <div className="relative w-full h-40 sm:h-44 md:h-48 overflow-hidden">
-          {/* Project Preview Image */}
           <Image
-            src={state.failedImages.has(projectImage) ? DefaultBanner.src : projectImage}
+            src={state.failedImages.has(imageUrl) ? DefaultBanner.src : imageUrl}
             alt={`${projectName} project preview`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-            onError={() => handleImageError(projectImage)}
+            onError={() => handleImageError(imageUrl)}
             priority={featured}
             loading={featured ? "eager" : "lazy"}
+            quality={35}
           />
 
-          {/* Gradient Overlay for Better Text Visibility */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-          {/* Featured Badge */}
           {featured && (
             <div className="absolute top-2 right-2 flex items-center gap-1 bg-gradient-to-r from-[#FF1493] to-[#FF69B4] backdrop-blur-sm px-2 py-1 rounded-full text-xs">
               <Star size={10} className="text-white fill-white" />
@@ -303,7 +383,6 @@ const Projects = () => {
             </div>
           )}
 
-          {/* Language Badge */}
           {projectLanguage && (
             <div className="absolute top-2 left-2 flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full text-xs">
               <Code size={10} className="text-white" />
@@ -311,14 +390,11 @@ const Projects = () => {
             </div>
           )}
 
-          {/* Project Stats Overlay */}
           <div className="absolute bottom-2 left-2 flex items-center space-x-2 text-white/90">
-            {/* Stars Count */}
             <div className="flex items-center space-x-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full text-xs">
               <Star size={10} />
               <span className="font-medium">{projectStars}</span>
             </div>
-            {/* Forks Count */}
             <div className="flex items-center space-x-1 bg-black/50 backdrop-blur-sm px-2 py-1 rounded-full text-xs">
               <GitFork size={10} />
               <span className="font-medium">{projectForks}</span>
@@ -326,19 +402,15 @@ const Projects = () => {
           </div>
         </div>
 
-        {/* Project Info Section */}
         <div className="p-3 sm:p-4 md:p-6 flex flex-col flex-grow">
-          {/* Project Title */}
           <h3 className="text-base sm:text-lg md:text-xl font-bold mb-2 text-[#00FFFF] line-clamp-1 group-hover:text-[#00BFFF] transition-colors">
             {projectName}
           </h3>
 
-          {/* Project Description */}
           <p className="text-gray-300 mb-3 sm:mb-4 text-xs sm:text-sm leading-relaxed line-clamp-2 sm:line-clamp-3 flex-grow">
             {projectDescription}
           </p>
 
-          {/* Project Meta Info */}
           <div className="flex items-center justify-between mb-3 text-xs text-gray-400">
             {projectUpdated && (
               <div className="flex items-center space-x-1">
@@ -348,7 +420,6 @@ const Projects = () => {
             )}
           </div>
 
-          {/* View Project Button */}
           <div className="mt-auto">
             <a
               href={projectUrl}
@@ -363,10 +434,15 @@ const Projects = () => {
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  }, [state.failedImages, formatDate]);
 
-  // === Error State ===
+  // ===== MEMOIZED VALUES =====
+  const displayedRecentProjects = useMemo(() => {
+    return state.showAll ? state.allRecentProjects : state.recentProjects.slice(0, 6);
+  }, [state.showAll, state.allRecentProjects, state.recentProjects]);
+
+  // ===== ERROR STATE =====
   if (state.error) {
     return (
       <section id="projects" className="py-18 w-full">
@@ -376,67 +452,85 @@ const Projects = () => {
             <AlertCircle className="mx-auto mb-4 h-12 w-12" />
             <p className="text-lg font-medium mb-2">Oops! Something went wrong</p>
             <p className="text-sm text-gray-400">{state.error}</p>
-            <Button onClick={() => window.location.reload()} className="mt-4 bg-red-600 hover:bg-red-700">
+            <Button 
+              onClick={() => {
+                requestCache.clear();
+                fetchInitialData();
+              }} 
+              className="mt-4 bg-red-600 hover:bg-red-700"
+            >
               Try Again
             </Button>
           </div>
         </div>
       </section>
-    )
+    );
   }
 
-  // === Main Render ===
-
+  // ===== MAIN RENDER =====
   return (
     <section
       id="projects"
       ref={projectsRef}
-      className={`py-18 w-full transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}
+      className={`py-18 w-full transition-all duration-1000 ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}
     >
       <div className="container mx-auto px-4 md:px-6">
-        {/* Section Title */}
         <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text text-center">Projects</h2>
         <p className="text-gray-400 text-center mb-12 max-w-2xl mx-auto">
           Explore my latest work and contributions. From featured projects that showcase my best work
           to recent developments and experiments.
         </p>
+
+        {/* Enhanced Loading State */}
+        {enhancing && !state.loading && (
+          <div className="flex items-center justify-center mb-4">
+            <div className="flex items-center space-x-2 text-cyan-400 text-sm">
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              <span>Enhancing project details...</span>
+            </div>
+          </div>
+        )}
+
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
           <div className="relative inline-flex rounded-full bg-black/40 backdrop-blur-sm border border-cyan-500/20 p-1 shadow-lg shadow-cyan-500/10">
-            {/* Glowing moving indicator */}
             <div
-              className={`absolute top-1 bottom-1 rounded-full blur-sm bg-cyan-500/30 transition-all duration-300 ${state.activeTab === "featured"
+              className={`absolute top-1 bottom-1 rounded-full blur-sm bg-cyan-500/30 transition-all duration-300 ${
+                state.activeTab === "featured"
                   ? "left-1 w-[calc(50%-4px)]"
                   : "left-1/2 w-[calc(50%-4px)]"
-                }`}
-            ></div>
-            {/* Solid colored indicator for foreground */}
+              }`}
+            />
             <div
-              className={`absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${state.activeTab === "featured"
+              className={`absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${
+                state.activeTab === "featured"
                   ? "left-1 w-[calc(50%-4px)]"
                   : "left-1/2 w-[calc(50%-4px)]"
-                }`}
-            ></div>
+              }`}
+            />
 
             <button
               onClick={() => setState(prev => ({ ...prev, activeTab: "featured" }))}
-              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${state.activeTab === "featured"
+              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${
+                state.activeTab === "featured"
                   ? "text-black"
                   : "text-gray-400 hover:text-cyan-300"
-                }`}
+              }`}
             >
               Featured ({state.featuredProjects.length})
             </button>
 
             <button
               onClick={() => setState(prev => ({ ...prev, activeTab: "recent" }))}
-              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${state.activeTab === "recent"
+              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${
+                state.activeTab === "recent"
                   ? "text-black"
                   : "text-gray-400 hover:text-cyan-300"
-                }`}
+              }`}
             >
-              Recent ({state.showAll ? state.allRecentProjects.length : state.recentProjects.length})
+              Recent ({displayedRecentProjects.length})
             </button>
           </div>
         </div>
@@ -459,7 +553,6 @@ const Projects = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {state.activeTab === "featured" ? (
-              // Featured Projects
               state.featuredProjects.length > 0 ? (
                 state.featuredProjects.map((project) => (
                   <ProjectCard key={project.name} project={project} featured />
@@ -471,9 +564,8 @@ const Projects = () => {
                 </div>
               )
             ) : (
-              // Recent Projects - Show only 6 initially
-              (state.showAll ? state.allRecentProjects : state.recentProjects.slice(0, 6)).length > 0 ? (
-                (state.showAll ? state.allRecentProjects : state.recentProjects.slice(0, 6)).map((project) => (
+              displayedRecentProjects.length > 0 ? (
+                displayedRecentProjects.map((project) => (
                   <ProjectCard key={project.id} project={project} />
                 ))
               ) : (
@@ -486,7 +578,7 @@ const Projects = () => {
           </div>
         )}
 
-        {/* Show More/Less Button for Recent Projects */}
+        {/* Show More/Less Button */}
         {!state.loading && state.activeTab === "recent" && state.recentProjects.length >= 6 && (
           <div className="text-center mt-8">
             <Button
@@ -509,7 +601,7 @@ const Projects = () => {
         )}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Projects
+export default Projects;
