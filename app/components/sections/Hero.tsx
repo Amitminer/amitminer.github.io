@@ -1,5 +1,5 @@
 /**
- * Optimized Hero Component
+ * Hero Component
  * 
  * Features:
  * - Responsive design with smooth animations
