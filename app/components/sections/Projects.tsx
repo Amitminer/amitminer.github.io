@@ -59,7 +59,7 @@ const generateImageUrl = (repoName: string, owner: string = GithubUsername): str
 };
 
 // ===== SIMPLIFIED API FUNCTIONS =====
-const fetchWithCache = async <T>(key: string, fetcher: () => Promise<T>): Promise<T> => {
+const fetchWithCache = async function <T>(key: string, fetcher: () => Promise<T>): Promise<T> {
   const cached = cache.get<T>(key);
   if (cached) return cached;
   
