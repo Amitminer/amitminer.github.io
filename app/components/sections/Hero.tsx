@@ -48,8 +48,8 @@ const throttle = <T extends (...args: any[]) => any>(
 };
 
 // Constants
-const SCROLL_THROTTLE_DELAY = 16; // ~60fps
-const MOUSE_MOVE_THROTTLE_DELAY = 100;
+const SCROLL_THROTTLE_DELAY = 32; 
+const MOUSE_MOVE_THROTTLE_DELAY = 150;
 const ARROW_HIDE_DELAY = 2000;
 const SCROLL_THRESHOLD = 50;
 const HERO_SECTION_THRESHOLD = 0.7;
@@ -63,6 +63,7 @@ const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const arrowRef = useRef<HTMLButtonElement>(null);
   const hideArrowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastScrollY = useRef(0);
 
   // Scroll handler with throttling
   const handleScroll = useCallback(
@@ -71,6 +72,10 @@ const Hero = () => {
       const heroHeight = heroRef.current?.offsetHeight || 0;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
+      
+      // Skip processing if scroll position hasn't changed significantly
+      if (Math.abs(scrollY - lastScrollY.current) < 5) return;
+      lastScrollY.current = scrollY;
       
       const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD;
       const isNotAtBottom = scrollY + windowHeight < documentHeight - 100;
@@ -155,19 +160,38 @@ const Hero = () => {
         id="hero"
         ref={heroRef}
         className="relative min-h-screen w-full flex items-center justify-center py-16 sm:py-20 md:py-32"
+        style={{ 
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden'
+        }}
       >
         <div className="container max-w-3xl mx-auto px-4 md:px-6 flex flex-col items-center text-center">
           
           {/* Profile Image Container */}
           <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mb-6">
             {/* Animated border ring (only border rotates, not the image) */}
-            <div className="absolute inset-0 rounded-full p-0.5 bg-gradient-to-r from-[#FF1493] via-[#00FFFF] to-[#FF1493] animate-spin" 
-                 style={{ animationDuration: '3s' }}>
+            <div 
+              className="absolute inset-0 rounded-full p-0.5 bg-gradient-to-r from-[#FF1493] via-[#00FFFF] to-[#FF1493] animate-spin" 
+              style={{ 
+                animationDuration: '3s',
+                willChange: 'transform',
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden'
+              }}
+            >
               <div className="w-full h-full rounded-full bg-black"></div>
             </div>
             
             {/* Static image container */}
-            <div className="absolute inset-1 rounded-full overflow-hidden shadow-2xl shadow-[#00FFFF]/30">
+            <div 
+              className="absolute inset-1 rounded-full overflow-hidden shadow-2xl shadow-[#00FFFF]/30"
+              style={{
+                willChange: 'transform',
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden'
+              }}
+            >
               <Image
                 src={ProfileImage}
                 alt="AmitxD Profile"
@@ -181,19 +205,47 @@ const Hero = () => {
             </div>
             
             {/* Subtle glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse"></div>
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse"
+              style={{
+                willChange: 'opacity',
+                transform: 'translateZ(0)',
+                backfaceVisibility: 'hidden'
+              }}
+            ></div>
           </div>
 
           {/* Name and Title */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 gradient-text">
+          <h1 
+            className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 gradient-text"
+            style={{
+              willChange: 'transform',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden'
+            }}
+          >
             AmitxD
           </h1>
-          <p className="text-lg sm:text-xl mb-8 text-[#00FFFF]">
+          <p 
+            className="text-lg sm:text-xl mb-8 text-[#00FFFF]"
+            style={{
+              willChange: 'transform',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden'
+            }}
+          >
             Self-taught Developer
           </p>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-4">
+          <div 
+            className="flex flex-col sm:flex-row gap-4 mt-4"
+            style={{
+              willChange: 'transform',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden'
+            }}
+          >
             {/* About Me Button */}
             <Button
               className="bg-gradient-to-r from-[#FF1493] to-[#00FFFF] hover:from-[#FF1493]/80 hover:to-[#00FFFF]/80 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-[#FF1493]/20 hover:shadow-[#00FFFF]/30"
@@ -240,6 +292,11 @@ const Hero = () => {
                 ? 'opacity-100 visible animate-bounce' 
                 : 'opacity-0 invisible'
             }`}
+            style={{
+              willChange: 'transform, opacity',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden'
+            }}
           >
             <ArrowDownCircle size={28} />
           </button>

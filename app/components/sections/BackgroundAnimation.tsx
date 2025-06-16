@@ -33,9 +33,10 @@ const BackgroundAnimation = () => {
       particlesRef.current.innerHTML = ""
 
       // Create floating particles
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 8; i++) {
         const particle = document.createElement("div")
         particle.className = "particle"
+        particle.style.willChange = "transform"
 
         // Random size between 2px and 5px
         const size = Math.random() * 3 + 2
@@ -67,10 +68,11 @@ const BackgroundAnimation = () => {
 
       shapesRef.current.innerHTML = ""
 
-      // Create geometric shapes
-      for (let i = 0; i < 8; i++) {
+      // Create geometric shapes 
+      for (let i = 0; i < 6; i++) {
         const shape = document.createElement("div")
         shape.className = "floating-shape"
+        shape.style.willChange = "transform"
 
         // Random shape type
         const shapeType = Math.random()
@@ -147,10 +149,11 @@ const BackgroundAnimation = () => {
         "Arc<Mutex<T>>",
       ]
 
-      // Create floating code snippets
-      for (let i = 0; i < 6; i++) {
+      // Create floating code snippets - reduced number for better performance
+      for (let i = 0; i < 4; i++) {
         const code = document.createElement("div")
         code.className = "code-snippet"
+        code.style.willChange = "transform"
         code.textContent = codeTexts[Math.floor(Math.random() * codeTexts.length)]
 
         // Position away from center area
@@ -178,9 +181,10 @@ const BackgroundAnimation = () => {
       dotsRef.current.innerHTML = ""
 
       // Create pulsing dots
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 6; i++) {
         const dot = document.createElement("div")
         dot.className = "pulsing-dot"
+        dot.style.willChange = "transform, opacity"
 
         // Random position
         dot.style.left = `${Math.random() * 100}%`
@@ -199,13 +203,13 @@ const BackgroundAnimation = () => {
     createCodeSnippets()
     createPulsingDots()
 
-    // Recreate elements periodically for variety
+    // Recreate elements periodically for variety 
     const interval = setInterval(() => {
       createParticles()
       createFloatingShapes()
       createCodeSnippets()
       createPulsingDots()
-    }, 15000)  // Regenerate every 15 seconds
+    }, 30000)  // Regenerate every 30 seconds
 
     // Cleanup interval on unmount
     return () => clearInterval(interval)
