@@ -142,12 +142,24 @@ const Contact = () => {
 
     setState(prev => ({ ...prev, isSubmitting: true }));
 
-    // Submit form
-    await handleSubmit(e);
-
-    // Dismiss loading toast
-    if (loadingToastId.dismiss) {
-      loadingToastId.dismiss();
+    try {
+      // Submit form
+      await handleSubmit(e);
+    } catch (error) {
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+        className: "bg-gradient-to-r from-red-500 to-rose-600 text-white border-none",
+      });
+    } finally {
+      // Always clean up
+      setState(prev => ({ ...prev, isSubmitting: false }));
+      if (loadingToastId.dismiss) {
+        loadingToastId.dismiss();
+      }
     }
   };
 
