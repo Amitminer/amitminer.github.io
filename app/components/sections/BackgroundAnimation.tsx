@@ -1,240 +1,196 @@
 /**
  * BackgroundAnimation Component
  * 
- * A dynamic background animation system that creates:
- * - Floating particles with random sizes and movements
- * - Geometric shapes (squares, circles, triangles)
- * - Floating code snippets from Rust
- * - Pulsing dots with gradient effects
+ * Performance optimizations:
+ * - Reduced element count
+ * - Static elements (no DOM recreation)
+ * - CSS-only animations
+ * - Mobile-friendly performance
  */
 
 "use client"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const BackgroundAnimation = () => {
-  // === Refs for Animation Containers ===
-  const particlesRef = useRef<HTMLDivElement>(null)  // Floating particles container
-  const shapesRef = useRef<HTMLDivElement>(null)     // Geometric shapes container
-  const codeRef = useRef<HTMLDivElement>(null)       // Code snippets container
-  const dotsRef = useRef<HTMLDivElement>(null)       // Pulsing dots container
+  const [isVisible, setIsVisible] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  // === Animation Effects ===
+  // Only start animations when page is loaded and visible
   useEffect(() => {
-    /**
-     * Creates floating particles with random properties
-     * - Random size between 2px and 5px
-     * - Random position across the screen
-     * - Random animation timing
-     */
-    const createParticles = () => {
-      if (!particlesRef.current) return
-
-      // Clear existing particles
-      particlesRef.current.innerHTML = ""
-
-      // Create floating particles
-      for (let i = 0; i < 12; i++) {
-        const particle = document.createElement("div")
-        particle.className = "particle"
-
-        // Random size between 2px and 5px
-        const size = Math.random() * 3 + 2
-        particle.style.width = `${size}px`
-        particle.style.height = `${size}px`
-
-        // Random position
-        particle.style.left = `${Math.random() * 100}%`
-        particle.style.top = `${Math.random() * 100}%`
-
-        // Random animation delay
-        particle.style.animationDelay = `${Math.random() * 6}s`
-
-        // Random animation duration
-        particle.style.animationDuration = `${4 + Math.random() * 4}s`
-
-        particlesRef.current.appendChild(particle)
-      }
-    }
-
-    /**
-     * Creates floating geometric shapes
-     * - Random shape type (square, circle, triangle)
-     * - Random size and color
-     * - Positioned away from center area
-     */
-    const createFloatingShapes = () => {
-      if (!shapesRef.current) return
-
-      shapesRef.current.innerHTML = ""
-
-      // Create geometric shapes
-      for (let i = 0; i < 8; i++) {
-        const shape = document.createElement("div")
-        shape.className = "floating-shape"
-
-        // Random shape type
-        const shapeType = Math.random()
-        if (shapeType < 0.33) {
-          // Square
-          const size = Math.random() * 20 + 10
-          shape.style.width = `${size}px`
-          shape.style.height = `${size}px`
-          shape.style.borderColor = Math.random() > 0.5 ? "#ff1493" : "#00ffff"
-        } else if (shapeType < 0.66) {
-          // Circle
-          const size = Math.random() * 15 + 8
-          shape.style.width = `${size}px`
-          shape.style.height = `${size}px`
-          shape.style.borderRadius = "50%"
-          shape.style.borderColor = Math.random() > 0.5 ? "#ff1493" : "#00ffff"
-        } else {
-          // Triangle
-          const size = Math.random() * 12 + 6
-          shape.style.width = "0"
-          shape.style.height = "0"
-          shape.style.borderLeft = `${size}px solid transparent`
-          shape.style.borderRight = `${size}px solid transparent`
-          shape.style.borderBottom = `${size * 1.5}px solid ${Math.random() > 0.5 ? "#ff1493" : "#00ffff"}`
-          shape.style.border = "none"
-        }
-
-        // Position shapes away from center (avoid 30%-70% of screen width and 20%-80% of height)
-        let left, top
-        do {
-          left = Math.random() * 100
-          top = Math.random() * 100
-        } while (left > 25 && left < 75 && top > 15 && top < 85)
-
-        shape.style.left = `${left}%`
-        shape.style.top = `${top}%`
-
-        // Random animation delay
-        shape.style.animationDelay = `${Math.random() * 8}s`
-
-        shapesRef.current.appendChild(shape)
-      }
-    }
-
-    /**
-     * Creates floating code snippets from Rust
-     * - Random selection from predefined snippets
-     * - Positioned away from center area
-     * - Random animation timing
-     */
-    const createCodeSnippets = () => {
-      if (!codeRef.current) return
-
-      codeRef.current.innerHTML = ""
-      const codeTexts = [
-        "fn main() {",
-        "let mut x = 5;",
-        'println!("Hello, world!");',
-        "match result {",
-        "Some(val) => val,",
-        "None => panic!(),",
-        "impl Display for",
-        "cargo build --release",
-        "use std::collections::HashMap;",
-        "async fn fetch_data()",
-        "#[derive(Debug)]",
-        "Result<T, E>",
-        "Vec<String>",
-        "struct Point { x: f64, y: f64 }",
-        ".iter().map(|x| x * 2)",
-        "pub mod tests {",
-        "Option<T>",
-        "#[cfg(test)]",
-        ".unwrap_or_default()",
-        "Arc<Mutex<T>>",
-      ]
-
-      // Create floating code snippets
-      for (let i = 0; i < 6; i++) {
-        const code = document.createElement("div")
-        code.className = "code-snippet"
-        code.textContent = codeTexts[Math.floor(Math.random() * codeTexts.length)]
-
-        // Position away from center area
-        let left
-        do {
-          left = Math.random() * 90
-        } while (left > 20 && left < 70)
-
-        code.style.left = `${left}%`
-        code.style.animationDelay = `${Math.random() * 10}s`
-        code.style.animationDuration = `${8 + Math.random() * 4}s`
-
-        codeRef.current.appendChild(code)
-      }
-    }
-
-    /**
-     * Creates pulsing dots with gradient effects
-     * - Random position across the screen
-     * - Random animation timing
-     */
-    const createPulsingDots = () => {
-      if (!dotsRef.current) return
-
-      dotsRef.current.innerHTML = ""
-
-      // Create pulsing dots
-      for (let i = 0; i < 10; i++) {
-        const dot = document.createElement("div")
-        dot.className = "pulsing-dot"
-
-        // Random position
-        dot.style.left = `${Math.random() * 100}%`
-        dot.style.top = `${Math.random() * 100}%`
-
-        // Random animation delay
-        dot.style.animationDelay = `${Math.random() * 3}s`
-
-        dotsRef.current.appendChild(dot)
-      }
-    }
-
-    // Initial creation of all animation elements
-    createParticles()
-    createFloatingShapes()
-    createCodeSnippets()
-    createPulsingDots()
-
-    // Recreate elements periodically for variety
-    const interval = setInterval(() => {
-      createParticles()
-      createFloatingShapes()
-      createCodeSnippets()
-      createPulsingDots()
-    }, 15000)  // Regenerate every 15 seconds
-
-    // Cleanup interval on unmount
-    return () => clearInterval(interval)
+    const timer = setTimeout(() => setIsVisible(true), 1000)
+    return () => clearTimeout(timer)
   }, [])
 
-  // === Render ===
+  // Rust code snippets (keeping as requested)
+  const rustCodeSnippets = [
+    "fn main() {",
+    "let mut x = 5;",
+    'println!("Hello!");',
+    "match result {",
+    "Some(val) => val,",
+    "impl Display for",
+    "use std::collections;",
+    "async fn fetch()",
+    "#[derive(Debug)]",
+    "Result<T, E>",
+    "Vec<String>",
+    "Option<T>",
+  ]
+
+  if (!isVisible) {
+    return (
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800" />
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden">
-      {/* Grid Pattern Background */}
-      <div className="grid-pattern" />
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 pointer-events-none overflow-hidden"
+    >
+      {/* Simplified Grid Pattern */}
+      <div className="absolute inset-0 opacity-20">
+        <div 
+          className="w-full h-full"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
+      </div>
 
-      {/* Wave Animation Layer */}
-      <div className="wave-animation" />
+      {/* Static Floating Particles (CSS only animation) */}
+      <div className="absolute inset-0">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={`particle-${i}`}
+            className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float ${4 + Math.random() * 4}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 4}s`
+            }}
+          />
+        ))}
+      </div>
 
-      {/* Floating Particles Layer */}
-      <div ref={particlesRef} className="floating-particles" />
+      {/* Static Geometric Shapes */}
+      <div className="absolute inset-0">
+        {[...Array(5)].map((_, i) => {
+          const shapeType = i % 3
+          const size = 8 + Math.random() * 12
+          const isLeft = Math.random() > 0.5
+          const isTop = Math.random() > 0.5
+          
+          return (
+            <div
+              key={`shape-${i}`}
+              className="absolute opacity-30"
+              style={{
+                left: isLeft ? `${Math.random() * 25}%` : `${75 + Math.random() * 25}%`,
+                top: isTop ? `${Math.random() * 30}%` : `${70 + Math.random() * 30}%`,
+                animation: `spin ${8 + Math.random() * 4}s linear infinite`,
+                animationDelay: `${Math.random() * 6}s`
+              }}
+            >
+              {shapeType === 0 && (
+                <div 
+                  className="border border-cyan-400"
+                  style={{ width: size, height: size }}
+                />
+              )}
+              {shapeType === 1 && (
+                <div 
+                  className="border border-pink-500 rounded-full"
+                  style={{ width: size, height: size }}
+                />
+              )}
+              {shapeType === 2 && (
+                <div 
+                  style={{
+                    width: 0,
+                    height: 0,
+                    borderLeft: `${size/2}px solid transparent`,
+                    borderRight: `${size/2}px solid transparent`,
+                    borderBottom: `${size}px solid rgba(255, 20, 147, 0.6)`
+                  }}
+                />
+              )}
+            </div>
+          )
+        })}
+      </div>
 
-      {/* Geometric Shapes Layer */}
-      <div ref={shapesRef} className="floating-shapes" />
+      {/* Static Rust Code Snippets */}
+      <div className="absolute inset-0">
+        {rustCodeSnippets.slice(0, 4).map((code, i) => {
+          const isLeft = i % 2 === 0
+          return (
+            <div
+              key={`code-${i}`}
+              className="absolute text-xs font-mono text-cyan-300/40 whitespace-nowrap select-none"
+              style={{
+                left: isLeft ? `${Math.random() * 20}%` : `${80 + Math.random() * 15}%`,
+                top: `${20 + i * 20 + Math.random() * 10}%`,
+                animation: `fadeSlide ${6 + Math.random() * 4}s ease-in-out infinite`,
+                animationDelay: `${i * 2}s`
+              }}
+            >
+              {code}
+            </div>
+          )
+        })}
+      </div>
 
-      {/* Code Snippets Layer */}
-      <div ref={codeRef} className="floating-shapes" />
+      {/* Static Pulsing Dots */}
+      <div className="absolute inset-0">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={`dot-${i}`}
+            className="absolute w-2 h-2 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full opacity-50"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `pulse ${2 + Math.random() * 2}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 3}s`
+            }}
+          />
+        ))}
+      </div>
 
-      {/* Pulsing Dots Layer */}
-      <div ref={dotsRef} className="floating-shapes" />
+      {/* Subtle Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-pink-500/5 to-cyan-500/5" />
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-[#FF1493]/3 to-[#00FFFF]/3" />
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-10px) translateX(5px); }
+          50% { transform: translateY(-5px) translateX(-5px); }
+          75% { transform: translateY(-15px) translateX(3px); }
+        }
+        
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.2); }
+        }
+        
+        @keyframes fadeSlide {
+          0%, 100% { opacity: 0.2; transform: translateX(0px); }
+          50% { opacity: 0.6; transform: translateX(10px); }
+        }
+      `}</style>
     </div>
   )
 }
