@@ -66,7 +66,7 @@ class RequestCache {
 
 const requestCache = new RequestCache();
 
-// ===== OPTIMIZED IMAGE UTILITIES =====
+// ===== IMAGE UTILITIES =====
 /**
  * Smart image URL generation with fallback strategy
  */
@@ -80,13 +80,13 @@ const generateOptimalImageUrl = (repoName: string, owner: string = GithubUsernam
  */
 const preloadCriticalImages = (projects: (PinnedProject | GitHubRepo)[], count: number = 3) => {
   if (typeof window === 'undefined') return;
-  
+
   projects.slice(0, count).forEach((project, index) => {
-    const imageUrl = 'html_url' in project 
+    const imageUrl = 'html_url' in project
       ? generateOptimalImageUrl(project.name)
       : project.image;
-    
-    const link = document.createElement('link');
+
+    const link = document.createElement('link') as HTMLLinkElement & { fetchPriority?: string };
     link.rel = 'preload';
     link.as = 'image';
     link.href = imageUrl;
@@ -95,19 +95,19 @@ const preloadCriticalImages = (projects: (PinnedProject | GitHubRepo)[], count: 
   });
 };
 
-// ===== OPTIMIZED API FUNCTIONS =====
+// ===== API FUNCTIONS =====
 /**
  * Enhanced GitHub API fetcher with caching and error handling
  */
 const fetchGitHubData = async (endpoint: string): Promise<any> => {
   return requestCache.get(`github-${endpoint}`, async () => {
     const response = await fetch(`${BackendURL}?endpoint=${endpoint}`);
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Network error' }));
       throw new Error(errorData.error || `HTTP ${response.status}: Failed to fetch GitHub data`);
     }
-    
+
     return response.json();
   });
 };
@@ -118,11 +118,11 @@ const fetchGitHubData = async (endpoint: string): Promise<any> => {
 const fetchPinnedRepos = async (): Promise<PinnedRepoAPI[]> => {
   return requestCache.get(`pinned-${GithubUsername}`, async () => {
     const response = await fetch(`${PinnedRepoApiUrl}${GithubUsername}`);
-    
+
     if (!response.ok) {
       throw new Error(`Failed to fetch pinned repositories: ${response.status}`);
     }
-    
+
     return response.json();
   });
 };
@@ -210,7 +210,7 @@ const Projects = () => {
   const projectsRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // ===== OPTIMIZED DATA FETCHING =====
+  // ===== DATA FETCHING =====
   const fetchInitialData = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
@@ -223,7 +223,7 @@ const Projects = () => {
 
       // Handle pinned repos
       const pinnedData = pinnedRepos.status === 'fulfilled' ? pinnedRepos.value : [];
-      
+
       // Handle recent repos
       const recentRepos = recentData.status === 'fulfilled' ? recentData.value : [];
 
@@ -350,7 +350,7 @@ const Projects = () => {
     const projectIssues = isGitHubRepo ? project.open_issues_count : project.issues;
     const projectLanguage = isGitHubRepo ? project.language : null;
     const projectUpdated = isGitHubRepo ? project.updated_at : (project as PinnedProject).updated_at;
-    
+
     const imageUrl = isGitHubRepo
       ? generateOptimalImageUrl(project.name)
       : (project as PinnedProject).image;
@@ -452,11 +452,11 @@ const Projects = () => {
             <AlertCircle className="mx-auto mb-4 h-12 w-12" />
             <p className="text-lg font-medium mb-2">Oops! Something went wrong</p>
             <p className="text-sm text-gray-400">{state.error}</p>
-            <Button 
+            <Button
               onClick={() => {
                 requestCache.clear();
                 fetchInitialData();
-              }} 
+              }}
               className="mt-4 bg-red-600 hover:bg-red-700"
             >
               Try Again
@@ -472,9 +472,8 @@ const Projects = () => {
     <section
       id="projects"
       ref={projectsRef}
-      className={`py-18 w-full transition-all duration-1000 ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      }`}
+      className={`py-18 w-full transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
     >
       <div className="container mx-auto px-4 md:px-6">
         <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text text-center">Projects</h2>
@@ -497,38 +496,34 @@ const Projects = () => {
         <div className="flex justify-center mb-8">
           <div className="relative inline-flex rounded-full bg-black/40 backdrop-blur-sm border border-cyan-500/20 p-1 shadow-lg shadow-cyan-500/10">
             <div
-              className={`absolute top-1 bottom-1 rounded-full blur-sm bg-cyan-500/30 transition-all duration-300 ${
-                state.activeTab === "featured"
+              className={`absolute top-1 bottom-1 rounded-full blur-sm bg-cyan-500/30 transition-all duration-300 ${state.activeTab === "featured"
                   ? "left-1 w-[calc(50%-4px)]"
                   : "left-1/2 w-[calc(50%-4px)]"
-              }`}
+                }`}
             />
             <div
-              className={`absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${
-                state.activeTab === "featured"
+              className={`absolute top-1 bottom-1 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-all duration-300 ${state.activeTab === "featured"
                   ? "left-1 w-[calc(50%-4px)]"
                   : "left-1/2 w-[calc(50%-4px)]"
-              }`}
+                }`}
             />
 
             <button
               onClick={() => setState(prev => ({ ...prev, activeTab: "featured" }))}
-              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${
-                state.activeTab === "featured"
+              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${state.activeTab === "featured"
                   ? "text-black"
                   : "text-gray-400 hover:text-cyan-300"
-              }`}
+                }`}
             >
               Featured ({state.featuredProjects.length})
             </button>
 
             <button
               onClick={() => setState(prev => ({ ...prev, activeTab: "recent" }))}
-              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${
-                state.activeTab === "recent"
+              className={`relative z-10 px-4 py-2 rounded-full transition-all duration-300 font-semibold text-sm ${state.activeTab === "recent"
                   ? "text-black"
                   : "text-gray-400 hover:text-cyan-300"
-              }`}
+                }`}
             >
               Recent ({displayedRecentProjects.length})
             </button>
