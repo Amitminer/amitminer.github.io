@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_LOCAL_BACKEND_URL: ${{ secrets.BACKEND_URL }}
+      NEXT_PUBLIC_BACKEND_URL: ${{ secrets.BACKEND_URL }}
       NEXT_PUBLIC_FORMSPREE_FORM_ID: ${{ secrets.FORMSPREE_FORM_ID }}
     steps:
       - name: Checkout

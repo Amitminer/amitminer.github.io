@@ -95,7 +95,6 @@ const BackgroundAnimation = () => {
           shape.style.borderLeft = `${size}px solid transparent`
           shape.style.borderRight = `${size}px solid transparent`
           shape.style.borderBottom = `${size * 1.5}px solid ${Math.random() > 0.5 ? "#ff1493" : "#00ffff"}`
-          shape.style.border = "none"
         }
 
         // Position shapes away from center (avoid 30%-70% of screen width and 20%-80% of height)

@@ -35,24 +35,46 @@ const Header = () => {
 
   // Detect scroll to change header style and active section
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const scrollPosition = window.scrollY;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollPosition = window.scrollY;
+          let nextActiveSection = '';
+          let isScrolled = scrollPosition > 20;
 
-      // Update scrolled state
-      setState(prev => ({ ...prev, scrolled: scrollPosition > 20 }));
+          // Find active section
+          const sections = document.querySelectorAll('section[id]');
+          for (const section of sections) {
+            const sectionElement = section as HTMLElement;
+            const sectionTop = sectionElement.offsetTop - 100;
+            const sectionHeight = sectionElement.offsetHeight;
+            const sectionId = section.getAttribute('id') || '';
 
-      // Update active section
-      const sections = document.querySelectorAll('section[id]');
-      sections.forEach(section => {
-        const sectionElement = section as HTMLElement;
-        const sectionTop = sectionElement.offsetTop - 100;
-        const sectionHeight = sectionElement.offsetHeight;
-        const sectionId = section.getAttribute('id') || '';
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+              nextActiveSection = sectionId;
+              break;
+            }
+          }
 
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-          setState(prev => ({ ...prev, activeSection: sectionId }));
-        }
-      });
+          // Update state only if changed
+          setState(prev => {
+            if (prev.scrolled === isScrolled && prev.activeSection === nextActiveSection) {
+              return prev;
+            }
+            return {
+              ...prev,
+              scrolled: isScrolled,
+              activeSection: nextActiveSection
+            };
+          });
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
     };
 
     window.addEventListener('scroll', handleScroll);

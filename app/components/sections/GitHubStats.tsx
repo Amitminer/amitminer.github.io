@@ -146,8 +146,6 @@ const GitHubStatsComponent = () => {
         signal: controller.signal,
       })
 
-      clearTimeout(timeoutId)
-
       if (!response.ok) {
         const errorText = await response.text()
         throw new Error(`API Error ${response.status}: ${errorText}`)
@@ -155,11 +153,12 @@ const GitHubStatsComponent = () => {
 
       return response.json()
     } catch (error: unknown) {
-      clearTimeout(timeoutId)
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('Request timeout - API is taking too long')
       }
       throw error instanceof Error ? error : new Error('Unknown fetch error')
+    } finally {
+      clearTimeout(timeoutId)
     }
   }, [BackendURL])
 

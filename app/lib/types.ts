@@ -58,10 +58,66 @@ export interface GitHubRepoInfo {
   }
 }
 
+export interface PushEventPayload {
+  commits?: Array<{
+    sha: string;
+    message: string;
+    author: {
+      name: string;
+      email: string;
+    };
+  }>;
+  ref?: string;
+  head?: string;
+  before?: string;
+}
+
+export interface IssueEventPayload {
+  action: string;
+  issue: {
+    number: number;
+    title: string;
+    state: string;
+  };
+}
+
+export interface PullRequestEventPayload {
+  action: string;
+  pull_request: {
+    number: number;
+    title: string;
+    state: string;
+    merged: boolean;
+  };
+}
+
+export interface CreateEventPayload {
+  ref: string;
+  ref_type: string;
+  master_branch: string;
+  description: string;
+}
+
+export interface DeleteEventPayload {
+  ref: string;
+  ref_type: string;
+}
+
+export interface ForkEventPayload {
+  forkee: {
+    full_name: string;
+    html_url: string;
+  };
+}
+
+export interface WatchEventPayload {
+  action: string;
+}
+
 export interface GitHubEvent {
-  type: string
-  created_at: string
-  payload: any
+  type: string;
+  created_at: string;
+  payload: PushEventPayload | IssueEventPayload | PullRequestEventPayload | CreateEventPayload | DeleteEventPayload | ForkEventPayload | WatchEventPayload;
 }
 
 export interface StatCardProps {

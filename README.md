@@ -11,10 +11,13 @@ npm install
 
 2. Set up environment variables:
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 # Edit .env.local with your values:
-# - NEXT_PUBLIC_GITHUB_TOKEN: Get from https://github.com/settings/tokens
-# - NEXT_PUBLIC_FORMSPREE_ID: Get from your Formspree form settings
+# Required Environment Variables:
+- NEXT_PUBLIC_BACKEND_URL=http://your-api-endpoint.com/api/github
+    # Your backend API server URL
+- NEXT_PUBLIC_FORMSPREE_FORM_ID=your-form-id
+    # Form ID from Formspree dashboard settings
 ```
 
 3. Run development server:

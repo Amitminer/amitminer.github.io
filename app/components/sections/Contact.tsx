@@ -143,7 +143,7 @@ const Contact = () => {
       title: "Sending...",
       description: "Please wait while we send your message.",
       className: "bg-gradient-to-r from-blue-500 to-purple-600 text-white border-none",
-      duration: Infinity,
+      duration: 10000, // 10 seconds timeout
     });
 
     setState(prev => ({ ...prev, isSubmitting: true }));

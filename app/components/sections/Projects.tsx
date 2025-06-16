@@ -238,9 +238,17 @@ const Projects = () => {
     const date = new Date(dateString)
     const now = new Date()
     const diffTime = Math.abs(now.getTime() - date.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const diffMinutes = Math.floor(diffTime / (1000 * 60))
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
 
-    if (diffDays === 1) return "1 day ago"
+    if (diffMinutes < 60) {
+      return diffMinutes === 0 ? "Just now" : `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`
+    }
+    if (diffHours < 24) {
+      return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`
+    }
+    if (diffDays === 1) return "Yesterday"
     if (diffDays < 30) return `${diffDays} days ago`
     if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`
     return `${Math.floor(diffDays / 365)} years ago`

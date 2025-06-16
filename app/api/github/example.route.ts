@@ -101,15 +101,23 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Endpoint parameter required' }, { status: 400 });
     }
 
-    if (!endpoint.startsWith('/')) {
-        return NextResponse.json({ error: 'Endpoint must start with /' }, { status: 400 });
+    // Enhanced validation rules
+    const allowedPrefixes = ['/users', '/repos', '/search', '/orgs'];
+    const hasValidPrefix = allowedPrefixes.some(prefix => endpoint.startsWith(prefix));
+    const hasInvalidChars = endpoint.includes('..') || /[\x00-\x1F\x7F]/.test(endpoint);
+
+    if (!hasValidPrefix || hasInvalidChars) {
+        return NextResponse.json({ 
+            error: 'Invalid endpoint. Must start with /users, /repos, /search, or /orgs and not contain invalid characters.' 
+        }, { status: 400 });
     }
 
     const shouldUseCache = cacheParam === 'true' || cacheParam === 'skills';
 
     try {
         if (shouldUseCache) {
-            const cachedData = cacheManager.get(endpoint);
+            const cacheKey = `${endpoint}:${cacheParam}`;
+            const cachedData = cacheManager.get(cacheKey);
             if (cachedData) {
                 return NextResponse.json(cachedData);
             }
@@ -166,9 +174,10 @@ export async function GET(request: NextRequest) {
         const data = await response.json();
 
         if (shouldUseCache) {
-            const cacheSuccess = cacheManager.set(endpoint, data);
+            const cacheKey = `${endpoint}:${cacheParam}`;
+            const cacheSuccess = cacheManager.set(cacheKey, data);
             if (!cacheSuccess) {
-                console.warn(`Failed to cache data for endpoint: ${endpoint} - Data too large`);
+                console.warn(`Failed to cache data for endpoint: ${cacheKey} - Data too large`);
             }
         }
 

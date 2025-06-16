@@ -18,6 +18,7 @@ const VisitorCounter = () => {
   const [count, setCount] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState(false);
   const hasRun = useRef(false);
+  const isMounted = useRef(true);
   
   const counterId = GithubUsername;
   const SESSION_KEY = `visitor_${counterId}`;
@@ -53,8 +54,10 @@ const VisitorCounter = () => {
       
       // If we already fetched this session, don't fetch again
       if (sessionData?.fetched) {
-        setCount(sessionData.count);
-        setIsUpdating(false);
+        if (isMounted.current) {
+          setCount(sessionData.count);
+          setIsUpdating(false);
+        }
         return;
       }
 
@@ -74,20 +77,28 @@ const VisitorCounter = () => {
         const apiCount = data?.count || 0;
         
         // API auto-incremented, so this is our new count
-        setCount(apiCount);
-        setSessionData(apiCount, true);
+        if (isMounted.current) {
+          setCount(apiCount);
+          setSessionData(apiCount, true);
+        }
       } else {
         // Fallback to cached or estimated
         const fallbackCount = sessionData?.count || Math.floor(Math.random() * 100) + 50;
-        setCount(fallbackCount);
+        if (isMounted.current) {
+          setCount(fallbackCount);
+        }
       }
     } catch (error) {
       // Use cached data or show estimated count
       const sessionData = getSessionData();
       const fallbackCount = sessionData?.count || Math.floor(Math.random() * 100) + 50;
-      setCount(fallbackCount);
+      if (isMounted.current) {
+        setCount(fallbackCount);
+      }
     } finally {
-      setIsUpdating(false);
+      if (isMounted.current) {
+        setIsUpdating(false);
+      }
     }
   };
 
@@ -115,6 +126,9 @@ const VisitorCounter = () => {
       fetchCount();
     }, 100);
 
+    return () => {
+      isMounted.current = false;
+    };
   }, [counterId]);
 
   return (
