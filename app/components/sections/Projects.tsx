@@ -1,13 +1,19 @@
 /**
- * Performance Optimized Projects Component
+ * Projects Component
  * 
- * Key optimizations for mobile performance:
- * - Reduced re-renders with proper memoization
- * - Throttled scroll events and intersection observer
- * - Simplified animations and transitions
- * - Optimized image loading strategy
- * - Reduced DOM complexity
- * - Better state management
+ * A dynamic projects showcase section that displays:
+ * - Featured projects (pinned repositories)
+ * - Recent projects from GitHub
+ * 
+ * Features:
+ * - Tabbed interface for featured/recent projects
+ * - Project cards with GitHub stats
+ * - Lazy loading images with fallback
+ * - Intersection Observer animations
+ * - Error handling and loading states
+ * - Responsive grid layout
+ * - Shows all recent projects (not limited to 6)
+ * - Enhanced UI with better visual feedback
  */
 
 "use client"
@@ -53,7 +59,7 @@ class SimpleCache {
 
 const cache = new SimpleCache();
 
-// ===== OPTIMIZED IMAGE UTILITIES =====
+// ===== IMAGE UTILITIES =====
 const generateImageUrl = (repoName: string, owner: string = GithubUsername): string => {
   return `https://opengraph.githubassets.com/1/${owner}/${repoName}`;
 };
@@ -97,7 +103,7 @@ const ProjectCardSkeleton = memo(() => (
   </div>
 ));
 
-// ===== OPTIMIZED PROJECT CARD =====
+// ===== PROJECT CARD =====
 const ProjectCard = memo(({ project, featured = false }: { project: PinnedProject | GitHubRepo; featured?: boolean }) => {
   const [imageError, setImageError] = useState(false);
   
