@@ -143,6 +143,7 @@ const ProjectCard = memo(({ project, featured = false }: { project: PinnedProjec
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           onError={() => setImageError(true)}
           priority={featured}
+          decoding="async"
           loading={featured ? "eager" : "lazy"}
           quality={75}
         />

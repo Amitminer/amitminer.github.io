@@ -34,18 +34,27 @@
     overflow-x: hidden;
     scroll-behavior: smooth;
     overscroll-behavior: none;
+    background-color: rgb(15, 10, 25);
   }
-}
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(135deg, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.011em;
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: linear-gradient(135deg, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
+    background-attachment: fixed;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+    margin: 0;
+    padding: 0;
+  }
+
+  #root {
+    min-height: 100vh;
+    background: transparent;
+  }
 }
 
 @layer components {
@@ -54,7 +63,7 @@ body {
   }
 
   .nav-link {
-    @apply relative px-3 py-2 transition-all duration-300 hover:text-[#00FFFF];
+    @apply relative px-3 py-2 transition-colors duration-300 hover:text-[#00FFFF];
   }
 
   .nav-link::after {
@@ -82,16 +91,17 @@ body {
   }
 
   .loading-shimmer {
-    @apply animate-pulse bg-gradient-to-r from-secondary/50 via-secondary/30 to-secondary/50 bg-[length:200%_100%];
-    animation: shimmer 1.5s infinite;
+    background: linear-gradient(90deg, rgba(255, 20, 147, 0.1) 25%, rgba(0, 255, 255, 0.05) 50%, rgba(255, 20, 147, 0.1) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
   }
 
   /* Skeleton loading components */
   .skeleton {
-    @apply animate-pulse bg-gradient-to-r from-gray-300/20 to-gray-300/10 rounded;
     background: linear-gradient(90deg, rgba(255, 20, 147, 0.1) 25%, rgba(0, 255, 255, 0.05) 50%, rgba(255, 20, 147, 0.1) 75%);
     background-size: 200% 100%;
     animation: skeletonShimmer 2s ease-in-out infinite;
+    @apply rounded;
   }
 
   .skeleton-image {
@@ -109,82 +119,9 @@ body {
   .skeleton-button {
     @apply skeleton h-12 w-full rounded-lg;
   }
-
-  /* New background animation classes */
-  .floating-particles {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 0;
-  }
-
-  .particle {
-    position: absolute;
-    background: linear-gradient(45deg, #ff1493, #00ffff);
-    border-radius: 50%;
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .grid-pattern {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: gridMove 20s linear infinite;
-    z-index: 0;
-  }
-
-  .wave-animation {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, transparent 30%, rgba(255, 20, 147, 0.1) 50%, transparent 70%);
-    animation: wave 8s ease-in-out infinite;
-    z-index: 0;
-  }
-
-  .floating-shapes {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: -1;
-  }
-
-  .floating-shape {
-    position: absolute;
-    border: 1px solid;
-    animation: floatShape 8s ease-in-out infinite;
-    opacity: 0.4;
-  }
-
-  .code-snippet {
-    position: absolute;
-    font-family: "Courier New", monospace;
-    font-size: 12px;
-    color: #00ffff;
-    opacity: 0.2;
-    animation: codeFloat 10s linear infinite;
-  }
-
-  .pulsing-dot {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: radial-gradient(circle, #ff1493, transparent);
-    border-radius: 50%;
-    animation: pulse 3s ease-in-out infinite;
-  }
 }
 
-/* Animations */
+/* Lightweight animations - CPU friendly */
 @keyframes shimmer {
   0% {
     background-position: 200% 0;
@@ -194,7 +131,6 @@ body {
   }
 }
 
-/* New skeleton shimmer animation with cyberpunk colors */
 @keyframes skeletonShimmer {
   0% {
     background-position: 200% 0;
@@ -204,7 +140,6 @@ body {
   }
 }
 
-/* Enhanced fade-in animation with transform */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -243,77 +178,35 @@ body {
     width: 0;
   }
   to {
-    width: 6rem; /* 24 in Tailwind */
+    width: 6rem;
   }
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 0.7;
+/* Simple float animation  */
+@keyframes simpleFloat {
+  0%, 100% {
+    opacity: 0.4;
   }
   50% {
-    transform: translateY(-20px) rotate(180deg);
-    opacity: 1;
+    opacity: 0.8;
   }
 }
 
-@keyframes gridMove {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(50px, 50px);
-  }
-}
-
-@keyframes wave {
-  0%,
-  100% {
-    transform: translateX(-100%) skewX(0deg);
-  }
-  50% {
-    transform: translateX(100%) skewX(5deg);
-  }
-}
-
-@keyframes floatShape {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
+@keyframes simplePulse {
+  0%, 100% {
     opacity: 0.3;
   }
   50% {
-    transform: translateY(-30px) rotate(180deg);
     opacity: 0.7;
   }
 }
 
-@keyframes codeFloat {
-  0% {
-    transform: translateY(100vh) translateX(0);
-    opacity: 0;
+@keyframes simpleFade {
+  0%, 100% {
+    opacity: 0.2;
   }
-  10%,
-  90% {
-    opacity: 0.3;
-  }
-  100% {
-    transform: translateY(-100px) translateX(50px);
-    opacity: 0;
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
+  50% {
     opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 1;
   }
 }
 
@@ -372,7 +265,6 @@ body {
   animation: expandWidth 1s ease-out 0.5s both;
 }
 
-/* New skeleton and loading animation classes */
 .animate-fade-in {
   animation: fadeIn 0.6s ease-out forwards;
 }
@@ -436,16 +328,18 @@ body {
     @apply p-3;
   }
 
-  .particle {
-    animation-duration: 4s;
-  }
-
-  .wave-animation {
-    animation-duration: 6s;
-  }
-
-  /* Faster skeleton animations on mobile for better UX */
   .skeleton {
     animation-duration: 1.5s;
+  }
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

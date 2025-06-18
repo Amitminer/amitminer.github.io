@@ -13,8 +13,8 @@ npm install
 ```bash
 cp .env.example .env.local
 # Edit .env.local with your values:
-# - NEXT_PUBLIC_GITHUB_TOKEN: Get from https://github.com/settings/tokens
-# - NEXT_PUBLIC_FORMSPREE_ID: Get from your Formspree form settings
+# - NEXT_PUBLIC_BACKEND_URL: GitHub proxy backend API URL (e.g., http://localhost:8000/api/github)
+# - NEXT_PUBLIC_FORMSPREE_FORM_ID: Get this from your Formspree form settings
 ```
 
 3. Run development server:
