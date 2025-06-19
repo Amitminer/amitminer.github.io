@@ -76,7 +76,7 @@ const fetchWithCache = async function <T>(key: string, fetcher: () => Promise<T>
 
 const fetchGitHubData = async (endpoint: string): Promise<any> => {
   return fetchWithCache(`github-${endpoint}`, async () => {
-    const response = await fetch(`${BackendURL}?endpoint=${endpoint}`);
+    const response = await fetch(`${BackendURL}/v2/?endpoint=${endpoint}`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
   });

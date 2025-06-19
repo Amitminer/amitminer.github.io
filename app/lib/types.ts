@@ -12,6 +12,7 @@ export interface HeaderState {
 
 // GithubStats Component Types
 export interface GitHubStats {
+  cacheAge: number
   totalStars: number
   totalForks: number
   totalRepos: number

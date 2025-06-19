@@ -91,7 +91,10 @@ class CacheManager {
 }
 
 const cacheManager = new CacheManager();
-
+/**
+ * @deprecated This endpoint is deprecated and will be removed in a future version.
+ * Please use the new GitHub AProxy PI endpoint instead. url: https://github.com/amitxd75/github-api-backend
+ */
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const endpoint = searchParams.get('endpoint');

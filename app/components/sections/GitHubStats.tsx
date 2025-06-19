@@ -11,7 +11,7 @@
 
 "use client"
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import {
   GitFork,
   Code,
@@ -20,19 +20,7 @@ import {
   AlertCircle,
 } from "lucide-react"
 import { BackendURL, GithubUsername } from "@/app/utils/Links"
-import type { GitHubStats, GitHubEvent, CachedData, DetailCardProps, StatCardProps, CacheUtils, GitHubRepoInfo } from "@/app/lib/types"
-
-// Constants
-const REPOS_PER_PAGE = 80;
-const EVENTS_PER_PAGE = 80;
-const LOADING_STEPS = {
-  INITIAL: 10,
-  CORE_DATA: 20,
-  REPO_PROCESS: 50,
-  REPO_STATS: 70,
-  FINAL_DATA: 90,
-  COMPLETE: 100
-};
+import type { GitHubStats, DetailCardProps, StatCardProps } from "@/app/lib/types"
 
 // Skeleton Components
 const StatCardSkeleton = () => (
@@ -95,319 +83,89 @@ const GitHubStatsComponent = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [loadingProgress, setLoadingProgress] = useState(0)
   const statsRef = useRef<HTMLDivElement>(null)
 
   const GITHUB_USERNAME = GithubUsername
-  const CACHE_KEY = "github_stats_cache"
-  const CACHE_DURATION = 10 * 60 * 1000
 
-  // Memoized cache utilities
-  const cacheUtils: CacheUtils = useMemo(() => ({
-    isValid: (timestamp: number): boolean => Date.now() - timestamp < CACHE_DURATION,
-
-    get: (): GitHubStats | null => {
-      try {
-        const cached = localStorage.getItem(CACHE_KEY)
-        if (cached) {
-          const parsedCache: CachedData = JSON.parse(cached)
-          if (Date.now() - parsedCache.timestamp < CACHE_DURATION) {
-            return parsedCache.data
-          }
-        }
-      } catch (error) {
-        console.error("Cache read error:", error)
-      }
-      return null
-    },
-
-    set: (data: GitHubStats): void => {
-      try {
-        const cacheData: CachedData = { data, timestamp: Date.now() }
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData))
-      } catch (error) {
-        console.error("Cache write error:", error)
-      }
-    }
-  }), [CACHE_KEY, CACHE_DURATION])
-
-  // Optimized API fetch with better error handling and timeout
-  const fetchFromAPI = useCallback(async (endpoint: string, timeout = 8000): Promise<any> => {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), timeout)
-
+  // Fetch stats from backend
+  const fetchGitHubStats = useCallback(async (force = false) => {
+    setLoading(true)
+    setError(null)
     try {
-      const response = await fetch(`${BackendURL}?endpoint=${endpoint}&cache=true`, {
+      const url = `${BackendURL}/v2/stats?username=${GITHUB_USERNAME}${force ? "&force=true" : ""}`
+      const response = await fetch(url, {
         headers: {
-          "Cache-Control": "max-age=300", // 5 minutes browser cache
           "Accept": "application/json",
-          "Referrer-Policy": "strict-origin-when-cross-origin"
         },
-        signal: controller.signal,
       })
-
-      clearTimeout(timeoutId)
-
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`API Error ${response.status}: ${errorText}`)
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to fetch GitHub stats')
       }
-
-      return response.json()
-    } catch (error: unknown) {
-      clearTimeout(timeoutId)
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timeout - API is taking too long')
-      }
-      throw error instanceof Error ? error : new Error('Unknown fetch error')
-    }
-  }, [BackendURL])
-
-  // Optimized data processing functions
-  const processRepoData = useCallback((repos: GitHubRepoInfo[]) => {
-    let totalStars = 0
-    let totalForks = 0
-    let totalSize = 0
-    const languageBytes: { [key: string]: number } = {}
-    const oneMonthAgo = Date.now() - (30 * 24 * 60 * 60 * 1000)
-    let recentRepoActivity = 0
-
-    repos.forEach((repo) => {
-      totalStars += repo.stargazers_count
-      totalForks += repo.forks_count
-
-      if (repo.language && repo.size > 0) {
-        languageBytes[repo.language] = (languageBytes[repo.language] || 0) + repo.size
-        totalSize += repo.size
-      }
-
-      if (new Date(repo.pushed_at).getTime() > oneMonthAgo) {
-        recentRepoActivity++
-      }
-    })
-
-    // Calculate top languages efficiently
-    const topLanguages = totalSize > 0
-      ? Object.fromEntries(
-        Object.entries(languageBytes)
-          .map(([lang, bytes]: [string, number]) => [lang, Math.round((bytes / totalSize) * 100)] as [string, number])
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-      )
-      : {};
-
-    return { totalStars, totalForks, topLanguages, recentRepoActivity }
-  }, [])
-
-  // Contributions calculation (simplified)
-  const calculateSimpleContributions = useCallback((events: GitHubEvent[]) => {
-    const currentYear = new Date().getFullYear()
-    const currentYearStart = new Date(currentYear, 0, 1).getTime()
-    const oneMonthAgo = Date.now() - (30 * 24 * 60 * 60 * 1000)
-
-    let totalCommits = 0
-    let recentEvents = 0
-    let lastActivityDate = new Date(0)
-
-    events.forEach(event => {
-      const eventDate = new Date(event.created_at)
-      const eventTime = eventDate.getTime()
-
-      if (eventTime > currentYearStart && event.type === "PushEvent") {
-        totalCommits += event.payload?.commits?.length || 1
-      }
-
-      if (eventTime > oneMonthAgo) {
-        recentEvents++
-      }
-
-      if (eventDate > lastActivityDate) {
-        lastActivityDate = eventDate
-      }
-    })
-
-    // Simple streak calculation (approximate)
-    const daysSinceLastActivity = Math.floor((Date.now() - lastActivityDate.getTime()) / (1000 * 60 * 60 * 24))
-    const currentStreak = daysSinceLastActivity <= 1 ? Math.min(recentEvents, 30) : 0
-
-    return {
-      totalCommits,
-      recentEvents,
-      lastActivity: lastActivityDate.toISOString(),
-      currentStreak,
-      longestStreak: Math.min(totalCommits * 2, 365), // Rough estimate
-      totalContributions: totalCommits * 3 // Rough estimate
-    }
-  }, [])
-
-  // Main data fetching function
-  const fetchGitHubStats = useCallback(async (): Promise<GitHubStats> => {
-    setLoadingProgress(LOADING_STEPS.INITIAL)
-
-    try {
-      // Fetch core data in parallel with reduced payload
-      setLoadingProgress(LOADING_STEPS.CORE_DATA)
-      const [userData, reposData] = await Promise.all([
-        fetchFromAPI(`/user`),
-        fetchFromAPI(`/user/repos?per_page=${REPOS_PER_PAGE}&sort=updated&type=all`) // Reduced from 100
-      ])
-
-      setLoadingProgress(LOADING_STEPS.REPO_PROCESS)
-
-      // Process repo data immediately
-      const repoStats = processRepoData(reposData)
-
-      setLoadingProgress(LOADING_STEPS.REPO_STATS)
-
-      // Fetch remaining data
-      const [eventsData, prsData, issuesData] = await Promise.all([
-        fetchFromAPI(`/users/${GITHUB_USERNAME}/events?per_page=${EVENTS_PER_PAGE}`), // Reduced from 100
-        fetchFromAPI(`/search/issues?q=author:${GITHUB_USERNAME}+type:pr&per_page=1`), // Just count
-        fetchFromAPI(`/search/issues?q=author:${GITHUB_USERNAME}+type:issue&per_page=1`) // Just count
-      ])
-
-      setLoadingProgress(LOADING_STEPS.FINAL_DATA)
-
-      // Process events data
-      const contributionStats = calculateSimpleContributions(eventsData)
-
-      // Calculate unique contributors efficiently
-      const uniqueContributedTo = new Set(
-        reposData
-          .filter((repo: GitHubRepoInfo) => repo.owner.login !== GITHUB_USERNAME)
-          .map((repo: GitHubRepoInfo) => repo.owner.login)
-      ).size
-
-      setLoadingProgress(LOADING_STEPS.COMPLETE)
-
-      return {
-        totalStars: repoStats.totalStars,
-        totalForks: repoStats.totalForks,
-        totalRepos: userData.public_repos,
-        privateRepos: userData.total_private_repos || 0,
-        followers: userData.followers,
-        following: userData.following,
-        publicGists: userData.public_gists,
-        accountCreated: userData.created_at,
-        lastActivity: contributionStats.lastActivity,
-        topLanguages: repoStats.topLanguages,
-        recentActivity: repoStats.recentRepoActivity + contributionStats.recentEvents,
-        totalCommits: contributionStats.totalCommits,
-        totalPRs: prsData.total_count || 0,
-        totalIssues: issuesData.total_count || 0,
-        contributedTo: uniqueContributedTo,
-        totalContributions: contributionStats.totalContributions,
-        currentStreak: contributionStats.currentStreak,
-        longestStreak: contributionStats.longestStreak,
-        lastUpdated: new Date().toISOString(),
-      }
-    } catch (error) {
-      console.error("Error fetching GitHub stats:", error)
-      throw error
-    }
-  }, [GITHUB_USERNAME, fetchFromAPI, processRepoData, calculateSimpleContributions])
-
-  // Data fetching and error handling
-  useEffect(() => {
-    const loadData = async () => {
-    try {
-      // Check cache first
-        const cachedData = cacheUtils.get();
-        if (cachedData) {
-          setStats(cachedData);
-          setLoading(false);
-          return;
-      }
-
-      // Fetch fresh data
-        const freshData = await fetchGitHubStats();
-        setStats(freshData);
-        cacheUtils.set(freshData);
-    } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to fetch GitHub stats');
+      const data = await response.json()
+      setStats(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch GitHub stats')
     } finally {
-        setLoading(false);
+      setLoading(false)
     }
-    };
+  }, [BackendURL, GITHUB_USERNAME])
 
-    loadData();
-  }, [fetchGitHubStats, cacheUtils]);
+  useEffect(() => {
+    fetchGitHubStats()
+  }, [fetchGitHubStats])
 
   // Intersection Observer for animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
+          setIsVisible(true)
         }
       },
       { threshold: 0.1 }
-    );
-
-    const currentRef = statsRef.current;
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, []);
+    )
+    const currentRef = statsRef.current
+    if (currentRef) observer.observe(currentRef)
+    return () => { if (currentRef) observer.unobserve(currentRef) }
+  }, [])
 
   // Refresh data handler
   const handleRefresh = async () => {
-    setIsRefreshing(true);
-    setError(null);
-    setLoadingProgress(0);
-
+    setIsRefreshing(true)
+    setError(null)
     try {
-      const freshData = await fetchGitHubStats();
-      setStats(freshData);
-      cacheUtils.set(freshData);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to refresh GitHub stats');
+      await fetchGitHubStats(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refresh GitHub stats')
     } finally {
-      setIsRefreshing(false);
+      setIsRefreshing(false)
     }
-  };
+  }
 
   // Helper functions
   const getCacheAge = (): string => {
-    if (!stats) return '';
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (!cached) return 'Just now';
-    
-    const { timestamp } = JSON.parse(cached);
-    const age = Math.floor((Date.now() - timestamp) / 1000);
-    
-    if (age < 60) return `${age}s ago`;
-    if (age < 3600) return `${Math.floor(age / 60)}m ago`;
-    return `${Math.floor(age / 3600)}h ago`;
-  };
-
-  const getActivityLevel = (activity: number): string => {
-    if (activity > 50) return 'Very Active';
-    if (activity > 30) return 'Active';
-    if (activity > 10) return 'Moderate';
-    return 'Low';
-  };
+    if (!stats?.cacheAge) return 'Just now'
+    const age = stats.cacheAge
+    if (age < 60) return `${age}s ago`
+    if (age < 3600) return `${Math.floor(age / 60)}m ago`
+    return `${Math.floor(age / 3600)}h ago`
+  }
 
   const getYearsActive = (): number => {
-    if (!stats) return 0;
-    const created = new Date(stats.accountCreated);
-    const now = new Date();
-    return now.getFullYear() - created.getFullYear();
-  };
+    if (!stats) return 0
+    const created = new Date(stats.accountCreated)
+    const now = new Date()
+    return now.getFullYear() - created.getFullYear()
+  }
 
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
-    });
-  };
+    })
+  }
 
   // Render loading state
   if (loading && !stats) {
@@ -424,7 +182,7 @@ const GitHubStatsComponent = () => {
           </div>
         </div>
       </section>
-    );
+    )
   }
 
   // Render error state
@@ -453,7 +211,7 @@ const GitHubStatsComponent = () => {
           </div>
         </div>
       </section>
-    );
+    )
   }
 
   // Render stats
@@ -544,7 +302,7 @@ const GitHubStatsComponent = () => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default GitHubStatsComponent;
+export default GitHubStatsComponent
