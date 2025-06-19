@@ -138,7 +138,10 @@ const BackgroundAnimation = () => {
               style={{
                 left: isLeft ? `${Math.random() * 20}%` : `${80 + Math.random() * 15}%`,
                 top: `${20 + i * 20 + Math.random() * 10}%`,
-                animation: `fadeSlide ${6 + Math.random() * 4}s ease-in-out infinite`,
+                animationName: 'fadeSlide',
+                animationDuration: `${6 + Math.random() * 4}s`,
+                animationTimingFunction: 'ease-in-out',
+                animationIterationCount: 'infinite',
                 animationDelay: `${i * 2}s`
               }}
             >

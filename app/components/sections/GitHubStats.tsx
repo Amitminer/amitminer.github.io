@@ -24,7 +24,7 @@ import type { GitHubStats, DetailCardProps, StatCardProps } from "@/app/lib/type
 
 // Skeleton Components
 const StatCardSkeleton = () => (
-  <div className="stat-card animate-pulse">
+  <div id="stat-card" className="stat-card animate-pulse">
     <div className="w-8 h-8 bg-gray-700 rounded mb-2"></div>
     <div className="w-16 h-8 bg-gray-700 rounded mb-1"></div>
     <div className="w-20 h-4 bg-gray-700 rounded"></div>
@@ -32,7 +32,7 @@ const StatCardSkeleton = () => (
 );
 
 const DetailCardSkeleton = () => (
-  <div className="stat-card animate-pulse">
+  <div id="stat-card" className="stat-card animate-pulse">
     <div className="w-48 h-6 bg-gray-700 rounded mb-6"></div>
     <div className="space-y-4">
       {[...Array(6)].map((_, i) => (
@@ -50,7 +50,7 @@ const StatCard = ({ icon, value, label, loading = false, color = "text-blue-400"
   if (loading) return <StatCardSkeleton />;
 
   return (
-    <div className="stat-card">
+    <div id="stat-card" className="stat-card">
       <div className={`text-2xl mb-2 ${color}`}>{icon}</div>
       <div className="text-2xl font-bold mb-1 text-white">{value}</div>
       <div className="text-sm text-cyan-300">{label}</div>
@@ -63,7 +63,7 @@ const DetailCard = ({ title, data, loading = false }: DetailCardProps) => {
   if (loading) return <DetailCardSkeleton />;
 
   return (
-    <div className="stat-card">
+    <div id="stat-card" className="stat-card">
       <h3 className="text-lg font-semibold mb-6 text-purple-300">{title}</h3>
       <div className="space-y-4">
         {data.map(({ label, value }, index) => (

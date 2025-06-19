@@ -9,144 +9,137 @@
  * - Gradient effects and animations
  * - Action buttons with hover effects
  */
-
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
-import Image from "next/image"
 import { Button } from "@/app/components/ui/button"
 import { ArrowDownCircle, ExternalLink } from "lucide-react"
 import ProfileImage from "@/app/assets/pfp.webp"
 import BackgroundAnimation from "./BackgroundAnimation"
 import { GitHubIcon } from "../icons/index"
 import { GithubUsername } from "@/app/utils/Links"
-import { ThrottleOptions } from "@/app/lib/types"
+import type { ThrottleOptions } from "@/app/lib/types"
+import Image from "next/image"
 
-// Throttle utility with TypeScript support
+// Throttle utility
 const throttle = <T extends (...args: any[]) => any>(
   func: T,
-  { delay, leading = true, trailing = true }: ThrottleOptions
+  { delay, leading = true, trailing = true }: ThrottleOptions,
 ): ((...args: Parameters<T>) => void) => {
-  let timeoutId: NodeJS.Timeout | null = null;
-  let lastExecTime = 0;
-  
+  let timeoutId: NodeJS.Timeout | null = null
+  let lastExecTime = 0
+
   return (...args: Parameters<T>) => {
-    const currentTime = Date.now();
-    const remainingTime = delay - (currentTime - lastExecTime);
-    
+    const currentTime = Date.now()
+    const remainingTime = delay - (currentTime - lastExecTime)
+
     if (remainingTime <= 0 && leading) {
-      func(...args);
-      lastExecTime = currentTime;
+      func(...args)
+      lastExecTime = currentTime
     } else if (trailing) {
-      if (timeoutId) clearTimeout(timeoutId);
+      if (timeoutId) clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
-        func(...args);
-        lastExecTime = Date.now();
-      }, remainingTime);
+        func(...args)
+        lastExecTime = Date.now()
+      }, remainingTime)
     }
-  };
-};
+  }
+}
 
 // Constants
-const SCROLL_THROTTLE_DELAY = 16; // ~60fps
-const MOUSE_MOVE_THROTTLE_DELAY = 100;
-const ARROW_HIDE_DELAY = 2000;
-const SCROLL_THRESHOLD = 50;
-const HERO_SECTION_THRESHOLD = 0.7;
+const SCROLL_THROTTLE_DELAY = 16 // ~60fps
+const MOUSE_MOVE_THROTTLE_DELAY = 100
+const ARROW_HIDE_DELAY = 2000
+const SCROLL_THRESHOLD = 50
+const HERO_SECTION_THRESHOLD = 0.7
 
 const Hero = () => {
-  // State
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [showScrollArrow, setShowScrollArrow] = useState(false);
-  
-  // Refs
-  const heroRef = useRef<HTMLDivElement>(null);
-  const arrowRef = useRef<HTMLButtonElement>(null);
-  const hideArrowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Simplified state - removed unnecessary loading states
+  const [showScrollArrow, setShowScrollArrow] = useState(false)
+
+  const heroRef = useRef<HTMLDivElement>(null)
+  const arrowRef = useRef<HTMLButtonElement>(null)
+  const hideArrowTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Scroll handler with throttling
   const handleScroll = useCallback(
-    throttle(() => {
-      const scrollY = window.scrollY;
-      const heroHeight = heroRef.current?.offsetHeight || 0;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      
-      const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD;
-      const isNotAtBottom = scrollY + windowHeight < documentHeight - 100;
-      const hasScrolled = scrollY > SCROLL_THRESHOLD;
-      
-      const shouldShow = hasScrolled && isInHeroSection && isNotAtBottom;
-      
-      if (shouldShow !== showScrollArrow) {
-        setShowScrollArrow(shouldShow);
-      }
-      
-      // Auto-hide after delay
-      if (hideArrowTimeoutRef.current) {
-        clearTimeout(hideArrowTimeoutRef.current);
-      }
-      
-      if (shouldShow) {
-        hideArrowTimeoutRef.current = setTimeout(() => {
-          setShowScrollArrow(false);
-        }, ARROW_HIDE_DELAY);
-      }
-    }, { delay: SCROLL_THROTTLE_DELAY }),
-    [showScrollArrow]
-  );
+    throttle(
+      () => {
+        const scrollY = window.scrollY
+        const heroHeight = heroRef.current?.offsetHeight || 0
+        const windowHeight = window.innerHeight
+        const documentHeight = document.documentElement.scrollHeight
+
+        const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD
+        const isNotAtBottom = scrollY + windowHeight < documentHeight - 100
+        const hasScrolled = scrollY > SCROLL_THRESHOLD
+
+        const shouldShow = hasScrolled && isInHeroSection && isNotAtBottom
+
+        if (shouldShow !== showScrollArrow) {
+          setShowScrollArrow(shouldShow)
+        }
+
+        // Auto-hide after delay
+        if (hideArrowTimeoutRef.current) {
+          clearTimeout(hideArrowTimeoutRef.current)
+        }
+
+        if (shouldShow) {
+          hideArrowTimeoutRef.current = setTimeout(() => {
+            setShowScrollArrow(false)
+          }, ARROW_HIDE_DELAY)
+        }
+      },
+      { delay: SCROLL_THROTTLE_DELAY },
+    ),
+    [showScrollArrow],
+  )
 
   // Mouse move handler for showing arrow
   const handleMouseMove = useCallback(
-    throttle(() => {
-      const scrollY = window.scrollY;
-      const heroHeight = heroRef.current?.offsetHeight || 0;
-      const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD;
-      const hasScrolled = scrollY > SCROLL_THRESHOLD;
-      
-      if (isInHeroSection && hasScrolled && !showScrollArrow) {
-        setShowScrollArrow(true);
-      }
-    }, { delay: MOUSE_MOVE_THROTTLE_DELAY }),
-    [showScrollArrow]
-  );
+    throttle(
+      () => {
+        const scrollY = window.scrollY
+        const heroHeight = heroRef.current?.offsetHeight || 0
+        const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD
+        const hasScrolled = scrollY > SCROLL_THRESHOLD
+
+        if (isInHeroSection && hasScrolled && !showScrollArrow) {
+          setShowScrollArrow(true)
+        }
+      },
+      { delay: MOUSE_MOVE_THROTTLE_DELAY },
+    ),
+    [showScrollArrow],
+  )
 
   // Setup scroll listeners
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("mousemove", handleMouseMove, { passive: true })
+
     // Initial check
-    handleScroll();
-    
+    handleScroll()
+
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("mousemove", handleMouseMove)
       if (hideArrowTimeoutRef.current) {
-        clearTimeout(hideArrowTimeoutRef.current);
+        clearTimeout(hideArrowTimeoutRef.current)
       }
-    };
-  }, [handleScroll, handleMouseMove]);
-
-  // Image loading handlers
-  const handleImageLoad = useCallback(() => {
-    setIsImageLoaded(true);
-  }, []);
-
-  const handleImageError = useCallback(() => {
-    console.warn("Profile image failed to load");
-    setIsImageLoaded(true);
-  }, []);
+    }
+  }, [handleScroll, handleMouseMove])
 
   // Scroll to about section
   const scrollToAbout = useCallback(() => {
-    const aboutSection = document.getElementById("about");
+    const aboutSection = document.getElementById("about")
     if (aboutSection) {
-      aboutSection.scrollIntoView({ behavior: "smooth" });
+      aboutSection.scrollIntoView({ behavior: "smooth" })
     } else {
-      window.scrollTo({ top: window.innerHeight, behavior: "smooth" });
+      window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
     }
-  }, []);
+  }, [])
 
   return (
     <>
@@ -157,40 +150,44 @@ const Hero = () => {
         className="relative min-h-screen w-full flex items-center justify-center py-16 sm:py-20 md:py-32"
       >
         <div className="container max-w-3xl mx-auto px-4 md:px-6 flex flex-col items-center text-center">
-          
-          {/* Profile Image Container */}
+          {/* Profile Image Container - Optimized */}
           <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mb-6">
-            {/* Animated border ring (only border rotates, not the image) */}
-            <div className="absolute inset-0 rounded-full p-0.5 bg-gradient-to-r from-[#FF1493] via-[#00FFFF] to-[#FF1493] animate-spin" 
-                 style={{ animationDuration: '3s' }}>
+            {/* Animated border ring */}
+            <div
+              className="absolute inset-0 rounded-full p-0.5 bg-gradient-to-r from-[#FF1493] via-[#00FFFF] to-[#FF1493]"
+              style={{ 
+                animation: "spin 3s linear infinite",
+                // Preload the gradient to prevent flash
+                willChange: "transform"
+              }}
+            >
               <div className="w-full h-full rounded-full bg-black"></div>
             </div>
-            
-            {/* Static image container */}
+
+            {/* Image container with immediate visibility */}
             <div className="absolute inset-1 rounded-full overflow-hidden shadow-2xl shadow-[#00FFFF]/30">
               <Image
-                src={ProfileImage}
+                src={ProfileImage} //
                 alt="AmitxD Profile"
                 fill
                 sizes="(max-width: 640px) 8rem, (max-width: 768px) 10rem, 12rem"
                 className="object-cover"
                 priority
-                onLoad={handleImageLoad}
-                onError={handleImageError}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/2"
+                loading="eager"
+                decoding="async"
+                quality={80}
               />
             </div>
-            
+
             {/* Subtle glow effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse"></div>
           </div>
 
-          {/* Name and Title */}
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 gradient-text">
-            AmitxD
-          </h1>
-          <p className="text-lg sm:text-xl mb-8 text-[#00FFFF]">
-            Self-taught Developer
-          </p>
+          {/* Name and Title - Immediately visible */}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 gradient-text">AmitxD</h1>
+          <p className="text-lg sm:text-xl mb-8 text-[#00FFFF]">Self-taught Developer</p>
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
@@ -210,7 +207,7 @@ const Hero = () => {
             >
               <a href="#contact">Contact Me</a>
             </Button>
-            
+
             {/* GitHub Profile Button */}
             <Button
               variant="outline"
@@ -236,9 +233,7 @@ const Hero = () => {
             onClick={scrollToAbout}
             aria-label="Scroll down to about section"
             className={`fixed bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 text-[#00FFFF]/60 hover:text-[#00FFFF] transition-all duration-300 hover:scale-110 z-10 ${
-              showScrollArrow 
-                ? 'opacity-100 visible animate-bounce' 
-                : 'opacity-0 invisible'
+              showScrollArrow ? "opacity-100 visible animate-bounce" : "opacity-0 invisible"
             }`}
           >
             <ArrowDownCircle size={28} />
@@ -246,7 +241,7 @@ const Hero = () => {
         </div>
       </section>
     </>
-  );
-};
+  )
+}
 
-export default Hero;
+export default Hero

@@ -88,7 +88,7 @@ const techGroups: TechGroup[] = [
 
 // Memoized tech item component
 const TechItem = React.memo<TechItemProps>(({ tech, isLast }) => (
-  <div className={`flex flex-col items-center group ${!isLast ? 'border-r border-gray-700/50' : ''} py-2`}>
+  <div id="tech-items" className={`flex flex-col items-center group ${!isLast ? 'border-r border-gray-700/50' : ''} py-2`}>
     <div 
       className={`text-2xl mb-1 ${tech.color} group-hover:scale-110 transition-transform duration-200`}
       style={{ willChange: 'transform' }}

@@ -133,8 +133,8 @@ const ProjectCard = memo(({ project, featured = false }: { project: PinnedProjec
   }, []);
 
   return (
-    <div className="group bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-colors duration-200 h-full flex flex-col">
-      <div className="relative w-full h-48 overflow-hidden">
+    <div id="project-card" className="group bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-colors duration-200 h-full flex flex-col">
+      <div id="project-image" className="relative w-full h-48 overflow-hidden">
         <Image
           src={imageError ? DefaultBanner.src : imageUrl}
           alt={`${projectName} preview`}
