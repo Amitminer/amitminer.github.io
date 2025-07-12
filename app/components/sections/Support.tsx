@@ -60,7 +60,8 @@ const Support = () => {
         </h2>
 
         <p className="text-sm mb-12 text-gray-300 leading-relaxed">
-          Enjoying my projects? Buy me a coffee to support ongoing development and maintenance.
+          Building and maintaining stuff solo takes time (and caffeine 😅).<br />
+          If you find my projects useful, a small coffee goes a long way!
         </p>
 
         <div className="flex justify-center">
