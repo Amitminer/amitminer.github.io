@@ -13,8 +13,7 @@ Welcome to my personal portfolio — a fast, minimal, and modern site built with
 git clone https://github.com/Amitminer/amitminer.github.io.git
 cd amitminer.github.io
 pnpm install
-````
-
+```
 ### 2. Set Up Environment Variables
 
 Create the `.env.local` file:
