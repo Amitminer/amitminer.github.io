@@ -13,7 +13,7 @@
  * - Error handling and loading states
  * - Responsive grid layout
  * - Shows all recent projects (not limited to 6)
- * - Enhanced UI with better visual feedback
+ * - UI with better visual feedback
  */
 
 "use client"
@@ -102,6 +102,7 @@ const ProjectCardSkeleton = memo(() => (
     </div>
   </div>
 ));
+ProjectCardSkeleton.displayName = 'ProjectCardSkeleton';
 
 // ===== PROJECT CARD =====
 const ProjectCard = memo(({ project, featured = false }: { project: PinnedProject | GitHubRepo; featured?: boolean }) => {
@@ -206,6 +207,7 @@ const ProjectCard = memo(({ project, featured = false }: { project: PinnedProjec
     </div>
   );
 });
+ProjectCard.displayName = 'ProjectCard';
 
 // ===== MAIN COMPONENT =====
 const Projects = () => {

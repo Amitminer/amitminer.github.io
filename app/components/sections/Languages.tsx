@@ -12,6 +12,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 import { GithubUsername, TopLanguagesApiUrl } from '@/app/utils/Links';
+import Image from 'next/image';
 
 const Languages = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -46,7 +47,7 @@ const Languages = () => {
   // Preload image when component mounts
   useEffect(() => {
     const preloadImage = () => {
-      const img = new Image();
+      const img = new window.Image();
       img.src = imageUrl + (retryCount > 0 ? `&t=${Date.now()}` : '');
 
       img.onload = () => {
@@ -116,7 +117,7 @@ const Languages = () => {
         <div className="max-w-4xl mx-auto text-center pt-4 pb-0">
           <div className="relative w-full max-w-[400px] md:max-w-[460px] lg:max-w-[500px] mx-auto p-[2px] rounded-xl bg-gradient-to-br from-cyan-400/60 to-pink-500/60 shadow-xl hover:shadow-cyan-500/30 transition-all duration-300 group">
             <div className="rounded-[10px] overflow-hidden bg-[#0d1117]">
-              <img
+              <Image
                 src={imageUrl + (retryCount > 0 ? `&t=${Date.now()}` : '')}
                 alt={`${GithubUsername}'s Top Languages`}
                 width={500}
@@ -126,6 +127,7 @@ const Languages = () => {
                 style={{
                   backgroundColor: '#1f2937',
                 }}
+                unoptimized
               />
             </div>
 

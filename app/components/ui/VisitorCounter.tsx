@@ -12,7 +12,7 @@
 
 import { GithubUsername } from '@/app/utils/Links';
 import { Users } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 const VisitorCounter = () => {
   const [count, setCount] = useState<number>(0);
@@ -25,7 +25,7 @@ const VisitorCounter = () => {
   /**
    * Session storage operations - faster than cookies
    */
-  const getSessionData = (): { count: number; fetched: boolean } | null => {
+  const getSessionData = useCallback((): { count: number; fetched: boolean } | null => {
     if (typeof window === 'undefined') return null;
     try {
       const data = sessionStorage.getItem(SESSION_KEY);
@@ -33,21 +33,21 @@ const VisitorCounter = () => {
     } catch {
       return null;
     }
-  };
+  }, [SESSION_KEY]);
 
-  const setSessionData = (count: number, fetched: boolean = true): void => {
+  const setSessionData = useCallback((count: number, fetched: boolean = true): void => {
     if (typeof window === 'undefined') return;
     try {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify({ count, fetched }));
     } catch {
       // Ignore errors
     }
-  };
+  }, [SESSION_KEY]);
 
   /**
    * Fast count fetch - API auto-increments, so we handle it properly
    */
-  const fetchCount = async (): Promise<void> => {
+  const fetchCount = useCallback(async (): Promise<void> => {
     try {
       const sessionData = getSessionData();
       
@@ -89,7 +89,7 @@ const VisitorCounter = () => {
     } finally {
       setIsUpdating(false);
     }
-  };
+  }, [counterId, getSessionData, setSessionData]);
 
   useEffect(() => {
     if (hasRun.current) return;
@@ -115,7 +115,7 @@ const VisitorCounter = () => {
       fetchCount();
     }, 100);
 
-  }, [counterId]);
+  }, [counterId, fetchCount, getSessionData]);
 
   return (
   

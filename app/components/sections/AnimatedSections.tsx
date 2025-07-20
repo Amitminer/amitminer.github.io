@@ -109,7 +109,6 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           height: 3px;
           background: linear-gradient(90deg, #FF1493, #00FFFF);
           z-index: 1000;
-          will-change: width;
           transition: none;
           box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
         `
@@ -189,7 +188,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
               rotation: i % 4 === 0 ? 10 : -10,
               ease: "none",
               scrollTrigger: {
-                trigger: "body",
+                trigger: document.body || containerRef.current,
                 start: "top top",
                 end: "bottom bottom",
                 scrub: 1,
@@ -330,7 +329,6 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
             animatedCards.add(card)
             card.setAttribute("data-card-animated", "true")
-            card.style.willChange = "transform"
 
             // Check if it's a project card specifically
             const isProjectCard = card.closest("#projects")
@@ -365,9 +363,6 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
                 end: "bottom 5%",
                 toggleActions: "play none none reverse",
                 fastScrollEnd: true,
-                onEnter: () => {
-                  card.style.willChange = "auto"
-                },
               },
             })
 
@@ -472,7 +467,6 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           height: 100%;
           pointer-events: none;
           z-index: -1;
-          will-change: background;
           background: linear-gradient(135deg,
             rgba(255, 20, 147, 0.02) 0%,
             transparent 30%,
@@ -579,10 +573,18 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
       return () => {
         ctx.revert()
         ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+        gsap.killTweensOf("*")
 
         const elements = [".scroll-progress", ".morphing-bg", ".reverse-scroll-bg"]
         elements.forEach((selector) => {
           document.querySelectorAll(selector).forEach((el) => el.remove())
+        })
+
+        // Clean up any remaining will-change styles
+        document.querySelectorAll('[style*="will-change"]').forEach((el) => {
+          if (el instanceof HTMLElement) {
+            el.style.willChange = 'auto'
+          }
         })
 
         setIsInitialized(false)

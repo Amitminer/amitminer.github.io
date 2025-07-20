@@ -21,6 +21,7 @@ const Support = () => {
 
   // Intersection Observer for animations
   useEffect(() => {
+    const currentRef = supportRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -31,13 +32,13 @@ const Support = () => {
       { threshold: 0.1 }
     );
 
-    if (supportRef.current) {
-      observer.observe(supportRef.current);
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (supportRef.current) {
-        observer.unobserve(supportRef.current);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
   }, []);

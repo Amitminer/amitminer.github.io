@@ -109,7 +109,7 @@ const GitHubStatsComponent = () => {
     } finally {
       setLoading(false)
     }
-  }, [BackendURL, GITHUB_USERNAME])
+  }, [GITHUB_USERNAME])
 
   useEffect(() => {
     fetchGitHubStats()
@@ -193,7 +193,14 @@ const GitHubStatsComponent = () => {
           <div className="max-w-2xl mx-auto text-center">
             <AlertCircle className="mx-auto mb-4 h-12 w-12 text-red-400" />
             <h2 className="text-2xl font-bold mb-2 text-red-300">Error Loading Stats</h2>
-            <p className="text-orange-300 mb-4">{error}</p>
+            <p className="text-orange-300 mb-4">
+              {error}
+              <br />
+              <span className="text-xs text-gray-400 block mt-2">
+                Note: The backend server we use for GitHub stats may be restricting access (e.g., due to CORS, rate limits, or region restrictions), or your network connection may be unstable. <br />
+                Try reloading the page, or connect using a different network (VPN, mobile data, etc). If the issue persists, the backend may be temporarily unavailable.
+              </span>
+            </p>
             <button
               onClick={handleRefresh}
               className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg transition-colors"

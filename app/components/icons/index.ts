@@ -15,3 +15,5 @@ export { FaWindows } from 'react-icons/fa';
 // export { VscCode } from 'react-icons/vsc';
 
 export { RefreshCw } from 'lucide-react';
+
+export { EmailIcon } from './EmailIcon';

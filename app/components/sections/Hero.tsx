@@ -62,8 +62,8 @@ const Hero = () => {
   const hideArrowTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Scroll handler with throttling
-  const handleScroll = useCallback(
-    throttle(
+  const handleScroll = useCallback(() => {
+    const throttledScroll = throttle(
       () => {
         const scrollY = window.scrollY
         const heroHeight = heroRef.current?.offsetHeight || 0
@@ -92,13 +92,13 @@ const Hero = () => {
         }
       },
       { delay: SCROLL_THROTTLE_DELAY },
-    ),
-    [showScrollArrow],
-  )
+    )
+    throttledScroll()
+  }, [showScrollArrow])
 
   // Mouse move handler for showing arrow
-  const handleMouseMove = useCallback(
-    throttle(
+  const handleMouseMove = useCallback(() => {
+    const throttledMouseMove = throttle(
       () => {
         const scrollY = window.scrollY
         const heroHeight = heroRef.current?.offsetHeight || 0
@@ -110,9 +110,9 @@ const Hero = () => {
         }
       },
       { delay: MOUSE_MOVE_THROTTLE_DELAY },
-    ),
-    [showScrollArrow],
-  )
+    )
+    throttledMouseMove()
+  }, [showScrollArrow])
 
   // Setup scroll listeners
   useEffect(() => {
