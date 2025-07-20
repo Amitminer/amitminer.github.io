@@ -299,11 +299,18 @@ const Projects = () => {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
       const recentData = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=12`).catch(() => []);
-      // Ensure each repo has a slug
+      // Utility to generate a URL-safe slug from a string
+      const toUrlSlug = (str: string) =>
+        str
+          .toLowerCase()
+          .replace(/[^a-z0-9\-_]+/g, '-') // Replace non-url-safe chars with hyphen
+          .replace(/^-+|-+$/g, '')         // Trim leading/trailing hyphens
+          .replace(/--+/g, '-');           // Collapse multiple hyphens
+
       const recentDataWithSlugs = Array.isArray(recentData)
         ? recentData.map((repo: any) => ({
             ...repo,
-            slug: repo.name ? repo.name.toLowerCase() : '',
+            slug: repo.name ? toUrlSlug(repo.name) : '',
           }))
         : [];
       setState(prev => ({

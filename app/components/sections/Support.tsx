@@ -24,7 +24,7 @@ const Support = () => {
     showOptions: false,
   });
 
-  const UPI_ID = "amitxd@fam"; // Hardcoded for now :
+  const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || "";
 
   // Intersection Observer for animations
   useEffect(() => {
@@ -105,7 +105,7 @@ const Support = () => {
         <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500">
           Support My Work
         </h2>
-        <p className="text-sm sm:text-base mb-12 text-gray-300 leading-rel relax ed">
+        <p className="text-sm sm:text-base mb-12 text-gray-300 leading-relaxed">
           Building and maintaining stuff solo takes time (and caffeine 😅).<br />
           If you find my projects useful, a small coffee goes a long way!
         </p>

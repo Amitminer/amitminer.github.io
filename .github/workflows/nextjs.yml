@@ -18,6 +18,7 @@ jobs:
       NEXT_PUBLIC_FORMSPREE_FORM_ID: ${{ secrets.FORMSPREE_FORM_ID }}
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
       NEXT_PUBLIC_EMAIL: ${{ secrets.EMAIL }}
+      NEXT_PUBLIC_UPI_ID: ${{ secrets.UPI_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

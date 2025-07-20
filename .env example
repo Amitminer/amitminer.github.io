@@ -3,3 +3,4 @@ NEXT_PUBLIC_LOCAL_BACKEND_URL=http://localhost:8000/api/github
 NEXT_PUBLIC_FORMSPREE_FORM_ID=your-formspree-form-id
 NEXT_PUBLIC_TURNSTILE_SITE_KEY=your-turnstile-site-key
 NEXT_PUBLIC_EMAIL=your@email.com
+NEXT_PUBLIC_UPI_ID=your_name@upi
