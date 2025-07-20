@@ -2,8 +2,8 @@
  * Hero Component
  * 
  * Features:
- * - Responsive design with smooth animations
- * - Performance optimized scroll and mouse move handlers
+ * - Design with smooth animations
+ * - Performance scroll and mouse move handlers
  * - Dynamic scroll indicator with auto-hide
  * - Profile image with loading states
  * - Gradient effects and animations

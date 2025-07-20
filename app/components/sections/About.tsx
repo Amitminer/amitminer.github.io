@@ -5,7 +5,7 @@
  * - Typewriter effect for text animation
  * - Intersection Observer for scroll-based animations
  * - Floating particles and decorative elements
- * - Responsive design with gradient effects
+ * - Design with gradient effects
  * - Skeleton loading state
  * 
  * Key Features:

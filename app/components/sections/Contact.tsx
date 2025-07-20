@@ -3,7 +3,7 @@
  * 
  * A contact form section that provides:
  * - Email contact form using Formspree
- * - Social media links with enhanced styling
+ * - Social media links with styling
  * - Toast notifications for form status
  * - Cloudflare Turnstile captcha
  */
@@ -150,7 +150,7 @@ const Contact = () => {
     if (formspreeState.succeeded) {
       setSubmitStatus({
         type: 'success',
-        message: 'Message sent successfully! We\'ll get back to you soon.'
+        message: 'Message sent successfully! I\'ll get back to you soon.'
       });
 
       // Reset form and captcha after a delay
@@ -474,7 +474,7 @@ const Contact = () => {
 
             {/* Form Help Text */}
             <p className="text-center text-xs text-gray-500">
-              Your message will be encrypted and sent securely. We typically respond within 24 hours.
+              Your message will be sent securely. I typically respond within 24 hours.
             </p>
           </form>
         </div>

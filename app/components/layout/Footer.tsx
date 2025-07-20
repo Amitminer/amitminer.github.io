@@ -1,7 +1,7 @@
 /**
  * Footer component that displays website footer content with dynamic elements.
  * 
- * - Responsive design with desktop detection
+ * - Design with desktop detection
  * - Shows visitor counter only on desktop when scrolled to bottom
  * - Displays copyright year, love animation, and social links
  * - Includes open source project link

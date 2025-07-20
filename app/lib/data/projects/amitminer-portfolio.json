@@ -1,0 +1,44 @@
+{
+  "slug": "amitminer-portfolio",
+  "name": "Developer Portfolio",
+  "description": "A portfolio built with Next.js, GitHub API integration, and a custom backend proxy for secure, cached data.",
+  "longDescription": "This Portfolio is a fully responsive, developer-centric portfolio website built using Next.js and TypeScript. It dynamically showcases projects, GitHub stats, and live activity using a custom-built GitHub API backend proxy to bypass rate limits and improve security.\n\nThe frontend is optimized for performance with skeleton loading, lazy loading, and strategic caching to ensure fast loads on both desktop and mobile. The project emphasizes clean architecture, modular component structure, and a well-organized file layout using modern web technologies.\n\nSince the site is hosted on GitHub Pages, serverless limitations required decoupling the backend logic. Thus, a dedicated GitHub API proxy was developed and deployed separately to Netlify, enabling intelligent caching and error handling while reducing direct API hits.",
+  "image": "/assets/projects/portfolio.webp",
+  "technologies": [
+    "Next.js", 
+    "TypeScript", 
+    "Tailwind CSS", 
+    "React", 
+    "Gasp", 
+    "GitHub API", 
+    "Cloudflare Turnstile"
+  ],
+  "features": [
+    "📦 Real-time GitHub stats via custom proxy",
+    "⚡ Skeleton + lazy loading for snappy UX",
+    "📱 Mobile-first responsive design",
+    "🧱 Clean component structure and file hierarchy",
+    "🛡️ Form protection with Cloudflare Turnstile",
+    "🔍 SEO-optimized static site (GitHub Pages deploy)"
+  ],
+  "challenges": [
+    "🚧 Avoiding GitHub API rate limits securely",
+    "🔁 Implementing backend caching and proxy logic",
+    "📉 Reducing mobile load times with optimizations",
+    "🧩 Structuring modular, reusable components",
+    "🔗 Hosting frontend and backend separately"
+  ],
+  "learnings": [
+    "📘 Static site architecture with dynamic data",
+    "🔐 API proxying and cache control strategies",
+    "🛠️ Performance optimization on frontend",
+    "🧠 Secure form handling in static environments"
+  ],
+  "featured": true,
+  "github": "https://github.com/Amitminer/amitminer.github.io",
+  "demo": "https://amitminer.github.io/",
+  "status": "completed",
+  "startDate": "2025-05-23",
+  "endDate": "2025-05-29",
+  "team": ["Solo Project"]
+} 
