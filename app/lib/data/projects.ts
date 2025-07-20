@@ -33,30 +33,36 @@ import compressorx from './projects/compressorx.json';
 import encryptx from './projects/encryptx.json';
 import docsx from './projects/docsx.json';
 
-export const CUSTOM_PROJECTS: CustomProject[] = [
-  ProjectSchema.parse(amitminerPortfolio),
-  ProjectSchema.parse(compressorx),
-  ProjectSchema.parse(encryptx),
-  ProjectSchema.parse(docsx),
-];
+// In-memory cache for parsed projects
+let cachedProjects: CustomProject[] | null = null;
 
-// Utility functions for working with projects
+export const getCustomProjects = (): CustomProject[] => {
+  if (cachedProjects) return cachedProjects;
+  cachedProjects = [
+    ProjectSchema.parse(amitminerPortfolio),
+    ProjectSchema.parse(compressorx),
+    ProjectSchema.parse(encryptx),
+    ProjectSchema.parse(docsx),
+  ];
+  return cachedProjects;
+};
+
 export const getProjectBySlug = (slug: string): CustomProject | undefined => {
-  return CUSTOM_PROJECTS.find(project => project.slug === slug);
+  return getCustomProjects().find(project => project.slug === slug);
 };
 
 export const getFeaturedProjects = (): CustomProject[] => {
-  return CUSTOM_PROJECTS.filter(project => project.featured);
+  return getCustomProjects().filter(project => project.featured);
 };
 
 export const getProjectsByStatus = (status: CustomProject['status']): CustomProject[] => {
-  return CUSTOM_PROJECTS.filter(project => project.status === status);
+  return getCustomProjects().filter(project => project.status === status);
 };
 
 export const getProjectsByTechnology = (technology: string): CustomProject[] => {
-  return CUSTOM_PROJECTS.filter(project =>
+  return getCustomProjects().filter(project =>
     project.technologies.some(tech =>
       tech.toLowerCase().includes(technology.toLowerCase())
     )
   );
-}; 
+};
