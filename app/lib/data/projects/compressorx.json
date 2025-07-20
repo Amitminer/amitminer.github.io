@@ -3,7 +3,7 @@
   "name": "CompressorX",
   "description": "A fast, lightweight desktop video compressor built with Tauri, Rust, and TypeScript.",
   "longDescription": "CompressorX is a cross-platform desktop application designed to simplify video compression. Built using Tauri (Rust) and a TypeScript + Tailwind CSS frontend, it delivers high performance and a smooth user experience—without requiring any command-line knowledge or internet access.\n\nThe app runs entirely offline, leveraging FFmpeg under the hood via Rust bindings. It supports drag-and-drop input, real-time compression stats, resolution and bitrate customization, and a clean, dark-themed interface. I built it to solve my own media compression workflow while exploring desktop development with Tauri.\n\nInstead of relying on web-based compressors or bloated tools, CompressorX offers a native experience with minimal overhead. Every aspect of the compression pipeline, from file handling to FFmpeg invocation, is handled locally through Rust—ensuring speed, efficiency, and user control.",
-  "image": "compressorx_hero",
+  "image": "compressorx",
   "technologies": [
     "Rust",
     "Tauri",

@@ -300,10 +300,16 @@ const Projects = () => {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
       const recentData = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=12`).catch(() => []);
-
+      // Ensure each repo has a slug
+      const recentDataWithSlugs = Array.isArray(recentData)
+        ? recentData.map((repo: any) => ({
+            ...repo,
+            slug: repo.name ? repo.name.toLowerCase() : '',
+          }))
+        : [];
       setState(prev => ({
         ...prev,
-        recentProjects: recentData,
+        recentProjects: recentDataWithSlugs,
         loading: false
       }));
 

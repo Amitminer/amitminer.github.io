@@ -3,7 +3,7 @@
   "name": "DocsX",
   "description": "An AI-powered documentation platform built with Rust and Next.js — fast, modern, and made for devs.",
   "longDescription": "DocsX is a blazing-fast, AI-enhanced documentation and tutorial platform built for developers who are tired of scattered, outdated, and clunky doc systems. It combines a Rust backend with a modern Next.js frontend to offer a smooth experience for writing, exploring, and sharing technical content.\n\nWriters can create rich Markdown-based docs and tutorials, enhanced by Google AI summaries. Readers get instant full-text search, community interaction features, and fast load times. With secure authentication via Clerk and JWT, built-in asset support, and custom slugs for sharing — DocsX aims to be the dev-focused Notion + Dev.to hybrid.\n\nIt also exposes a powerful REST API for content, assets, and user interaction, and is structured with scalable deployment in mind. Although the backend may be offline due to hosting limits, it's fully open-source and ready to self-host.",
-  "image": "/assets/projects/docsx.webp",
+  "image": "docsx",
   "technologies": [
     "Rust", 
     "Actix Web", 

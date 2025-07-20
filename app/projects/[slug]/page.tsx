@@ -164,7 +164,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     </a>
                   ) : (
                     <Image
-                      src={previewImage || DefaultBanner.src}
+                      src={previewImage || DefaultBanner}
                       alt={`${project.name} preview`}
                       fill
                       className="object-cover"
@@ -380,7 +380,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const project = getProjectBySlug(slug);
   
   if (!project) {
     return {

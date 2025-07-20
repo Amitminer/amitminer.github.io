@@ -3,7 +3,7 @@
   "name": "EncryptX",
   "description": "A modern, full-stack file encryption tool built with Rust and Next.js — secure, fast, and developer-friendly.",
   "longDescription": "EncryptX is a full-stack file encryption platform designed for users who care about privacy and performance. Built with a memory-safe Rust backend and a sleek Next.js frontend, it offers secure encryption and decryption for any file type, directly in the browser.\n\nThe tool supports both password-based and key-based encryption using AES-256-GCM, with strong key derivation through Argon2id. Files are compressed with `zstd` before encryption to ensure faster transfers and reduced file sizes. Despite a lightweight UI, EncryptX is optimized for large files and secure by default — making it ideal for developers, security enthusiasts, or anyone handling sensitive files.\n\nEncryptX also offers a public Rust library that can be integrated into other projects, supporting CLI, API, and web-based use cases. Its backend is hosted on Railway, and the frontend runs on Vercel with reliability monitoring via BetterUptime.",
-  "image": "/assets/projects/encryptx.webp",
+  "image": "encryptx",
   "technologies": [
     "Rust", 
     "Actix Web", 

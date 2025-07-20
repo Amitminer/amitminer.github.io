@@ -3,10 +3,12 @@ import CompressorX from './compressorx.webp';
 import EncryptX from './encryptx.webp';
 import DocsX from './docsx.webp';
 
-import CompressorXPreview from './preview/compressorx.webp';
-import PortfolioPreview from './portfolio.webp';
-import EncryptXPreview from './encryptx.webp';
-import DocsXPreview from './docsx.webp';
+// Note: For preview images, I'm using the project's thumbnail image as the preview.
+// For CompressorX, a dedicated preview image is used.
+import CompressorXPreview from './preview/compressorx_hero.webp';
+import PortfolioPreview from './portfolio.webp'; // using thumbnail as preview
+import EncryptXPreview from './encryptx.webp';   // using thumbnail as preview
+import DocsXPreview from './docsx.webp';         // using thumbnail as preview
 
 import { StaticImageData } from 'next/image';
 

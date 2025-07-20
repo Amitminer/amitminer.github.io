@@ -1,38 +1,43 @@
 /**
- * Centralized Projects Data
+ * Projects Data Module
  * 
- * This file contains all project information used throughout the application.
+ * This module provides all project metadata and utility functions for use across the app.
+ * Update this file to add, remove, or modify project information.
  */
+
+import { z } from 'zod';
+
+export const ProjectSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  slug: z.string(),
+  longDescription: z.string().optional(),
+  image: z.string(),
+  technologies: z.array(z.string()),
+  features: z.array(z.string()).optional(),
+  challenges: z.array(z.string()).optional(),
+  learnings: z.array(z.string()).optional(),
+  featured: z.boolean(),
+  github: z.string().optional(),
+  demo: z.string().optional(),
+  status: z.enum(['completed', 'in-progress', 'archived']),
+  startDate: z.string(),
+  endDate: z.string().optional(),
+  team: z.array(z.string()).optional(),
+});
+
+export type CustomProject = z.infer<typeof ProjectSchema>;
 
 import amitminerPortfolio from './projects/amitminer-portfolio.json';
 import compressorx from './projects/compressorx.json';
 import encryptx from './projects/encryptx.json';
 import docsx from './projects/docsx.json';
 
-export interface CustomProject {
-  name: string;                    // Display name
-  description: string;             // Short description
-  slug: string;                    // Unique, URL-friendly identifier for the project (used in routing, e.g. "compressorx")
-  longDescription?: string;        // Detailed description for project pages
-  image: string;                   // Project preview image path
-  technologies: string[];          // Array of technologies used
-  features?: string[];             // Key features of the project
-  challenges?: string[];           // Challenges faced during development
-  learnings?: string[];            // Key learnings from the project
-  featured: boolean;               // Whether to show in featured section
-  github?: string;                 // GitHub repository URL
-  demo?: string;                   // Live demo URL
-  status: 'completed' | 'in-progress' | 'archived';
-  startDate: string;               // Project start date (YYYY-MM-DD)
-  endDate?: string;                // Project end date (YYYY-MM-DD)
-  team?: string[];                 // Team members/roles
-}
-
 export const CUSTOM_PROJECTS: CustomProject[] = [
-  amitminerPortfolio as CustomProject,
-  compressorx as CustomProject,
-  encryptx as CustomProject,
-  docsx as CustomProject
+  ProjectSchema.parse(amitminerPortfolio),
+  ProjectSchema.parse(compressorx),
+  ProjectSchema.parse(encryptx),
+  ProjectSchema.parse(docsx),
 ];
 
 // Utility functions for working with projects
