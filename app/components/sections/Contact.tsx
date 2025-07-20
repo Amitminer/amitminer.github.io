@@ -255,10 +255,6 @@ const Contact = () => {
     setSubmitStatus({ type: 'loading', message: 'Sending your message...' });
 
     try {
-      // Create form data with captcha token
-      const formData = new FormData(e.currentTarget);
-      formData.append('cf-turnstile-response', captchaState.token);
-
       // Submit form
       await handleSubmit(e);
 

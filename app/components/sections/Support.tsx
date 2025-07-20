@@ -24,7 +24,7 @@ const Support = () => {
     showOptions: false,
   });
 
-  const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || "";
+  const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || '';
 
   // Intersection Observer for animations
   useEffect(() => {
