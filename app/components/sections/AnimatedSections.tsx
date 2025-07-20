@@ -74,7 +74,6 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
     window.addEventListener("resize", handleResizeDebounced, { passive: true })
     
-    // Capture the current value of the ref at the start of the effect
     const timeouts = timeoutsRef.current
     const cleanup = () => {
       window.removeEventListener("resize", handleResizeDebounced)
@@ -91,7 +90,6 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
   useEffect(() => {
     if (!isDesktop || isInitialized) return
 
-    // Capture the current value of the ref at the start of the effect
     const timeouts = timeoutsRef.current
 
     const initDelay = setTimeout(() => {
@@ -212,7 +210,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
             y: 0,
             scale: 1,
             rotation: 0,
-            duration: 1.6,
+            duration: 0.7,
             ease: "power3.out",
             scrollTrigger: {
               trigger: section,
@@ -297,7 +295,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
             gsap.to(heading, {
               opacity: 1,
               y: 0,
-              duration: 0.8,
+              duration: 0.5,
               ease: "power2.out",
               scrollTrigger: {
                 trigger: heading,
@@ -414,7 +412,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
               card.classList.contains("tech-item") || card.closest('.tech-stack, #tech, [class*="tech"]')
 
             // Different trigger points for different card types
-            const startTrigger = isProjectCard ? "top 70%" : isTechStack ? "top 80%" : "top 75%"
+            const startTrigger = isProjectCard ? "top 99%" : isTechStack ? "top 80%" : "top 75%"
 
             const animationDelay = isTechStack ? i * 0.05 : i * 0.1
 
@@ -431,9 +429,9 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
               y: 0,
               rotationY: 0,
               scale: 1,
-              duration: isTechStack ? 0.8 : 1.2,
+              duration: isProjectCard ? 0.35 : (isTechStack ? 0.8 : 1.2),
               delay: animationDelay,
-              ease: "back.out(1.5)",
+              ease: isProjectCard ? "power2.out" : "back.out(1.5)",
               scrollTrigger: {
                 trigger: card,
                 start: startTrigger,

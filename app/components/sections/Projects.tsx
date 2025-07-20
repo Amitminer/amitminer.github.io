@@ -27,7 +27,7 @@ import { BackendURL, GithubUsername } from "@/app/utils/Links"
 import DefaultBanner from "@/app/assets/default_banner.jpg"
 import { projectImages, previewImages } from '@/app/assets/projects';
 
-import { CUSTOM_PROJECTS, type CustomProject } from "@/app/lib/data/projects"
+import { getCustomProjects, type CustomProject } from "@/app/lib/data/projects"
 
 // ===== PERFORMANCE UTILITIES =====
 const throttle = <T extends (...args: any[]) => any>(func: T, limit: number): T => {
@@ -356,7 +356,7 @@ const Projects = () => {
   // ===== MEMOIZED PROJECTS =====
   const displayedProjects = useMemo(() => {
     if (state.activeTab === "featured") {
-      return CUSTOM_PROJECTS;
+      return getCustomProjects();
     }
     return state.showAll ? state.recentProjects : state.recentProjects.slice(0, 6);
   }, [state.activeTab, state.recentProjects, state.showAll]);
@@ -399,7 +399,7 @@ const Projects = () => {
           Explore my latest work and contributions.
         </p>
 
-        {/* Simplified Tab Navigation */}
+        {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
           <div className="bg-gray-800/50 rounded-full p-1 border border-gray-700">
             <button
@@ -410,7 +410,7 @@ const Projects = () => {
                   : "text-gray-400 hover:text-cyan-300"
               }`}
             >
-              Featured ({CUSTOM_PROJECTS.length})
+              Featured ({getCustomProjects().length})
             </button>
             <button
               onClick={() => setState(prev => ({ ...prev, activeTab: "recent" }))}
@@ -433,23 +433,32 @@ const Projects = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {state.activeTab === "featured" ? (
-              displayedProjects.map((project) => (
-                <CustomProjectCard 
-                  key={project.slug} 
-                  project={project as CustomProject}
-                />
-              ))
-            ) : (
-              displayedProjects.map((project) => (
-                <GitHubProjectCard 
-                  key={project.name} 
-                  project={project as GitHubRepo} 
-                />
-              ))
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {state.activeTab === "featured" ? (
+                displayedProjects.map((project) => (
+                  <div className="animated-section" key={project.slug}>
+                    <CustomProjectCard 
+                      project={project as CustomProject}
+                    />
+                  </div>
+                ))
+              ) : (
+                displayedProjects.map((project) => (
+                  <div className="animated-section" key={project.name}>
+                    <GitHubProjectCard 
+                      project={project as GitHubRepo} 
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+            {displayedProjects.length === 0 && (
+              <div className="text-center text-gray-400 py-8">
+                No projects found. Check your data source.
+              </div>
             )}
-          </div>
+          </>
         )}
 
         {/* Show More Button */}

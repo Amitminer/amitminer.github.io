@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Calendar, Code, Users, Zap, Target, Lightbulb } from 'lucide-react';
 import { Button } from '@/app/components/ui/button';
 import { GitHubIcon } from '@/app/components/icons';
-import { CUSTOM_PROJECTS, getProjectBySlug, type CustomProject } from '@/app/lib/data/projects'
+import { getCustomProjects, getProjectBySlug, type CustomProject } from '@/app/lib/data/projects';
 import { previewImages } from '@/app/assets/projects';
 import DefaultBanner from '@/app/assets/default_banner.jpg';
 
@@ -131,7 +131,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   {project.github && (
                     <Button asChild className="bg-slate-800 hover:bg-slate-700 border border-slate-600 px-6 py-2.5 text-white font-medium rounded-xl">
                       <a href={project.github} target="_blank" rel="noopener noreferrer">
-                        <GitHubIcon size={18} className="mr-2" />
+                        <GitHubIcon className="w-5 h-5 mr-2" />
                         View Source
                       </a>
                     </Button>
@@ -152,7 +152,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/50 shadow-2xl">
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent z-10"></div>
                   {project.demo && previewImage ? (
-                    <a href={project.demo} target="_blank" rel="noopener noreferrer">
+                    <a href={project.demo} target="_blank" rel="noopener noreferrer" className="relative">
                       <Image
                         src={previewImage}
                         alt={`${project.name} preview`}
@@ -373,7 +373,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 }
 
 export function generateStaticParams() {
-  return CUSTOM_PROJECTS.map((project) => ({
+  return getCustomProjects().map((project) => ({
     slug: project.slug,
   }));
 }

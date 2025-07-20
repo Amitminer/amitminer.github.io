@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 	description: "Crafting high-quality Rust backends and modern web frontends. Explore projects, tools, and my developer workflow.",
 	keywords: [
 		"Rust developer", "TypeScript", "Next.js", "Actix", "PostgreSQL",
-		"Full-stack", "Arch Linux", "Hyprland", "Open Source", "Developer Portfolio"
+		"Full-stack", "Python", "Open Source", "Developer Portfolio"
 	],
 	authors: [{ name: "AmitxD" }],
 	openGraph: {
@@ -36,7 +36,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" className="scroll-smooth">
+		<html lang="en" data-scroll-behavior="smooth">
 			<body className={inter.className}>
 				<div className="flex flex-col min-h-screen">
 					<Header />
