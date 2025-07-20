@@ -1,0 +1,53 @@
+{
+  "slug": "encryptx",
+  "name": "EncryptX",
+  "description": "A modern, full-stack file encryption tool built with Rust and Next.js — secure, fast, and developer-friendly.",
+  "longDescription": "EncryptX is a full-stack file encryption platform designed for users who care about privacy and performance. Built with a memory-safe Rust backend and a sleek Next.js frontend, it offers secure encryption and decryption for any file type, directly in the browser.\n\nThe tool supports both password-based and key-based encryption using AES-256-GCM, with strong key derivation through Argon2id. Files are compressed with `zstd` before encryption to ensure faster transfers and reduced file sizes. Despite a lightweight UI, EncryptX is optimized for large files and secure by default — making it ideal for developers, security enthusiasts, or anyone handling sensitive files.\n\nEncryptX also offers a public Rust library that can be integrated into other projects, supporting CLI, API, and web-based use cases. Its backend is hosted on Railway, and the frontend runs on Vercel with reliability monitoring via BetterUptime.",
+  "image": "encryptx",
+  "technologies": [
+    "Rust", 
+    "Actix Web", 
+    "Next.js", 
+    "React", 
+    "TypeScript", 
+    "Tailwind CSS", 
+    "AES-256-GCM", 
+    "Argon2id", 
+    "zstd", 
+    "Railway", 
+    "Vercel"
+  ],
+  "features": [
+    "🔑 Dual encryption modes (password or raw key)",
+    "🔐 End-to-end AES-256-GCM encryption",
+    "🧠 Argon2id for strong password hashing",
+    "🧪 Tamper-proof files with authenticated encryption",
+    "📦 Automatic zstd compression before encryption",
+    "📂 Works with any file type (docs, images, archives, etc.)",
+    "🧱 Large file support (up to ~1GB, depending on server)",
+    "🖥️ Intuitive UI with drag & drop and instant feedback",
+    "🧼 Built in Rust for memory safety and performance",
+    "📦 Public Rust API for integration into other projects"
+  ],
+  "challenges": [
+    "⚙️ Handling frontend security (CORS, blob handling, etc.)",
+    "📉 Optimizing compression + encryption speed under size constraints",
+    "🧵 Adding CLI, API, and parallel encryption logic",
+    "🚀 Hosting full-stack Rust+Next.js securely and efficiently",
+    "🔐 Safely managing secrets and zeroing memory after use"
+  ],
+  "learnings": [
+    "🔬 Cryptography in practice: AES-GCM, Argon2id, SHA-256",
+    "🦀 Building secure and performant APIs with Actix Web",
+    "📦 File compression using `zstd` in Rust",
+    "🌐 Client-side file handling and security in Next.js",
+    "📡 Full-stack deployment using Railway + Vercel"
+  ],
+  "featured": true,
+  "github": "https://github.com/Amitminer/EncryptX",
+  "demo": "https://encryptx-xd.vercel.app/",
+  "status": "completed",
+  "startDate": "2025-06-17",
+  "endDate": "2025-06-22",
+  "team": ["Solo Project"]
+} 

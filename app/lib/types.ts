@@ -117,6 +117,7 @@ export interface GitHubRepo {
   open_issues_count: number;
   language: string;
   updated_at: string;
+  slug: string; 
 }
 
 export interface ProjectsState {

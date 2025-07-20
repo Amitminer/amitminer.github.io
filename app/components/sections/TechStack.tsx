@@ -4,8 +4,7 @@
  * A dynamic technology stack showcase that displays:
  * - Categorized technology groups
  * - Animated tech icons with hover effects
- * - Responsive grid layout
- * - Intersection Observer animations
+ * - Grid layout
  */
 
 'use client';

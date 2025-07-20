@@ -2,8 +2,8 @@
  * Hero Component
  * 
  * Features:
- * - Responsive design with smooth animations
- * - Performance optimized scroll and mouse move handlers
+ * - Design with smooth animations
+ * - Performance scroll and mouse move handlers
  * - Dynamic scroll indicator with auto-hide
  * - Profile image with loading states
  * - Gradient effects and animations
@@ -54,7 +54,6 @@ const SCROLL_THRESHOLD = 50
 const HERO_SECTION_THRESHOLD = 0.7
 
 const Hero = () => {
-  // Simplified state - removed unnecessary loading states
   const [showScrollArrow, setShowScrollArrow] = useState(false)
 
   const heroRef = useRef<HTMLDivElement>(null)
@@ -119,7 +118,6 @@ const Hero = () => {
     window.addEventListener("scroll", handleScroll, { passive: true })
     window.addEventListener("mousemove", handleMouseMove, { passive: true })
 
-    // Initial check
     handleScroll()
 
     return () => {
@@ -150,7 +148,7 @@ const Hero = () => {
         className="relative min-h-screen w-full flex items-center justify-center py-16 sm:py-20 md:py-32"
       >
         <div className="container max-w-3xl mx-auto px-4 md:px-6 flex flex-col items-center text-center">
-          {/* Profile Image Container - Optimized */}
+          {/* Profile Image Container */}
           <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mb-6">
             {/* Animated border ring */}
             <div

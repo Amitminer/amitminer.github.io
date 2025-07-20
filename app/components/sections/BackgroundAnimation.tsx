@@ -13,7 +13,7 @@ import { useEffect, useRef, useState } from "react"
 
 const BackgroundAnimation = () => {
   const [isVisible, setIsVisible] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef(null)
 
   // Only start animations when page is loaded and visible
   useEffect(() => {
@@ -21,7 +21,7 @@ const BackgroundAnimation = () => {
     return () => clearTimeout(timer)
   }, [])
 
-  // Rust code snippets (keeping as requested)
+  // Rust code snippets
   const rustCodeSnippets = [
     "fn main() {",
     "let mut x = 5;",
@@ -50,7 +50,7 @@ const BackgroundAnimation = () => {
       ref={containerRef}
       className="fixed inset-0 pointer-events-none overflow-hidden"
     >
-      {/* Simplified Grid Pattern */}
+      {/* Grid Pattern */}
       <div className="absolute inset-0 opacity-20">
         <div 
           className="w-full h-full"
@@ -66,18 +66,28 @@ const BackgroundAnimation = () => {
 
       {/* Static Floating Particles (CSS only animation) */}
       <div className="absolute inset-0">
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={`particle-${i}`}
-            className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${4 + Math.random() * 4}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 4}s`
-            }}
-          />
-        ))}
+        {[...Array(8)].map((_, i) => {
+          const left = Math.random() * 100
+          const top = Math.random() * 100
+          const duration = 4 + Math.random() * 4
+          const delay = Math.random() * 4
+          
+          return (
+            <div
+              key={`particle-${i}`}
+              className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-60"
+              style={{
+                left: `${left}%`,
+                top: `${top}%`,
+                animationName: 'float',
+                animationDuration: `${duration}s`,
+                animationTimingFunction: 'ease-in-out',
+                animationIterationCount: 'infinite',
+                animationDelay: `${delay}s`
+              }}
+            />
+          )
+        })}
       </div>
 
       {/* Static Geometric Shapes */}
@@ -87,6 +97,8 @@ const BackgroundAnimation = () => {
           const size = 8 + Math.random() * 12
           const isLeft = Math.random() > 0.5
           const isTop = Math.random() > 0.5
+          const duration = 8 + Math.random() * 4
+          const delay = Math.random() * 6
           
           return (
             <div
@@ -95,8 +107,11 @@ const BackgroundAnimation = () => {
               style={{
                 left: isLeft ? `${Math.random() * 25}%` : `${75 + Math.random() * 25}%`,
                 top: isTop ? `${Math.random() * 30}%` : `${70 + Math.random() * 30}%`,
-                animation: `spin ${8 + Math.random() * 4}s linear infinite`,
-                animationDelay: `${Math.random() * 6}s`
+                animationName: 'spin',
+                animationDuration: `${duration}s`,
+                animationTimingFunction: 'linear',
+                animationIterationCount: 'infinite',
+                animationDelay: `${delay}s`
               }}
             >
               {shapeType === 0 && (
@@ -131,6 +146,9 @@ const BackgroundAnimation = () => {
       <div className="absolute inset-0">
         {rustCodeSnippets.slice(0, 4).map((code, i) => {
           const isLeft = i % 2 === 0
+          const duration = 6 + Math.random() * 4
+          const delay = i * 2
+          
           return (
             <div
               key={`code-${i}`}
@@ -139,10 +157,10 @@ const BackgroundAnimation = () => {
                 left: isLeft ? `${Math.random() * 20}%` : `${80 + Math.random() * 15}%`,
                 top: `${20 + i * 20 + Math.random() * 10}%`,
                 animationName: 'fadeSlide',
-                animationDuration: `${6 + Math.random() * 4}s`,
+                animationDuration: `${duration}s`,
                 animationTimingFunction: 'ease-in-out',
                 animationIterationCount: 'infinite',
-                animationDelay: `${i * 2}s`
+                animationDelay: `${delay}s`
               }}
             >
               {code}
@@ -153,18 +171,28 @@ const BackgroundAnimation = () => {
 
       {/* Static Pulsing Dots */}
       <div className="absolute inset-0">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={`dot-${i}`}
-            className="absolute w-2 h-2 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full opacity-50"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `pulse ${2 + Math.random() * 2}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 3}s`
-            }}
-          />
-        ))}
+        {[...Array(6)].map((_, i) => {
+          const left = Math.random() * 100
+          const top = Math.random() * 100
+          const duration = 2 + Math.random() * 2
+          const delay = Math.random() * 3
+          
+          return (
+            <div
+              key={`dot-${i}`}
+              className="absolute w-2 h-2 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full opacity-50"
+              style={{
+                left: `${left}%`,
+                top: `${top}%`,
+                animationName: 'pulse',
+                animationDuration: `${duration}s`,
+                animationTimingFunction: 'ease-in-out',
+                animationIterationCount: 'infinite',
+                animationDelay: `${delay}s`
+              }}
+            />
+          )
+        })}
       </div>
 
       {/* Subtle Gradient Overlay */}

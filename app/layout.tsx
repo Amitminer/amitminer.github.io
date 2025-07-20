@@ -24,7 +24,8 @@ export const metadata: Metadata = {
 		title: "AmitxD – Rust & Web Developer",
 		description: "Explore my projects, tech stack, and contributions in Rust, TypeScript, and more.",
 		type: "website"
-	}
+	},
+	metadataBase: new URL('https://amitminer.github.io'),
 };
 
 

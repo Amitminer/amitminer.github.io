@@ -5,7 +5,6 @@
  * - User statistics and activity metrics
  * - Repository statistics
  * - Contribution data
- * - Language usage
  * - Activity timeline
  */
 

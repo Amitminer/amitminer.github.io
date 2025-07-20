@@ -2,30 +2,32 @@
  * Projects Component
  * 
  * A dynamic projects showcase section that displays:
- * - Featured projects (pinned repositories)
+ * - Custom curated projects (replaces pinned repositories)
  * - Recent projects from GitHub
  * 
  * Features:
- * - Tabbed interface for featured/recent projects
+ * - Tabbed interface for custom/recent projects
  * - Project cards with GitHub stats
  * - Lazy loading images with fallback
  * - Intersection Observer animations
  * - Error handling and loading states
- * - Responsive grid layout
- * - Shows all recent projects (not limited to 6)
- * - UI with better visual feedback
+ * - Grid layout
+ * - Custom project pages via /projects/[slug]
  */
 
 "use client"
 
 import { useEffect, useRef, useState, useCallback, useMemo, memo } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { ArrowUpRight, Star, GitFork, AlertCircle, Code, Eye, Calendar, RefreshCw } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
-import type { GitHubRepo, PinnedProject, ProjectsState, } from "@/app/lib/types"
-import { BackendURL, GithubUsername, PinnedRepoApiUrl } from "@/app/utils/Links"
+import type { GitHubRepo } from "@/app/lib/types"
+import { BackendURL, GithubUsername } from "@/app/utils/Links"
 import DefaultBanner from "@/app/assets/default_banner.jpg"
-import type { PinnedRepoAPI } from "@/app/lib/types"
+import { projectImages, previewImages } from '@/app/assets/projects';
+
+import { CUSTOM_PROJECTS, type CustomProject } from "@/app/lib/data/projects"
 
 // ===== PERFORMANCE UTILITIES =====
 const throttle = <T extends (...args: any[]) => any>(func: T, limit: number): T => {
@@ -39,7 +41,7 @@ const throttle = <T extends (...args: any[]) => any>(func: T, limit: number): T 
   }) as T;
 };
 
-// ===== SIMPLIFIED CACHING =====
+// ===== CACHING =====
 class SimpleCache {
   private cache = new Map<string, { data: any; timestamp: number }>();
   private readonly TTL = 5 * 60 * 1000; // 5 minutes
@@ -64,7 +66,7 @@ const generateImageUrl = (repoName: string, owner: string = GithubUsername): str
   return `https://opengraph.githubassets.com/1/${owner}/${repoName}`;
 };
 
-// ===== SIMPLIFIED API FUNCTIONS =====
+// ===== API FUNCTIONS =====
 const fetchWithCache = async function <T>(key: string, fetcher: () => Promise<T>): Promise<T> {
   const cached = cache.get<T>(key);
   if (cached) return cached;
@@ -82,15 +84,7 @@ const fetchGitHubData = async (endpoint: string): Promise<any> => {
   });
 };
 
-const fetchPinnedRepos = async (): Promise<PinnedRepoAPI[]> => {
-  return fetchWithCache(`pinned-${GithubUsername}`, async () => {
-    const response = await fetch(`${PinnedRepoApiUrl}${GithubUsername}`);
-    if (!response.ok) throw new Error(`Failed to fetch pinned repositories`);
-    return response.json();
-  });
-};
-
-// ===== SIMPLIFIED SKELETON =====
+// ===== SKELETON =====
 const ProjectCardSkeleton = memo(() => (
   <div className="bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden h-[320px] animate-pulse">
     <div className="h-48 bg-gradient-to-r from-gray-700/20 to-gray-700/10" />
@@ -104,22 +98,98 @@ const ProjectCardSkeleton = memo(() => (
 ));
 ProjectCardSkeleton.displayName = 'ProjectCardSkeleton';
 
-// ===== PROJECT CARD =====
-const ProjectCard = memo(({ project, featured = false }: { project: PinnedProject | GitHubRepo; featured?: boolean }) => {
+// ===== CUSTOM PROJECT CARD =====
+const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
   const [imageError, setImageError] = useState(false);
-  
-  const isGitHubRepo = "html_url" in project;
-  const projectName = project.name;
-  const projectDescription = project.description || "No description available";
-  const projectUrl = isGitHubRepo ? project.html_url : project.url;
-  const projectStars = isGitHubRepo ? project.stargazers_count : project.stars;
-  const projectForks = isGitHubRepo ? project.forks_count : project.forks;
-  const projectLanguage = isGitHubRepo ? project.language : null;
-  const projectUpdated = isGitHubRepo ? project.updated_at : (project as PinnedProject).updated_at;
+  const previewImage = previewImages[project.slug];
+  const mainImage = projectImages[project.slug];
 
-  const imageUrl = isGitHubRepo
-    ? generateImageUrl(project.name)
-    : (project as PinnedProject).image;
+  const getStatusColor = (status: CustomProject['status']) => {
+    switch (status) {
+      case 'completed': return 'text-green-400 bg-green-900/20';
+      case 'in-progress': return 'text-yellow-400 bg-yellow-900/20';
+      case 'archived': return 'text-gray-400 bg-gray-900/20';
+      default: return 'text-gray-400 bg-gray-900/20';
+    }
+  };
+
+  const getStatusText = (status: CustomProject['status']) => {
+    switch (status) {
+      case 'completed': return 'Completed';
+      case 'in-progress': return 'In Progress';
+      case 'archived': return 'Archived';
+      default: return 'Unknown';
+    }
+  };
+
+  return (
+    <div className="group bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-colors duration-200 h-full flex flex-col">
+      <div className="relative w-full h-48 overflow-hidden">
+        <Image
+          src={imageError ? DefaultBanner.src : (mainImage || DefaultBanner.src)}
+          alt={`${project.name} preview`}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={() => setImageError(true)}
+          priority={project.featured}
+          decoding="async"
+          loading={project.featured ? "eager" : "lazy"}
+          quality={75}
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+        {project.featured && (
+          <div className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-purple-500 px-2 py-1 rounded-full text-xs text-white font-medium">
+            <Star size={10} className="inline mr-1" />
+            Featured
+          </div>
+        )}
+
+        <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs ${getStatusColor(project.status)}`}>
+          {getStatusText(project.status)}
+        </div>
+
+        <div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
+          {project.technologies.slice(0, 2).map((tech) => (
+            <div key={tech} className="bg-black/60 px-2 py-1 rounded-full text-xs text-white">
+              {tech}
+            </div>
+          ))}
+          {project.technologies.length > 2 && (
+            <div className="bg-black/60 px-2 py-1 rounded-full text-xs text-white">
+              +{project.technologies.length - 2}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="p-4 flex flex-col flex-grow">
+        <h3 className="text-lg font-bold mb-2 text-cyan-400 line-clamp-1">
+          {project.name}
+        </h3>
+
+        <p className="text-gray-300 mb-4 text-sm line-clamp-2 flex-grow">
+          {project.description}
+        </p>
+
+        <Link
+          href={`/projects/${project.slug}`}
+          className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600/20 border border-purple-500/60 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-colors duration-200 font-medium text-sm"
+        >
+          Learn More
+          <ArrowUpRight size={14} />
+        </Link>
+      </div>
+    </div>
+  );
+});
+CustomProjectCard.displayName = 'CustomProjectCard';
+
+// ===== GITHUB PROJECT CARD =====
+const GitHubProjectCard = memo(({ project }: { project: GitHubRepo }) => {
+  const [imageError, setImageError] = useState(false);
 
   const formatDate = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -133,68 +203,62 @@ const ProjectCard = memo(({ project, featured = false }: { project: PinnedProjec
     return `${Math.floor(diffDays / 365)} years ago`;
   }, []);
 
+  const imageUrl = generateImageUrl(project.name);
+
   return (
-    <div id="project-card" className="group bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-colors duration-200 h-full flex flex-col">
-      <div id="project-image" className="relative w-full h-48 overflow-hidden">
+    <div className="group bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-colors duration-200 h-full flex flex-col">
+      <div className="relative w-full h-48 overflow-hidden">
         <Image
           src={imageError ? DefaultBanner.src : imageUrl}
-          alt={`${projectName} preview`}
+          alt={`${project.name} preview`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           onError={() => setImageError(true)}
-          priority={featured}
           decoding="async"
-          loading={featured ? "eager" : "lazy"}
+          loading="lazy"
           quality={75}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
-        {featured && (
-          <div className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-purple-500 px-2 py-1 rounded-full text-xs text-white font-medium">
-            <Star size={10} className="inline mr-1" />
-            Featured
-          </div>
-        )}
-
-        {projectLanguage && (
+        {project.language && (
           <div className="absolute top-2 left-2 bg-black/60 px-2 py-1 rounded-full text-xs text-white">
             <Code size={10} className="inline mr-1" />
-            {projectLanguage}
+            {project.language}
           </div>
         )}
 
         <div className="absolute bottom-2 left-2 flex space-x-2 text-white text-xs">
           <div className="bg-black/60 px-2 py-1 rounded-full flex items-center">
             <Star size={10} className="mr-1" />
-            {projectStars}
+            {project.stargazers_count}
           </div>
           <div className="bg-black/60 px-2 py-1 rounded-full flex items-center">
             <GitFork size={10} className="mr-1" />
-            {projectForks}
+            {project.forks_count}
           </div>
         </div>
       </div>
 
       <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-lg font-bold mb-2 text-cyan-400 line-clamp-1">
-          {projectName}
+          {project.name}
         </h3>
 
         <p className="text-gray-300 mb-3 text-sm line-clamp-2 flex-grow">
-          {projectDescription}
+          {project.description || "No description available"}
         </p>
 
-        {projectUpdated && (
+        {project.updated_at && (
           <div className="flex items-center text-xs text-gray-400 mb-3">
             <Calendar size={12} className="mr-1" />
-            {formatDate(projectUpdated)}
+            {formatDate(project.updated_at)}
           </div>
         )}
 
         <a
-          href={projectUrl}
+          href={project.html_url}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600/20 border border-purple-500/60 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-colors duration-200 font-medium text-sm"
@@ -207,20 +271,18 @@ const ProjectCard = memo(({ project, featured = false }: { project: PinnedProjec
     </div>
   );
 });
-ProjectCard.displayName = 'ProjectCard';
+GitHubProjectCard.displayName = 'GitHubProjectCard';
 
 // ===== MAIN COMPONENT =====
 const Projects = () => {
-  // ===== SIMPLIFIED STATE =====
+  // ===== STATE =====
   const [state, setState] = useState<{
-    featuredProjects: PinnedProject[];
     recentProjects: GitHubRepo[];
     loading: boolean;
     error: string | null;
     activeTab: "featured" | "recent";
     showAll: boolean;
   }>({
-    featuredProjects: [],
     recentProjects: [],
     loading: true,
     error: null,
@@ -231,35 +293,29 @@ const Projects = () => {
   const projectsRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // ===== SIMPLIFIED DATA FETCHING =====
+  // ===== DATA FETCHING =====
   const fetchData = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));
 
-      const [pinnedData, recentData] = await Promise.allSettled([
-        fetchPinnedRepos().catch(() => []),
-        fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=12`).catch(() => [])
-      ]);
+      const recentData = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=12`).catch(() => []);
+      // Utility to generate a URL-safe slug from a string
+      const toUrlSlug = (str: string) =>
+        str
+          .toLowerCase()
+          .replace(/[^a-z0-9\-_]+/g, '-') // Replace non-url-safe chars with hyphen
+          .replace(/^-+|-+$/g, '')         // Trim leading/trailing hyphens
+          .replace(/--+/g, '-');           // Collapse multiple hyphens
 
-      const pinned = pinnedData.status === 'fulfilled' ? pinnedData.value : [];
-      const recent = recentData.status === 'fulfilled' ? recentData.value : [];
-
-      // Create featured projects from pinned repos
-      const featured: PinnedProject[] = pinned.map(repo => ({
-        name: repo.name,
-        description: repo.description || "No description available",
-        image: generateImageUrl(repo.name, repo.author),
-        url: `https://github.com/${repo.author}/${repo.name}`,
-        stars: repo.stars || 0,
-        forks: repo.forks || 0,
-        issues: 0,
-        updated_at: repo.updated_at || null,
-      }));
-
+      const recentDataWithSlugs = Array.isArray(recentData)
+        ? recentData.map((repo: any) => ({
+            ...repo,
+            slug: repo.name ? toUrlSlug(repo.name) : '',
+          }))
+        : [];
       setState(prev => ({
         ...prev,
-        featuredProjects: featured,
-        recentProjects: recent,
+        recentProjects: recentDataWithSlugs,
         loading: false
       }));
 
@@ -267,7 +323,7 @@ const Projects = () => {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: "Failed to load projects"
+        error: "Failed to load recent projects"
       }));
     }
   }, []);
@@ -300,13 +356,13 @@ const Projects = () => {
   // ===== MEMOIZED PROJECTS =====
   const displayedProjects = useMemo(() => {
     if (state.activeTab === "featured") {
-      return state.featuredProjects;
+      return CUSTOM_PROJECTS;
     }
     return state.showAll ? state.recentProjects : state.recentProjects.slice(0, 6);
-  }, [state.activeTab, state.featuredProjects, state.recentProjects, state.showAll]);
+  }, [state.activeTab, state.recentProjects, state.showAll]);
 
   // ===== ERROR STATE =====
-  if (state.error) {
+  if (state.error && state.activeTab === "recent") {
     return (
       <section id="projects" className="py-16 w-full">
         <div className="container mx-auto px-4">
@@ -354,7 +410,7 @@ const Projects = () => {
                   : "text-gray-400 hover:text-cyan-300"
               }`}
             >
-              Featured ({state.featuredProjects.length})
+              Featured ({CUSTOM_PROJECTS.length})
             </button>
             <button
               onClick={() => setState(prev => ({ ...prev, activeTab: "recent" }))}
@@ -370,7 +426,7 @@ const Projects = () => {
         </div>
 
         {/* Projects Grid */}
-        {state.loading ? (
+        {state.loading && state.activeTab === "recent" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <ProjectCardSkeleton key={i} />
@@ -378,13 +434,21 @@ const Projects = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedProjects.map((project) => (
-              <ProjectCard 
-                key={project.name} 
-                project={project} 
-                featured={state.activeTab === "featured"} 
-              />
-            ))}
+            {state.activeTab === "featured" ? (
+              displayedProjects.map((project) => (
+                <CustomProjectCard 
+                  key={project.slug} 
+                  project={project as CustomProject}
+                />
+              ))
+            ) : (
+              displayedProjects.map((project) => (
+                <GitHubProjectCard 
+                  key={project.name} 
+                  project={project as GitHubRepo} 
+                />
+              ))
+            )}
           </div>
         )}
 

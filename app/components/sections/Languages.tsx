@@ -59,7 +59,6 @@ const Languages = () => {
       img.onerror = () => {
         if (retryCount < maxRetries) {
           setRetryCount(prev => prev + 1);
-          // Faster retry - 500ms instead of 1000ms
           setTimeout(preloadImage, 500);
         } else {
           setError('Unable to load language stats');
