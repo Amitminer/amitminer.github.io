@@ -5,7 +5,6 @@
  * - Categorized technology groups
  * - Animated tech icons with hover effects
  * - Grid layout
- * - Intersection Observer animations
  */
 
 'use client';

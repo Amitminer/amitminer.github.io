@@ -26,7 +26,6 @@ import type { GitHubRepo } from "@/app/lib/types"
 import { BackendURL, GithubUsername } from "@/app/utils/Links"
 import DefaultBanner from "@/app/assets/default_banner.jpg"
 import { projectImages, previewImages } from '@/app/assets/projects';
-import { StaticImageData } from "next/image";
 
 import { CUSTOM_PROJECTS, type CustomProject } from "@/app/lib/data/projects"
 
@@ -42,7 +41,7 @@ const throttle = <T extends (...args: any[]) => any>(func: T, limit: number): T 
   }) as T;
 };
 
-// ===== SIMPLIFIED CACHING =====
+// ===== CACHING =====
 class SimpleCache {
   private cache = new Map<string, { data: any; timestamp: number }>();
   private readonly TTL = 5 * 60 * 1000; // 5 minutes
@@ -67,7 +66,7 @@ const generateImageUrl = (repoName: string, owner: string = GithubUsername): str
   return `https://opengraph.githubassets.com/1/${owner}/${repoName}`;
 };
 
-// ===== SIMPLIFIED API FUNCTIONS =====
+// ===== API FUNCTIONS =====
 const fetchWithCache = async function <T>(key: string, fetcher: () => Promise<T>): Promise<T> {
   const cached = cache.get<T>(key);
   if (cached) return cached;
@@ -85,7 +84,7 @@ const fetchGitHubData = async (endpoint: string): Promise<any> => {
   });
 };
 
-// ===== SIMPLIFIED SKELETON =====
+// ===== SKELETON =====
 const ProjectCardSkeleton = memo(() => (
   <div className="bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden h-[320px] animate-pulse">
     <div className="h-48 bg-gradient-to-r from-gray-700/20 to-gray-700/10" />
@@ -276,7 +275,7 @@ GitHubProjectCard.displayName = 'GitHubProjectCard';
 
 // ===== MAIN COMPONENT =====
 const Projects = () => {
-  // ===== SIMPLIFIED STATE =====
+  // ===== STATE =====
   const [state, setState] = useState<{
     recentProjects: GitHubRepo[];
     loading: boolean;
@@ -294,7 +293,7 @@ const Projects = () => {
   const projectsRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // ===== SIMPLIFIED DATA FETCHING =====
+  // ===== DATA FETCHING =====
   const fetchData = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, loading: true, error: null }));

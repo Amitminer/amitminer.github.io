@@ -7,15 +7,6 @@
  * - Floating particles and decorative elements
  * - Design with gradient effects
  * - Skeleton loading state
- * 
- * Key Features:
- * - Progressive text reveal with typewriter effect
- * - Blinking cursor animation
- * - Scroll-triggered animations
- * - Highlighted name mentions
- * - Decorative particle animations
- * - Gradient text and border effects
- * - Skeleton loading state
  */
 
 'use client';

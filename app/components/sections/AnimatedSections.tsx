@@ -1,7 +1,7 @@
 /**
  * AnimatedSections Component
  *
- * A high-performance animation system that provides:
+ * A animation system that provides:
  * - Section-based animations with GSAP
  * - Scroll-triggered animations with performance optimizations
  * - Custom cursor effects for desktop devices
@@ -29,6 +29,11 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
   const cursorRef = useRef<HTMLDivElement>(null)
   const [isDesktop, setIsDesktop] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+  
+  // Add refs to track cleanup functions and animation IDs
+  const cleanupFunctionsRef = useRef<(() => void)[]>([])
+  const animationIdsRef = useRef<Set<number>>(new Set())
+  const timeoutsRef = useRef<Set<NodeJS.Timeout>>(new Set())
 
   const checkIsDesktop = useCallback(() => {
     const isDesktopSize = window.innerWidth >= 1024
@@ -39,28 +44,59 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
     return isDesktopSize && hasPointerDevice && isNotTouchDevice && hasGoodPerformance
   }, [])
 
+  const addTimeout = useCallback((timeoutId: NodeJS.Timeout) => {
+    timeoutsRef.current.add(timeoutId)
+  }, [])
+
+  const addAnimationId = useCallback((id: number) => {
+    animationIdsRef.current.add(id)
+  }, [])
+
+  const addCleanupFunction = useCallback((cleanup: () => void) => {
+    cleanupFunctionsRef.current.push(cleanup)
+  }, [])
+
   useEffect(() => {
     setIsDesktop(checkIsDesktop())
 
     let resizeTimeout: NodeJS.Timeout
     const handleResizeDebounced = () => {
-      clearTimeout(resizeTimeout)
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout)
+        timeoutsRef.current.delete(resizeTimeout)
+      }
       resizeTimeout = setTimeout(() => {
         setIsDesktop(checkIsDesktop())
+        timeoutsRef.current.delete(resizeTimeout)
       }, 150)
+      addTimeout(resizeTimeout)
     }
 
     window.addEventListener("resize", handleResizeDebounced, { passive: true })
-    return () => {
+    
+    // Capture the current value of the ref at the start of the effect
+    const timeouts = timeoutsRef.current
+    const cleanup = () => {
       window.removeEventListener("resize", handleResizeDebounced)
-      clearTimeout(resizeTimeout)
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout)
+        timeouts.delete(resizeTimeout)
+      }
     }
-  }, [checkIsDesktop])
+    
+    addCleanupFunction(cleanup)
+    return cleanup
+  }, [checkIsDesktop, addTimeout, addCleanupFunction])
 
   useEffect(() => {
     if (!isDesktop || isInitialized) return
 
+    // Capture the current value of the ref at the start of the effect
+    const timeouts = timeoutsRef.current
+
     const initDelay = setTimeout(() => {
+      timeouts.delete(initDelay)
+      
       const ctx = gsap.context(() => {
         gsap.defaults({
           ease: "power2.out",
@@ -71,6 +107,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
         let lastScrollTime = 0
         let scrollVelocity = 0
         let isFastScrolling = false
+        let fastScrollTimeout: NodeJS.Timeout
 
         // Detects fast scrolling to temporarily disable complex animations for performance
         const handleFastScroll = () => {
@@ -81,14 +118,24 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           if (timeDiff > 0) {
             const newVelocity = Math.abs(currentScroll - (window.lastScrollY || 0)) / timeDiff
             scrollVelocity = newVelocity
+            const wasFastScrolling = isFastScrolling
             isFastScrolling = newVelocity > 2 // Threshold for fast scrolling
 
-            if (isFastScrolling) {
+            if (isFastScrolling && !wasFastScrolling) {
               // Disable complex animations during fast scroll
               gsap.globalTimeline.timeScale(0.1)
-              setTimeout(() => {
+              
+              if (fastScrollTimeout) {
+                clearTimeout(fastScrollTimeout)
+                timeouts.delete(fastScrollTimeout)
+              }
+              
+              fastScrollTimeout = setTimeout(() => {
                 gsap.globalTimeline.timeScale(1)
+                isFastScrolling = false
+                timeouts.delete(fastScrollTimeout)
               }, 100)
+              addTimeout(fastScrollTimeout)
             }
           }
 
@@ -97,8 +144,15 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
         }
 
         window.addEventListener("scroll", handleFastScroll, { passive: true })
+        addCleanupFunction(() => {
+          window.removeEventListener("scroll", handleFastScroll)
+          if (fastScrollTimeout) {
+            clearTimeout(fastScrollTimeout)
+            timeouts.delete(fastScrollTimeout)
+          }
+        })
 
-        // UNIVERSAL PROGRESS BAR (works for all devices)
+        // *UNIVERSAL PROGRESS BAR (works for all devices)
         const progressBar = document.createElement("div")
         progressBar.className = "scroll-progress"
         progressBar.style.cssText = `
@@ -113,6 +167,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
         `
         document.body.appendChild(progressBar)
+        addCleanupFunction(() => progressBar.remove())
 
         let progressAnimationId: number
         ScrollTrigger.create({
@@ -120,10 +175,17 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           start: "top top",
           end: "bottom bottom",
           onUpdate: (self) => {
-            if (progressAnimationId) cancelAnimationFrame(progressAnimationId)
+            if (progressAnimationId) {
+              cancelAnimationFrame(progressAnimationId)
+              animationIdsRef.current.delete(progressAnimationId)
+            }
             progressAnimationId = requestAnimationFrame(() => {
-              progressBar.style.width = `${self.progress * 100}%`
+              if (progressBar.parentNode) { // Check if element still exists
+                progressBar.style.width = `${self.progress * 100}%`
+              }
+              animationIdsRef.current.delete(progressAnimationId)
             })
+            addAnimationId(progressAnimationId)
           },
         })
 
@@ -131,6 +193,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
         if (sections.length === 0) return
 
         sections.forEach((section: any, i) => {
+          if (!section || !section.parentNode) return
           const direction = i % 2 === 0 ? 100 : -100
           const rotationDir = i % 2 === 0 ? 5 : -5
 
@@ -164,38 +227,44 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
         // Reverse parallax
         sections.forEach((section: any, i) => {
-          if (i % 2 === 0) {
-            const reverseEl = document.createElement("div")
-            reverseEl.className = "reverse-scroll-bg"
-            reverseEl.style.cssText = `
-              position: absolute;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              pointer-events: none;
-              z-index: -1;
-              will-change: transform;
-              background: radial-gradient(circle at ${i % 4 === 0 ? "30%" : "70%"} 50%,
-                rgba(255, 20, 147, 0.03) 0%, transparent 70%);
-            `
-            section.style.position = "relative"
-            section.appendChild(reverseEl)
+          if (!section || !section.parentNode || i % 2 !== 0) return
 
-            gsap.to(reverseEl, {
-              yPercent: 50,
-              xPercent: i % 4 === 0 ? 20 : -20,
-              rotation: i % 4 === 0 ? 10 : -10,
-              ease: "none",
-              scrollTrigger: {
-                trigger: document.body || containerRef.current,
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1,
-                fastScrollEnd: true,
-              },
-            })
-          }
+          const reverseEl = document.createElement("div")
+          reverseEl.className = "reverse-scroll-bg"
+          reverseEl.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            will-change: transform;
+            background: radial-gradient(circle at ${i % 4 === 0 ? "30%" : "70%"} 50%,
+              rgba(255, 20, 147, 0.03) 0%, transparent 70%);
+          `
+          section.style.position = "relative"
+          section.appendChild(reverseEl)
+          
+          addCleanupFunction(() => {
+            if (reverseEl.parentNode) {
+              reverseEl.remove()
+            }
+          })
+
+          gsap.to(reverseEl, {
+            yPercent: 50,
+            xPercent: i % 4 === 0 ? 20 : -20,
+            rotation: i % 4 === 0 ? 10 : -10,
+            ease: "none",
+            scrollTrigger: {
+              trigger: containerRef.current || document.body,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: 1,
+              fastScrollEnd: true,
+            },
+          })
         })
 
         // Character animations with fast-scroll protection
@@ -204,6 +273,8 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
         )
 
         headings.forEach((heading: any) => {
+          if (!heading || !heading.parentNode) return
+          
           // Skip if already animated or in problematic sections
           if (
             heading.closest("#hero") ||
@@ -249,6 +320,8 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           heading.innerHTML = chars
           const charElements = heading.querySelectorAll(".char")
 
+          if (charElements.length === 0) return
+
           gsap.set(charElements, {
             opacity: 0,
             y: 100,
@@ -279,6 +352,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
             toggleActions: "play reverse play reverse",
             fastScrollEnd: true,
             onEnter: () => {
+              if (!heading.parentNode) return
               if (isFastScrolling) {
                 gsap.set(charElements, { opacity: 1, y: 0, rotationX: 0, scale: 1 })
               } else {
@@ -286,9 +360,11 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
               }
             },
             onLeave: () => {
+              if (!heading.parentNode) return
               charAnimation.reverse()
             },
             onEnterBack: () => {
+              if (!heading.parentNode) return
               if (isFastScrolling) {
                 gsap.set(charElements, { opacity: 1, y: 0, rotationX: 0, scale: 1 })
               } else {
@@ -296,6 +372,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
               }
             },
             onLeaveBack: () => {
+              if (!heading.parentNode) return
               charAnimation.reverse()
             },
           })
@@ -325,7 +402,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           const cards = gsap.utils.toArray(selector)
 
           cards.forEach((card: any, i) => {
-            if (animatedCards.has(card) || card.hasAttribute("data-card-animated")) return
+            if (!card || !card.parentNode || animatedCards.has(card) || card.hasAttribute("data-card-animated")) return
 
             animatedCards.add(card)
             card.setAttribute("data-card-animated", "true")
@@ -371,7 +448,12 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
             let animationId: number
 
             const animateHover = (targetValues: any) => {
-              if (animationId) cancelAnimationFrame(animationId)
+              if (!card.parentNode) return 
+              
+              if (animationId) {
+                cancelAnimationFrame(animationId)
+                animationIdsRef.current.delete(animationId)
+              }
 
               animationId = requestAnimationFrame(() => {
                 gsap.to(card, {
@@ -380,10 +462,12 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
                   ease: "power3.out",
                   overwrite: "auto",
                 })
+                animationIdsRef.current.delete(animationId)
               })
+              addAnimationId(animationId)
             }
 
-            card.addEventListener("mouseenter", () => {
+            const handleMouseEnter = () => {
               isHovered = true
               card.style.willChange = "transform"
               animateHover({
@@ -392,10 +476,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
                 rotationY: 8,
                 z: 50,
               })
-            })
+            }
 
-            card.addEventListener("mousemove", (e: MouseEvent) => {
-              if (!isHovered) return
+            const handleMouseMove = (e: MouseEvent) => {
+              if (!isHovered || !card.parentNode) return
 
               const rect = card.getBoundingClientRect()
               const x = (e.clientX - rect.left - rect.width / 2) / rect.width
@@ -407,9 +491,9 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
                 scale: 1.08,
                 y: -15,
               })
-            })
+            }
 
-            card.addEventListener("mouseleave", () => {
+            const handleMouseLeave = () => {
               isHovered = false
               card.style.willChange = "auto"
               animateHover({
@@ -419,12 +503,28 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
                 rotationX: 0,
                 z: 0,
               })
+            }
+
+            card.addEventListener("mouseenter", handleMouseEnter, { passive: true })
+            card.addEventListener("mousemove", handleMouseMove, { passive: true })
+            card.addEventListener("mouseleave", handleMouseLeave, { passive: true })
+
+            addCleanupFunction(() => {
+              if (animationId) {
+                cancelAnimationFrame(animationId)
+                animationIdsRef.current.delete(animationId)
+              }
+              card.removeEventListener("mouseenter", handleMouseEnter)
+              card.removeEventListener("mousemove", handleMouseMove)
+              card.removeEventListener("mouseleave", handleMouseLeave)
             })
           })
         })
 
         // Parallax
         sections.forEach((section: any, i) => {
+          if (!section || !section.parentNode) return
+          
           const speed = 0.4 + (i % 3) * 0.2
           const direction = i % 2 === 0 ? -1 : 1
 
@@ -442,6 +542,8 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
           const childElements = section.querySelectorAll("h1:not(#hero h1), h2, h3, p")
           childElements.forEach((child: any, childIndex: number) => {
+            if (!child || !child.parentNode) return
+            
             gsap.to(child, {
               yPercent: (childIndex % 2 === 0 ? 5 : -5) * speed,
               ease: "none",
@@ -474,6 +576,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
             transparent 100%);
         `
         document.body.appendChild(morphingBg)
+        addCleanupFunction(() => morphingBg.remove())
 
         let bgAnimationId: number
         ScrollTrigger.create({
@@ -482,15 +585,22 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           end: "bottom bottom",
           fastScrollEnd: true,
           onUpdate: (self) => {
-            if (bgAnimationId) cancelAnimationFrame(bgAnimationId)
+            if (bgAnimationId) {
+              cancelAnimationFrame(bgAnimationId)
+              animationIdsRef.current.delete(bgAnimationId)
+            }
             bgAnimationId = requestAnimationFrame(() => {
-              const progress = self.progress
-              morphingBg.style.background = `linear-gradient(${135 + progress * 120}deg,
-                rgba(255, 20, 147, ${0.02 + progress * 0.015}) 0%,
-                transparent 30%,
-                rgba(0, 255, 255, ${0.02 + progress * 0.015}) 70%,
-                transparent 100%)`
+              if (morphingBg.parentNode) {
+                const progress = self.progress
+                morphingBg.style.background = `linear-gradient(${135 + progress * 120}deg,
+                  rgba(255, 20, 147, ${0.02 + progress * 0.015}) 0%,
+                  transparent 30%,
+                  rgba(0, 255, 255, ${0.02 + progress * 0.015}) 70%,
+                  transparent 100%)`
+              }
+              animationIdsRef.current.delete(bgAnimationId)
             })
+            addAnimationId(bgAnimationId)
           },
         })
 
@@ -501,55 +611,88 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           let cursorAnimationId: number
 
           const updateCursor = () => {
-            gsap.set(cursor, {
-              x: cursorX,
-              y: cursorY,
-            })
+            if (cursor.parentNode) {
+              gsap.set(cursor, {
+                x: cursorX,
+                y: cursorY,
+              })
+            }
+            animationIdsRef.current.delete(cursorAnimationId)
           }
 
-          document.addEventListener(
-            "mousemove",
-            (e) => {
-              cursorX = e.clientX
-              cursorY = e.clientY
+          const handleMouseMove = (e: MouseEvent) => {
+            cursorX = e.clientX
+            cursorY = e.clientY
 
-              if (cursorAnimationId) cancelAnimationFrame(cursorAnimationId)
-              cursorAnimationId = requestAnimationFrame(updateCursor)
-            },
-            { passive: true },
-          )
+            if (cursorAnimationId) {
+              cancelAnimationFrame(cursorAnimationId)
+              animationIdsRef.current.delete(cursorAnimationId)
+            }
+            cursorAnimationId = requestAnimationFrame(updateCursor)
+            addAnimationId(cursorAnimationId)
+          }
+
+          document.addEventListener("mousemove", handleMouseMove, { passive: true })
+
+          addCleanupFunction(() => {
+            document.removeEventListener("mousemove", handleMouseMove)
+            if (cursorAnimationId) {
+              cancelAnimationFrame(cursorAnimationId)
+              animationIdsRef.current.delete(cursorAnimationId)
+            }
+          })
 
           const interactiveSelectors = [...cardSelectors, "button", "a", "[role='button']", ".cursor-hover"]
+          const interactiveElements: any[] = []
 
           interactiveSelectors.forEach((selector) => {
             gsap.utils.toArray(selector).forEach((element: any) => {
-              element.addEventListener("mouseenter", () => {
+              if (!element || !element.parentNode) return
+              
+              const handleMouseEnter = () => {
+                if (!cursor.parentNode) return
                 gsap.to(cursor, {
                   scale: 2,
                   backgroundColor: "rgba(255, 20, 147, 0.6)",
                   duration: 0.3,
                   ease: "power2.out",
                 })
-              })
+              }
 
-              element.addEventListener("mouseleave", () => {
+              const handleMouseLeave = () => {
+                if (!cursor.parentNode) return
                 gsap.to(cursor, {
                   scale: 1,
                   backgroundColor: "rgba(0, 255, 255, 0.4)",
                   duration: 0.3,
                   ease: "power2.out",
                 })
-              })
+              }
+
+              element.addEventListener("mouseenter", handleMouseEnter, { passive: true })
+              element.addEventListener("mouseleave", handleMouseLeave, { passive: true })
+              
+              interactiveElements.push({ element, handleMouseEnter, handleMouseLeave })
+            })
+          })
+
+          addCleanupFunction(() => {
+            interactiveElements.forEach(({ element, handleMouseEnter, handleMouseLeave }) => {
+              element.removeEventListener("mouseenter", handleMouseEnter)
+              element.removeEventListener("mouseleave", handleMouseLeave)
             })
           })
         }
 
-        gsap.delayedCall(0.1, () => {
+        const refreshTimeout1 = setTimeout(() => {
           ScrollTrigger.refresh()
+          timeouts.delete(refreshTimeout1)
 
-          gsap.delayedCall(0.3, () => {
+          const refreshTimeout2 = setTimeout(() => {
             const staticCards = document.querySelectorAll('[data-card-animated="true"]')
             staticCards.forEach((card: any) => {
+              if (!card || !card.parentNode) return
+              
               const rect = card.getBoundingClientRect()
               const isInView = rect.top < window.innerHeight * 0.8 && rect.bottom > 0
 
@@ -564,8 +707,12 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
                 })
               }
             })
-          })
-        })
+            timeouts.delete(refreshTimeout2)
+          }, 300)
+          addTimeout(refreshTimeout2)
+        }, 100)
+        addTimeout(refreshTimeout1)
+
       }, containerRef)
 
       setIsInitialized(true)
@@ -590,11 +737,69 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
         setIsInitialized(false)
       }
     }, 50)
+    
+    addTimeout(initDelay)
 
     return () => {
       clearTimeout(initDelay)
+      timeouts.delete(initDelay)
     }
-  }, [isDesktop, isInitialized])
+  }, [isDesktop, isInitialized, addTimeout, addAnimationId, addCleanupFunction])
+
+  // Comprehensive cleanup on unmount
+  useEffect(() => {
+    const animationIds = animationIdsRef.current
+    const timeouts = timeoutsRef.current
+    const cleanupFunctions = cleanupFunctionsRef.current
+
+    return () => {
+      animationIds.forEach(id => {
+        cancelAnimationFrame(id)
+      })
+      animationIds.clear()
+
+      timeouts.forEach(timeout => {
+        clearTimeout(timeout)
+      })
+      timeouts.clear()
+
+      cleanupFunctions.forEach(cleanup => {
+        try {
+          cleanup()
+        } catch (error) {
+          console.warn('Error during cleanup:', error)
+        }
+      })
+      cleanupFunctions.length = 0
+
+      // Clean up GSAP
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
+      gsap.killTweensOf("*")
+
+      // Remove created elements
+      const elementsToRemove = [".scroll-progress", ".morphing-bg", ".reverse-scroll-bg"]
+      elementsToRemove.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          try {
+            el.remove()
+          } catch (error) {
+            console.warn('Error removing element:', error)
+          }
+        })
+      })
+
+      // Clean up will-change styles
+      document.querySelectorAll('[style*="will-change"]').forEach((el) => {
+        if (el instanceof HTMLElement) {
+          try {
+            el.style.willChange = 'auto'
+          } catch (error) {
+            console.warn('Error cleaning will-change:', error)
+          }
+        }
+      })
+    }
+  }, [])
 
   return (
     <div ref={containerRef} className="relative">

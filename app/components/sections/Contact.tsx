@@ -315,7 +315,7 @@ const Contact = () => {
             ))}
           </div>
 
-          {/* Contact Form with Enhanced Styling */}
+          {/* Contact Form */}
           <form onSubmit={handleFormSubmit} className="space-y-6">
             <div className="space-y-4">
               {/* Email Input */}
@@ -361,7 +361,7 @@ const Contact = () => {
               </div>
             </div>
 
-            {/* Enhanced Cloudflare Turnstile Widget */}
+            {/* Cloudflare Turnstile Widget */}
             {captchaState.showCaptcha && (
               <div className="space-y-4">
                 {/* Captcha Header */}
