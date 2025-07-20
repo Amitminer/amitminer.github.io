@@ -152,7 +152,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/50 shadow-2xl">
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent z-10"></div>
                   {project.demo && previewImage ? (
-                    <a href={project.demo} target="_blank" rel="noopener noreferrer" className="relative">
+                    <a href={project.demo} target="_blank" rel="noopener noreferrer">
                       <Image
                         src={previewImage}
                         alt={`${project.name} preview`}
