@@ -79,7 +79,7 @@ const Languages = () => {
 
   // Compact loading indicator
   const LoadingOverlay = () => (
-    <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-sm rounded-lg flex items-center justify-center">
+    <div className="absolute inset-0 bg-gray-800/80 backdrop-blur-xs rounded-lg flex items-center justify-center">
       <div className="flex items-center space-x-3">
         <RefreshCw className="w-5 h-5 animate-spin text-[#00FFFF]" />
         <span className="text-gray-300 text-sm">Loading...</span>
@@ -114,7 +114,7 @@ const Languages = () => {
         </h2>
 
         <div className="max-w-4xl mx-auto text-center pt-4 pb-0">
-          <div className="relative w-full max-w-[400px] md:max-w-[460px] lg:max-w-[500px] mx-auto p-[2px] rounded-xl bg-gradient-to-br from-cyan-400/60 to-pink-500/60 shadow-xl hover:shadow-cyan-500/30 transition-all duration-300 group">
+          <div className="relative w-full max-w-[400px] md:max-w-[460px] lg:max-w-[500px] mx-auto p-[2px] rounded-xl bg-linear-to-br from-cyan-400/60 to-pink-500/60 shadow-xl hover:shadow-cyan-500/30 transition-all duration-300 group">
             <div className="rounded-[10px] overflow-hidden bg-[#0d1117]">
               <Image
                 src={imageUrl + (retryCount > 0 ? `&t=${Date.now()}` : '')}

@@ -152,22 +152,22 @@ const About = () => {
 
   // === Skeleton Loading Component ===
   const SkeletonLoader = useCallback(() => (
-    <div className="max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-sm border border-pink-500/10">
+    <div className="max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-xs border border-pink-500/10">
       {/* Title Skeleton */}
-      <div className="h-8 w-48 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded-lg animate-pulse mb-8 mx-auto" />
+      <div className="h-8 w-48 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded-lg animate-pulse mb-8 mx-auto" />
       
       {/* First Paragraph Skeleton */}
       <div className="space-y-3 mb-6">
-        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-3/4" />
-        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
-        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-5/6" />
+        <div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-3/4" />
+        <div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
+        <div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-5/6" />
       </div>
       
       {/* Second Paragraph Skeleton */}
       <div className="space-y-3">
-        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-2/3" />
-        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
-        <div className="h-4 bg-gradient-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-4/5" />
+        <div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-2/3" />
+        <div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
+        <div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-4/5" />
       </div>
     </div>
   ), []);
@@ -184,7 +184,7 @@ const About = () => {
         {[...Array(PARTICLE_COUNT)].map((_, i) => (
           <div
             key={i}
-            className={`absolute w-1 h-1 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full
+            className={`absolute w-1 h-1 bg-linear-to-r from-pink-500 to-cyan-500 rounded-full
               ${isVisible ? 'animate-bounce' : 'opacity-0'}`}
             style={{
               left: `${20 + i * 15}%`,
@@ -211,7 +211,7 @@ const About = () => {
           <SkeletonLoader />
         ) : (
           <div
-            className={`max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-sm
+            className={`max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-xs
               border border-pink-500/10 hover:border-pink-500/30 transition-all duration-500
               hover:shadow-2xl hover:shadow-pink-500/5 transform ${
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
@@ -241,7 +241,7 @@ const About = () => {
                   {[...Array(3)].map((_, i) => (
                     <div
                       key={i}
-                      className="w-2 h-2 bg-gradient-to-r from-pink-500 to-cyan-500 rounded-full animate-pulse"
+                      className="w-2 h-2 bg-linear-to-r from-pink-500 to-cyan-500 rounded-full animate-pulse"
                       style={{ animationDelay: `${i * 0.1}s` }}
                     />
                   ))}

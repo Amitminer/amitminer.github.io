@@ -87,7 +87,7 @@ const fetchGitHubData = async (endpoint: string): Promise<any> => {
 // ===== SKELETON =====
 const ProjectCardSkeleton = memo(() => (
   <div className="bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden h-[320px] animate-pulse">
-    <div className="h-48 bg-gradient-to-r from-gray-700/20 to-gray-700/10" />
+    <div className="h-48 bg-linear-to-r from-gray-700/20 to-gray-700/10" />
     <div className="p-4 space-y-3">
       <div className="h-6 bg-gray-700/50 rounded w-3/4" />
       <div className="h-4 bg-gray-700/50 rounded w-full" />
@@ -138,10 +138,10 @@ const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
           quality={75}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
 
         {project.featured && (
-          <div className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-purple-500 px-2 py-1 rounded-full text-xs text-white font-medium">
+          <div className="absolute top-2 right-2 bg-linear-to-r from-pink-500 to-purple-500 px-2 py-1 rounded-full text-xs text-white font-medium">
             <Star size={10} className="inline mr-1" />
             Featured
           </div>
@@ -165,12 +165,12 @@ const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
         </div>
       </div>
 
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-4 flex flex-col grow">
         <h3 className="text-lg font-bold mb-2 text-cyan-400 line-clamp-1">
           {project.name}
         </h3>
 
-        <p className="text-gray-300 mb-4 text-sm line-clamp-2 flex-grow">
+        <p className="text-gray-300 mb-4 text-sm line-clamp-2 grow">
           {project.description}
         </p>
 
@@ -220,7 +220,7 @@ const GitHubProjectCard = memo(({ project }: { project: GitHubRepo }) => {
           quality={75}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
 
         {project.language && (
           <div className="absolute top-2 left-2 bg-black/60 px-2 py-1 rounded-full text-xs text-white">
@@ -241,12 +241,12 @@ const GitHubProjectCard = memo(({ project }: { project: GitHubRepo }) => {
         </div>
       </div>
 
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-4 flex flex-col grow">
         <h3 className="text-lg font-bold mb-2 text-cyan-400 line-clamp-1">
           {project.name}
         </h3>
 
-        <p className="text-gray-300 mb-3 text-sm line-clamp-2 flex-grow">
+        <p className="text-gray-300 mb-3 text-sm line-clamp-2 grow">
           {project.description || "No description available"}
         </p>
 
@@ -366,7 +366,7 @@ const Projects = () => {
     return (
       <section id="projects" className="py-16 w-full">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold mb-8 text-center bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
             Projects
           </h2>
           <div className="text-center text-red-400 bg-red-900/20 border border-red-500/20 p-6 rounded-lg">
@@ -392,7 +392,7 @@ const Projects = () => {
       }`}
     >
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold mb-4 text-center bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
           Projects
         </h2>
         <p className="text-gray-400 text-center mb-8 max-w-2xl mx-auto">

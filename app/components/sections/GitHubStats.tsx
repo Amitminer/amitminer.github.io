@@ -171,7 +171,7 @@ const GitHubStatsComponent = () => {
     return (
       <section className="py-16 w-full">
         <div className="container mx-auto px-4 md:px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 bg-linear-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent text-center">
             GitHub Statistics
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -202,7 +202,7 @@ const GitHubStatsComponent = () => {
             </p>
             <button
               onClick={handleRefresh}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg transition-colors"
+              className="bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg transition-colors"
               disabled={isRefreshing}
             >
               {isRefreshing ? (
@@ -229,7 +229,7 @@ const GitHubStatsComponent = () => {
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
             GitHub Statistics
           </h2>
           <div className="flex items-center gap-4">

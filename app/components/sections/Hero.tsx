@@ -152,7 +152,7 @@ const Hero = () => {
           <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mb-6">
             {/* Animated border ring */}
             <div
-              className="absolute inset-0 rounded-full p-0.5 bg-gradient-to-r from-[#FF1493] via-[#00FFFF] to-[#FF1493]"
+              className="absolute inset-0 rounded-full p-0.5 bg-linear-to-r from-[#FF1493] via-[#00FFFF] to-[#FF1493]"
               style={{ 
                 animation: "spin 3s linear infinite",
                 // Preload the gradient to prevent flash
@@ -180,7 +180,7 @@ const Hero = () => {
             </div>
 
             {/* Subtle glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse"></div>
+            <div className="absolute inset-0 bg-linear-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse"></div>
           </div>
 
           {/* Name and Title - Immediately visible */}
@@ -191,7 +191,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             {/* About Me Button */}
             <Button
-              className="bg-gradient-to-r from-[#FF1493] to-[#00FFFF] hover:from-[#FF1493]/80 hover:to-[#00FFFF]/80 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-[#FF1493]/20 hover:shadow-[#00FFFF]/30"
+              className="bg-linear-to-r from-[#FF1493] to-[#00FFFF] hover:from-[#FF1493]/80 hover:to-[#00FFFF]/80 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-[#FF1493]/20 hover:shadow-[#00FFFF]/30"
               onClick={scrollToAbout}
             >
               About Me

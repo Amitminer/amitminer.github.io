@@ -64,10 +64,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"></div>
+      <div className="fixed inset-0 bg-linear-to-br from-slate-950 via-slate-900 to-slate-950"></div>
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
+      <header className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-xs border-b border-slate-700/50">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Link
             href="/#projects"
@@ -90,7 +90,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               <div className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex flex-col gap-3">
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
+                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-linear-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
                       {project.name}
                     </h1>
                     <div className={`self-start px-3 py-1.5 rounded-full text-sm font-medium border ${getStatusColor(project.status)}`}>
@@ -137,7 +137,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     </Button>
                   )}
                   {project.demo && (
-                    <Button asChild className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 px-6 py-2.5 text-white font-medium rounded-xl">
+                    <Button asChild className="bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 px-6 py-2.5 text-white font-medium rounded-xl">
                       <a href={project.demo} target="_blank" rel="noopener noreferrer">
                         <ExternalLink size={18} className="mr-2" />
                         Live Demo
@@ -150,7 +150,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               {/* Project Image */}
               <div className="order-first lg:order-last">
                 <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-700/50 shadow-2xl">
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 to-transparent z-10"></div>
+                  <div className="absolute inset-0 bg-linear-to-t from-slate-900/50 to-transparent z-10"></div>
                   {project.demo && previewImage ? (
                     <a href={project.demo} target="_blank" rel="noopener noreferrer">
                       <Image
@@ -190,7 +190,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     <div className="p-2 bg-cyan-500/20 rounded-lg">
                       <Target size={20} className="text-cyan-400" />
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                    <h2 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                       Project Overview
                     </h2>
                   </div>
@@ -216,7 +216,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                       <div className="p-2 bg-emerald-500/20 rounded-lg">
                         <Zap size={20} className="text-emerald-400" />
                       </div>
-                      <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                      <h2 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
                         Key Features
                       </h2>
                     </div>
@@ -224,7 +224,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                       {project.features.map((feature: string, index: number) => (
                         <div key={index} className="bg-slate-800/40 p-6 rounded-xl border border-slate-700/50">
                           <div className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full mt-3 flex-shrink-0"></div>
+                            <div className="w-2 h-2 bg-linear-to-r from-emerald-400 to-teal-400 rounded-full mt-3 shrink-0"></div>
                             <p className="text-slate-300 leading-relaxed">{feature}</p>
                           </div>
                         </div>
@@ -242,7 +242,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                           <div className="p-2 bg-orange-500/20 rounded-lg">
                             <Target size={20} className="text-orange-400" />
                           </div>
-                          <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+                          <h2 className="text-xl md:text-2xl font-bold bg-linear-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
                             Challenges
                           </h2>
                         </div>
@@ -262,7 +262,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                           <div className="p-2 bg-green-500/20 rounded-lg">
                             <Lightbulb size={20} className="text-green-400" />
                           </div>
-                          <h2 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                          <h2 className="text-xl md:text-2xl font-bold bg-linear-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
                             Key Learnings
                           </h2>
                         </div>
@@ -341,7 +341,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                     <div className="space-y-2">
                       {project.team.map((member, index) => (
                         <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/10">
-                          <div className="w-2 h-2 bg-indigo-400 rounded-full flex-shrink-0"></div>
+                          <div className="w-2 h-2 bg-indigo-400 rounded-full shrink-0"></div>
                           <span className="text-slate-300 font-medium text-sm">{member}</span>
                         </div>
                       ))}

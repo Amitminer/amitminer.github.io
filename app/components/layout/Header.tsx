@@ -91,7 +91,7 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${state.scrolled
-        ? 'bg-secondary/90 backdrop-blur-sm py-3 shadow-lg'
+        ? 'bg-secondary/90 backdrop-blur-xs py-3 shadow-lg'
         : 'bg-transparent py-5'
         }`}
     >
@@ -123,7 +123,7 @@ const Header = () => {
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-white focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-lg p-1"
+          className="md:hidden text-white focus:outline-hidden focus:ring-2 focus:ring-pink-500 rounded-lg p-1"
           onClick={toggleMenu}
           aria-expanded={state.isMenuOpen}
           aria-controls="mobile-menu"
@@ -136,7 +136,7 @@ const Header = () => {
       {/* Mobile Menu */}
       <div
         id="mobile-menu"
-        className={`md:hidden bg-secondary/95 backdrop-blur-sm absolute w-full transition-all duration-300 ${state.isMenuOpen
+        className={`md:hidden bg-secondary/95 backdrop-blur-xs absolute w-full transition-all duration-300 ${state.isMenuOpen
           ? 'opacity-100 translate-y-0'
           : 'opacity-0 -translate-y-2 pointer-events-none'
           }`}

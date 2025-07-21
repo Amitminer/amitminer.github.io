@@ -99,10 +99,10 @@ const Support = () => {
       ref={supportRef}
       className={`py-16 w-full transition-all duration-1000 ${
         state.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-      } bg-gradient-to-b from-secondary/10 to-secondary/40`}
+      } bg-linear-to-b from-secondary/10 to-secondary/40`}
     >
       <div className="container mx-auto px-4 sm:px-6 text-center max-w-3xl">
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-500">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-6 bg-clip-text text-transparent bg-linear-to-r from-pink-500 via-purple-600 to-indigo-500">
           Support My Work
         </h2>
         <p className="text-sm sm:text-base mb-12 text-gray-300 leading-relaxed">
@@ -120,13 +120,13 @@ const Support = () => {
               onMouseLeave={handleMouseLeave}
               className={`
                 flex items-center gap-3 w-full
-                bg-gradient-to-r from-pink-500 to-purple-600
+                bg-linear-to-r from-pink-500 to-purple-600
                 hover:from-pink-600 hover:to-purple-700
                 text-white font-semibold px-6 py-3 sm:px-8 sm:py-4
                 rounded-lg shadow-lg
                 transition-all duration-300
                 transform hover:scale-105
-                focus:outline-none focus:ring-4 focus:ring-pink-400/60
+                focus:outline-hidden focus:ring-4 focus:ring-pink-400/60
                 disabled:opacity-50 disabled:cursor-not-allowed
               `}
             >
@@ -150,7 +150,7 @@ const Support = () => {
                   {/* Buy Me a Coffee Option */}
                   <button
                     onClick={handleCoffeeClick}
-                    className="w-full flex items-center gap-3 p-3 sm:p-4 text-left text-white hover:bg-gradient-to-r hover:from-pink-500/80 hover:to-purple-600/80 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center gap-3 p-3 sm:p-4 text-left text-white hover:bg-linear-to-r hover:from-pink-500/80 hover:to-purple-600/80 rounded-lg transition-all duration-200 group"
                   >
                     <Coffee className="h-5 w-5 text-pink-400 group-hover:text-white transition-colors" />
                     <span className="font-medium text-sm sm:text-base">Buy Me a Coffee</span>
@@ -159,7 +159,7 @@ const Support = () => {
                   {/* UPI Option */}
                   <button
                     onClick={copyUpiId}
-                    className="w-full flex items-center gap-3 p-3 sm:p-4 text-left text-white hover:bg-gradient-to-r hover:from-green-500/80 hover:to-blue-600/80 rounded-lg transition-all duration-200 group"
+                    className="w-full flex items-center gap-3 p-3 sm:p-4 text-left text-white hover:bg-linear-to-r hover:from-green-500/80 hover:to-blue-600/80 rounded-lg transition-all duration-200 group"
                   >
                     {state.copied ? (
                       <Check className="h-5 w-5 text-green-400 group-hover:text-white transition-colors" />

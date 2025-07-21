@@ -36,3 +36,4 @@ yarn-error.log*
 *.tsbuildinfo
 .backend
 backend/*
+xd.txt

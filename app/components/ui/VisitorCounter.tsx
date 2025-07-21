@@ -123,7 +123,7 @@ const VisitorCounter = () => {
   className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-300 transition-all duration-200 scale-[0.95]"
       aria-label={`${count.toLocaleString()} total visitors`}
     >
-      <Users className={`text-cyan-400 w-4 h-4 flex-shrink-0 ${isUpdating ? 'animate-pulse' : ''}`} />
+      <Users className={`text-cyan-400 w-4 h-4 shrink-0 ${isUpdating ? 'animate-pulse' : ''}`} />
       <span className="tabular-nums">
         {count.toLocaleString()} visitors
       </span>
