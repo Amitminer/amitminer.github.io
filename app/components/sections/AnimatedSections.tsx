@@ -35,6 +35,29 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
     cleanupRef.current.push(cleanup)
   }, [])
 
+  // Helper function to show elements that are already in viewport
+  const showVisibleElements = useCallback(() => {
+    const allAnimatedElements = document.querySelectorAll('.animated-section, .project, .project-card, .stat-card, .tech-item, [class*="ProjectCard"], .grid > div, .contact-card')
+    
+    allAnimatedElements.forEach((element: any) => {
+      if (!element?.parentNode) return
+      
+      const rect = element.getBoundingClientRect()
+      const isInViewport = rect.top < window.innerHeight * 0.9 && rect.bottom > 0
+      
+      if (isInViewport) {
+        // Make element visible immediately if it's in viewport
+        gsap.set(element, {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotation: 0
+        })
+      }
+    })
+  }, [])
+
   // Desktop detection with resize handling
   useEffect(() => {
     setIsDesktop(checkIsDesktop())
@@ -51,46 +74,43 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        // Page became visible, check for elements that should be animated
+        // Page became visible, show elements immediately
+        setTimeout(showVisibleElements, 50)
+        setTimeout(() => ScrollTrigger.refresh(), 100)
+      }
+    }
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      // Handle browser back/forward navigation
+      if (event.persisted) {
+        // Page was restored from cache
         setTimeout(() => {
-          const allCards = document.querySelectorAll('.project, .project-card, .stat-card, .tech-item, [class*="ProjectCard"], .grid > div, .contact-card')
-          allCards.forEach((card: any) => {
-            if (!card?.parentNode) return
-            
-            const rect = card.getBoundingClientRect()
-            const isInViewport = rect.top < window.innerHeight * 0.8 && rect.bottom > 0
-            
-            if (isInViewport && parseFloat(getComputedStyle(card).opacity) < 0.1) {
-              gsap.to(card, {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.5,
-                ease: "power2.out"
-              })
-            }
-          })
+          showVisibleElements()
+          ScrollTrigger.refresh()
+        }, 50)
+      } else {
+        setTimeout(() => {
+          showVisibleElements()
           ScrollTrigger.refresh()
         }, 100)
       }
     }
 
-    const handlePageShow = () => {
-      // Handle browser back/forward navigation
-      setTimeout(() => {
-        ScrollTrigger.refresh()
-        handleVisibilityChange()
-      }, 150)
+    // Also handle focus events for additional reliability
+    const handleFocus = () => {
+      setTimeout(showVisibleElements, 50)
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     window.addEventListener('pageshow', handlePageShow)
+    window.addEventListener('focus', handleFocus)
     
     addCleanup(() => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('pageshow', handlePageShow)
+      window.removeEventListener('focus', handleFocus)
     })
-  }, [isDesktop, addCleanup])
+  }, [isDesktop, addCleanup, showVisibleElements])
 
   // Main animation initialization
   useEffect(() => {
@@ -155,20 +175,36 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           }
         })
 
-        // Section animations
+        // Section animations 
         const sections = gsap.utils.toArray(".animated-section")
         sections.forEach((section: any, i) => {
           if (!section?.parentNode) return
 
           const direction = i % 2 === 0 ? 100 : -100
           
-          gsap.set(section, {
-            opacity: 0,
-            x: direction,
-            y: 50,
-            scale: 0.9,
-            rotation: i % 2 === 0 ? 5 : -5
-          })
+          // Check if element is already in viewport
+          const rect = section.getBoundingClientRect()
+          const isInViewport = rect.top < window.innerHeight * 0.9 && rect.bottom > 0
+          
+          if (isInViewport) {
+            // Set to visible state immediately if in viewport
+            gsap.set(section, {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              scale: 1,
+              rotation: 0
+            })
+          } else {
+            // Set initial hidden state only if not in viewport
+            gsap.set(section, {
+              opacity: 0,
+              x: direction,
+              y: 50,
+              scale: 0.9,
+              rotation: i % 2 === 0 ? 5 : -5
+            })
+          }
 
           gsap.to(section, {
             opacity: 1,
@@ -200,7 +236,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           })
         })
 
-        // Text animations for headings
+        // Text animations for headings 
         const headings = gsap.utils.toArray(".animated-section h1, .animated-section h2, .animated-section h3")
         headings.forEach((heading: any) => {
           if (!heading?.parentNode || 
@@ -210,9 +246,15 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           heading.setAttribute("data-animated", "true")
           const text = heading.textContent || ""
 
+          // Check if heading is in viewport
+          const rect = heading.getBoundingClientRect()
+          const isInViewport = rect.top < window.innerHeight * 0.9 && rect.bottom > 0
+
           // Simple fade for long text
           if (text.length > 50) {
-            gsap.set(heading, { opacity: 0, y: 30 })
+            if (!isInViewport) {
+              gsap.set(heading, { opacity: 0, y: 30 })
+            }
             gsap.to(heading, {
               opacity: 1,
               y: 0,
@@ -234,11 +276,13 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           heading.innerHTML = chars;
           const charElements = heading.querySelectorAll(".char")
 
-          gsap.set(charElements, {
-            opacity: 0,
-            y: 50,
-            scale: 0.8
-          })
+          if (!isInViewport) {
+            gsap.set(charElements, {
+              opacity: 0,
+              y: 50,
+              scale: 0.8
+            })
+          }
 
           gsap.to(charElements, {
             opacity: 1,
@@ -268,11 +312,25 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
             
             animatedCards.add(card)
             
-            gsap.set(card, {
-              opacity: 0,
-              y: 60,
-              scale: 0.9
-            })
+            // Check if card is already in viewport
+            const rect = card.getBoundingClientRect()
+            const isInViewport = rect.top < window.innerHeight * 0.9 && rect.bottom > 0
+            
+            if (isInViewport) {
+              // Set to visible state immediately if in viewport
+              gsap.set(card, {
+                opacity: 1,
+                y: 0,
+                scale: 1
+              })
+            } else {
+              // Set initial hidden state only if not in viewport
+              gsap.set(card, {
+                opacity: 0,
+                y: 60,
+                scale: 0.9
+              })
+            }
 
             const cardAnimation = gsap.to(card, {
               opacity: 1,
@@ -288,15 +346,6 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
               trigger: card,
               start: "top 80%",
               toggleActions: "play none none reverse",
-              onRefresh: () => {
-                // Check if card is already in viewport and should be animated
-                const rect = card.getBoundingClientRect()
-                const isInViewport = rect.top < window.innerHeight * 0.8 && rect.bottom > 0
-                
-                if (isInViewport && !cardAnimation.isActive()) {
-                  cardAnimation.play()
-                }
-              },
               onEnter: () => cardAnimation.play(),
               onLeave: () => cardAnimation.reverse(),
               onEnterBack: () => cardAnimation.play(),
@@ -404,45 +453,13 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
           }
         })
 
-        // Refresh ScrollTrigger and check for elements already in viewport
+        // Initial setup - show visible elements immediately
+        showVisibleElements()
+        
+        // Refresh ScrollTrigger after setup
         setTimeout(() => {
           ScrollTrigger.refresh()
-          
-          // Force check for cards that should already be visible
-          const allCards = document.querySelectorAll('.project, .project-card, .stat-card, .tech-item, [class*="ProjectCard"], .grid > div, .contact-card')
-          allCards.forEach((card: any) => {
-            if (!card?.parentNode) return
-            
-            const rect = card.getBoundingClientRect()
-            const isInViewport = rect.top < window.innerHeight * 0.8 && rect.bottom > 0
-            
-            // If card is in viewport but still invisible, animate it immediately
-            if (isInViewport && parseFloat(getComputedStyle(card).opacity) < 0.1) {
-              gsap.set(card, { opacity: 1, y: 0, scale: 1 })
-            }
-          })
         }, 100)
-
-        // Additional check after a longer delay for navigation cases
-        setTimeout(() => {
-          const allCards = document.querySelectorAll('.project, .project-card, .stat-card, .tech-item, [class*="ProjectCard"], .grid > div, .contact-card')
-          allCards.forEach((card: any) => {
-            if (!card?.parentNode) return
-            
-            const rect = card.getBoundingClientRect()
-            const isInViewport = rect.top < window.innerHeight * 0.8 && rect.bottom > 0
-            
-            if (isInViewport && parseFloat(getComputedStyle(card).opacity) < 0.1) {
-              gsap.to(card, {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 0.5,
-                ease: "power2.out"
-              })
-            }
-          })
-        }, 500)
 
       }, containerRef)
 
@@ -456,7 +473,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
     }, 50)
 
     return () => clearTimeout(timer)
-  }, [isDesktop, isInitialized, addCleanup])
+  }, [isDesktop, isInitialized, addCleanup, showVisibleElements])
 
   // Cleanup on unmount
   useEffect(() => {

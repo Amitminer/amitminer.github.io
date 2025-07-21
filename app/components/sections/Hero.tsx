@@ -191,8 +191,11 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             {/* About Me Button */}
             <Button
-              className="bg-linear-to-r from-[#FF1493] to-[#00FFFF] hover:from-[#FF1493]/80 hover:to-[#00FFFF]/80 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-[#FF1493]/20 hover:shadow-[#00FFFF]/30"
+              className="bg-gradient-to-r from-[#FF1493]/70 to-[#00FFFF]/70 hover:from-[#FF1493]/60 hover:to-[#00FFFF]/60 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-[#FF1493]/20 hover:shadow-[#00FFFF]/30 backdrop-blur-[2px]"
               onClick={scrollToAbout}
+              style={{
+                filter: "saturate(0.9) brightness(0.95)"
+              }}
             >
               About Me
             </Button>
