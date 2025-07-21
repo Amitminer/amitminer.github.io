@@ -106,5 +106,3 @@ docker run -p 3000:3000 --env-file .env.local my-portfolio-app
 
 The app will be available at [http://localhost:3000](http://localhost:3000)
 Make sure to set up your `.env.local` file before running.
-
-```
