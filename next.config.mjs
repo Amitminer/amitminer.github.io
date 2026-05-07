@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	// ESLint configuration
-	eslint: {
-		ignoreDuringBuilds: true,
-	},
 	// Image optimization
 	images: {
 		unoptimized: false,
@@ -17,6 +13,7 @@ const nextConfig = {
 		imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
 		formats: ['image/webp'],
 		minimumCacheTTL: 60,
+		qualities: [75, 80],
 	},
 
 	// Development + production options
