@@ -12,7 +12,7 @@ Welcome to my personal portfolio — a fast, minimal, and modern site built with
 ```bash
 git clone https://github.com/Amitminer/amitminer.github.io.git
 cd amitminer.github.io
-pnpm install
+bun install
 ```
 ### 2. Set Up Environment Variables
 
@@ -47,7 +47,7 @@ Once deployed, use that backend URL as `NEXT_PUBLIC_BACKEND_URL` in `.env.local`
 ### 4. Run Development Server
 
 ```bash
-pnpm dev
+bun dev
 ```
 
 Visit your local site at:
