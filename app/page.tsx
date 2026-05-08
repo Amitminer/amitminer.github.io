@@ -9,47 +9,47 @@ import Support from "@/app/components/sections/Support"
 import AnimatedSections from "@/app/components/sections/AnimatedSections"
 
 export default function Home() {
-  return (
-    <AnimatedSections>
-      {/* Hero/Banner section */}
-      <div className="animated-section">
-        <Hero />
-      </div>
+	return (
+		<AnimatedSections>
+			{/* Hero/Banner section */}
+			<div className="animated-section">
+				<Hero />
+			</div>
 
-      {/* About me section */}
-      <div className="animated-section">
-        <About />
-      </div>
+			{/* About me section */}
+			<div className="animated-section">
+				<About />
+			</div>
 
-      {/* Technology Stack section */}
-      <div className="animated-section">
-        <TechStack />
-      </div>
+			{/* Technology Stack section */}
+			<div className="animated-section">
+				<TechStack />
+			</div>
 
-      {/* GitHub statistics section */}
-      <div className="animated-section">
-        <GitHubStats />
-      </div>
+			{/* GitHub statistics section */}
+			<div className="animated-section">
+				<GitHubStats />
+			</div>
 
-      {/* Projects portfolio section */}
-      <div className="animated-section">
-        <Projects />
-      </div>
+			{/* Projects portfolio section */}
+			<div className="animated-section">
+				<Projects />
+			</div>
 
-      {/* Top Programming Languages section */}
-      <div className="animated-section">
-        <Languages />
-      </div>
+			{/* Top Programming Languages section */}
+			<div className="animated-section">
+				<Languages />
+			</div>
 
-      {/* Contact form or info section */}
-      <div className="animated-section">
-        <Contact />
-      </div>
+			{/* Contact form or info section */}
+			<div className="animated-section">
+				<Contact />
+			</div>
 
-      {/* Support section for contributions */}
-      <div className="animated-section">
-        <Support />
-      </div>
-    </AnimatedSections>
-  )
+			{/* Support section for contributions */}
+			<div className="animated-section">
+				<Support />
+			</div>
+		</AnimatedSections>
+	)
 }

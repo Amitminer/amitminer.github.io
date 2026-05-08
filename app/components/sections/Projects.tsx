@@ -20,36 +20,36 @@
 import { useEffect, useRef, useState, useCallback, useMemo, memo } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowUpRight, Star, GitFork, AlertCircle, Code, Eye, Calendar, RefreshCw } from "lucide-react"
+import { ArrowUpRight, Star, GitFork, AlertCircle, Code, Eye, Calendar } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import type { GitHubRepo } from "@/app/lib/types"
 import { BackendURL, GithubUsername } from "@/app/utils/Links"
 import DefaultBanner from "@/app/assets/default_banner.jpg"
-import { projectImages, previewImages } from '@/app/assets/projects';
+import { projectImages } from '@/app/assets/projects';
 
 import { getCustomProjects, type CustomProject } from "@/app/lib/data/projects"
 
 // ===== PERFORMANCE UTILITIES =====
-const throttle = <T extends (...args: any[]) => any>(func: T, limit: number): T => {
+const throttle = <Args extends unknown[]>(func: (...args: Args) => unknown, limit: number): ((...args: Args) => void) => {
 	let inThrottle: boolean;
-	return ((...args: any[]) => {
+	return (...args: Args) => {
 		if (!inThrottle) {
-			func.apply(null, args);
+			func(...args);
 			inThrottle = true;
-			setTimeout(() => inThrottle = false, limit);
+			setTimeout(() => { inThrottle = false; }, limit);
 		}
-	}) as T;
+	};
 };
 
 // ===== CACHING =====
 class SimpleCache {
-	private cache = new Map<string, { data: any; timestamp: number }>();
+	private cache = new Map<string, { data: unknown; timestamp: number }>();
 	private readonly TTL = 5 * 60 * 1000; // 5 minutes
 
 	get<T>(key: string): T | null {
 		const cached = this.cache.get(key);
 		if (cached && (Date.now() - cached.timestamp) < this.TTL) {
-			return cached.data;
+			return cached.data as T;
 		}
 		return null;
 	}
@@ -76,7 +76,7 @@ const fetchWithCache = async function <T>(key: string, fetcher: () => Promise<T>
 	return data;
 };
 
-const fetchGitHubData = async (endpoint: string): Promise<any> => {
+const fetchGitHubData = async (endpoint: string): Promise<unknown> => {
 	return fetchWithCache(`github-${endpoint}`, async () => {
 		const response = await fetch(`${BackendURL}/v2/?endpoint=${endpoint}`);
 		if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -101,7 +101,6 @@ ProjectCardSkeleton.displayName = 'ProjectCardSkeleton';
 // ===== CUSTOM PROJECT CARD =====
 const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
 	const [imageError, setImageError] = useState(false);
-	const previewImage = previewImages[project.slug];
 	const mainImage = projectImages[project.slug];
 
 	const getStatusColor = (status: CustomProject['status']) => {
@@ -308,18 +307,18 @@ const Projects = () => {
 					.replace(/--+/g, '-');           // Collapse multiple hyphens
 
 			const recentDataWithSlugs = Array.isArray(recentData)
-				? recentData.map((repo: any) => ({
+				? (recentData as { name: string }[]).map((repo) => ({
 					...repo,
 					slug: repo.name ? toUrlSlug(repo.name) : '',
 				}))
 				: [];
 			setState(prev => ({
 				...prev,
-				recentProjects: recentDataWithSlugs,
+				recentProjects: recentDataWithSlugs as GitHubRepo[],
 				loading: false
 			}));
 
-		} catch (error) {
+		} catch {
 			setState(prev => ({
 				...prev,
 				loading: false,

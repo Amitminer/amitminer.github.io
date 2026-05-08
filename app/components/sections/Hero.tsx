@@ -8,6 +8,7 @@
  * - Profile image with loading states
  * - Gradient effects and animations
  * - Action buttons with hover effects
+ * - Typewriter/carousel effect for role description
  */
 "use client"
 
@@ -22,7 +23,7 @@ import type { ThrottleOptions } from "@/app/lib/types"
 import Image from "next/image"
 
 // Throttle utility
-const throttle = <T extends (...args: any[]) => any>(
+const throttle = <T extends (...args: unknown[]) => unknown>(
 	func: T,
 	{ delay, leading = true, trailing = true }: ThrottleOptions,
 ): ((...args: Parameters<T>) => void) => {
@@ -53,19 +54,72 @@ const ARROW_HIDE_DELAY = 2000
 const SCROLL_THRESHOLD = 50
 const HERO_SECTION_THRESHOLD = 0.7
 
+// Typewriter constants
+const ROLES = [
+	"Self-taught developer building cool stuff",
+	"Focused on backend and performance",
+	"Rust enthusiast and Linux user",
+	"Obsessed with optimization and clean code",
+]
+const TYPEWRITER_SPEED = 28  // ms per character (typing)
+const ERASE_SPEED = 15       // ms per character (erasing)
+const HOLD_DELAY = 1600      // ms to hold full string before erasing
+const PAUSE_DELAY = 250      // ms pause before typing next string
+
 const Hero = () => {
 	const [showScrollArrow, setShowScrollArrow] = useState(false)
+
+	// Typewriter state
+	const [displayedText, setDisplayedText] = useState("")
+	const [roleIndex, setRoleIndex] = useState(0)
+	const [isErasing, setIsErasing] = useState(false)
 
 	const heroRef = useRef<HTMLDivElement>(null)
 	const arrowRef = useRef<HTMLButtonElement>(null)
 	const hideArrowTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+	// --- Typewriter effect ---
+	useEffect(() => {
+		const currentRole = ROLES[roleIndex]
+
+		if (!isErasing) {
+			// Typing phase
+			if (displayedText.length < currentRole.length) {
+				const timeout = setTimeout(() => {
+					setDisplayedText(currentRole.slice(0, displayedText.length + 1))
+				}, TYPEWRITER_SPEED)
+				return () => clearTimeout(timeout)
+			} else {
+				// Hold full string, then start erasing
+				const timeout = setTimeout(() => {
+					setIsErasing(true)
+				}, HOLD_DELAY)
+				return () => clearTimeout(timeout)
+			}
+		} else {
+			// Erasing phase
+			if (displayedText.length > 0) {
+				const timeout = setTimeout(() => {
+					setDisplayedText(displayedText.slice(0, -1))
+				}, ERASE_SPEED)
+				return () => clearTimeout(timeout)
+			} else {
+				// Move to next role after short pause
+				const timeout = setTimeout(() => {
+					setIsErasing(false)
+					setRoleIndex((prev) => (prev + 1) % ROLES.length)
+				}, PAUSE_DELAY)
+				return () => clearTimeout(timeout)
+			}
+		}
+	}, [displayedText, isErasing, roleIndex])
 
 	// Scroll handler with throttling
 	const handleScroll = useCallback(() => {
 		const throttledScroll = throttle(
 			() => {
 				const scrollY = window.scrollY
-				const heroHeight = heroRef.current?.offsetHeight || 0
+				const heroHeight = heroRef.current?.offsetHeight ?? 0
 				const windowHeight = window.innerHeight
 				const documentHeight = document.documentElement.scrollHeight
 
@@ -100,7 +154,7 @@ const Hero = () => {
 		const throttledMouseMove = throttle(
 			() => {
 				const scrollY = window.scrollY
-				const heroHeight = heroRef.current?.offsetHeight || 0
+				const heroHeight = heroRef.current?.offsetHeight ?? 0
 				const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD
 				const hasScrolled = scrollY > SCROLL_THRESHOLD
 
@@ -155,17 +209,16 @@ const Hero = () => {
 							className="absolute inset-0 rounded-full p-0.5 bg-linear-to-r from-[#FF1493] via-[#00FFFF] to-[#FF1493]"
 							style={{
 								animation: "spin 3s linear infinite",
-								// Preload the gradient to prevent flash
-								willChange: "transform"
+								willChange: "transform",
 							}}
 						>
-							<div className="w-full h-full rounded-full bg-black"></div>
+							<div className="w-full h-full rounded-full bg-black" />
 						</div>
 
 						{/* Image container with immediate visibility */}
 						<div className="absolute inset-1 rounded-full overflow-hidden shadow-2xl shadow-[#00FFFF]/30">
 							<Image
-								src={ProfileImage} //
+								src={ProfileImage}
 								alt="AmitxD Profile"
 								fill
 								sizes="(max-width: 640px) 8rem, (max-width: 768px) 10rem, 12rem"
@@ -180,12 +233,29 @@ const Hero = () => {
 						</div>
 
 						{/* Subtle glow effect */}
-						<div className="absolute inset-0 bg-linear-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse"></div>
+						<div className="absolute inset-0 bg-linear-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse" />
 					</div>
 
-					{/* Name and Title - Immediately visible */}
-					<h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 gradient-text">AmitxD</h1>
-					<p className="text-lg sm:text-xl mb-8 text-[#00FFFF]">Self-taught Developer</p>
+					{/* Name */}
+					<h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 gradient-text">AmitxD</h1>
+
+					{/* Typewriter Role Description */}
+					<p
+						className="text-sm sm:text-base md:text-lg lg:text-xl mb-8 min-h-6 sm:min-h-7 flex items-center justify-center px-2 sm:px-0 font-medium"
+						style={{
+							background: "linear-gradient(90deg, #FFFFFF, #FF1493, #FF0000)",
+							WebkitBackgroundClip: "text",
+							WebkitTextFillColor: "transparent",
+							backgroundClip: "text",
+						}}
+					>
+						<span>{displayedText}</span>
+						<span
+							className="ml-0.5 inline-block w-0.5 h-[1em] align-middle animate-pulse"
+							style={{ background: "#FF1493", WebkitTextFillColor: "initial" }}
+							aria-hidden="true"
+						/>
+					</p>
 
 					{/* Action Buttons */}
 					<div className="flex flex-col sm:flex-row gap-4 mt-4">
@@ -193,9 +263,7 @@ const Hero = () => {
 						<Button
 							className="bg-linear-to-r from-[#FF1493]/70 to-[#00FFFF]/70 hover:from-[#FF1493]/60 hover:to-[#00FFFF]/60 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-[#FF1493]/20 hover:shadow-[#00FFFF]/30 backdrop-blur-[2px]"
 							onClick={scrollToAbout}
-							style={{
-								filter: "saturate(0.9) brightness(0.95)"
-							}}
+							style={{ filter: "saturate(0.9) brightness(0.95)" }}
 						>
 							About Me
 						</Button>

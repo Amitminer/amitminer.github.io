@@ -62,7 +62,7 @@ export interface GitHubRepoInfo {
 export interface GitHubEvent {
 	type: string
 	created_at: string
-	payload: any
+	payload: unknown
 }
 
 export interface StatCardProps {

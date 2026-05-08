@@ -19,11 +19,16 @@ import { DiscordLink, GithubLink, InstagramLink, XLink } from '@/app/utils/Links
 import { ContactState, FormState } from '@/app/lib/types';
 import Turnstile from 'react-turnstile';
 
+interface TurnstileInstance {
+	reset: () => void;
+	remove: () => void;
+}
+
 const Contact = () => {
 	// === Refs ===
 	const emailRef = useRef<HTMLInputElement>(null);
 	const messageRef = useRef<HTMLTextAreaElement>(null);
-	const turnstileRef = useRef<any>(null);
+	const turnstileRef = useRef<TurnstileInstance>(null);
 
 	// === Form Configuration ===
 	const FormspreeId = process.env.NEXT_PUBLIC_FORMSPREE_FORM_ID || 'contact';

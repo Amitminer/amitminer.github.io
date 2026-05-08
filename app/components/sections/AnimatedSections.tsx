@@ -72,10 +72,9 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 	}, [addCleanup])
 
 	useEffect(() => {
-		let rafId: number
-
-		rafId = requestAnimationFrame(() => {
+		const rafId = requestAnimationFrame(() => {
 			const ctx = gsap.context(() => {
+				const container = containerRef.current!
 				const desktop = isDesktop()
 				const reduced = reducedMotion()
 
@@ -100,7 +99,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
 				// ── HERO ────────────────────────────────────────
 				// Already in viewport — animate on load, no ScrollTrigger
-				const hero = document.querySelector<HTMLElement>("#hero")
+				const hero = container.querySelector<HTMLElement>("#hero")
 				if (hero && !reduced) {
 					const img = hero.querySelector<HTMLElement>("[class*='w-32'][class*='h-32'], [class*='w-40'], [class*='w-48']")
 					const h1 = hero.querySelector<HTMLElement>("h1")
@@ -118,9 +117,8 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── ABOUT ───────────────────────────────────────
-				const about = document.querySelector<HTMLElement>("#about")
+				const about = container.querySelector<HTMLElement>("#about")
 				if (about) {
-					// Force opacity:1 — the component sets opacity-0 in className
 					gsap.set(about, { opacity: 1 })
 
 					const h2 = about.querySelector<HTMLElement>("h2")
@@ -153,7 +151,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── TECH STACK ──────────────────────────────────
-				const tech = document.querySelector<HTMLElement>("#tech-stack")
+				const tech = container.querySelector<HTMLElement>("#tech-stack")
 				if (tech) {
 					const h2 = tech.querySelector<HTMLElement>("h2")
 					const groups = tech.querySelectorAll<HTMLElement>("[class*='rounded-lg'][class*='bg-secondary']")
@@ -202,8 +200,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── GITHUB STATS ────────────────────────────────
-				// Uses MutationObserver so async-loaded cards still animate
-				const ghStats = document.querySelector<HTMLElement>("#github-stats")
+				const ghStats = container.querySelector<HTMLElement>("#github-stats")
 				if (ghStats) {
 					const h2 = ghStats.querySelector<HTMLElement>("h2")
 					if (h2 && !inVP(h2) && !reduced) {
@@ -223,7 +220,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						gsap.set(card, { opacity: 0, y: alreadyVisible ? 20 : 55, x: xFrom, scale: 0.87 })
 
 						if (alreadyVisible) {
-							// Cached data — just play immediately, no ScrollTrigger needed
+							// Cached data — just play immediately
 							gsap.to(card, { opacity: 1, y: 0, x: 0, scale: 1, duration: DUR_SLOW, delay: i * 0.07, ease: EASE_POP })
 							return
 						}
@@ -260,7 +257,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── PROJECTS ────────────────────────────────────
-				const proj = document.querySelector<HTMLElement>("#projects")
+				const proj = container.querySelector<HTMLElement>("#projects")
 				if (proj) {
 					const h2 = proj.querySelector<HTMLElement>("h2")
 					const tabs = proj.querySelector<HTMLElement>("[class*='bg-gray-800\\/50'][class*='rounded-full']")
@@ -310,7 +307,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── LANGUAGES ───────────────────────────────────
-				const lang = document.querySelector<HTMLElement>("#languages")
+				const lang = container.querySelector<HTMLElement>("#languages")
 				if (lang) {
 					const h2 = lang.querySelector<HTMLElement>("h2")
 					const imgWrap = lang.querySelector<HTMLElement>("[class*='rounded-xl']")
@@ -334,7 +331,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── CONTACT ─────────────────────────────────────
-				const contact = document.querySelector<HTMLElement>("#contact")
+				const contact = container.querySelector<HTMLElement>("#contact")
 				if (contact && !reduced) {
 					const h2 = contact.querySelector<HTMLElement>("h2")
 					const icons = Array.from(contact.querySelectorAll<HTMLElement>(".social-icon"))
@@ -402,7 +399,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── SUPPORT ─────────────────────────────────────
-				const support = document.querySelector<HTMLElement>("#support")
+				const support = container.querySelector<HTMLElement>("#support")
 				if (support && !inVP(support) && !reduced) {
 					const h2 = support.querySelector<HTMLElement>("h2")
 					const p = support.querySelector<HTMLElement>("p")
@@ -449,7 +446,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── FALLBACK — .animated-section wrappers ───────
-				document.querySelectorAll<HTMLElement>(".animated-section").forEach(sec => {
+				container.querySelectorAll<HTMLElement>(".animated-section").forEach(sec => {
 					if (sec.closest("#projects")) return
 					if (inVP(sec)) { gsap.set(sec, { opacity: 1 }); return }
 					if (sec.dataset.ga) return
@@ -476,7 +473,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						document.addEventListener("mousemove", move)
 						addCleanup(() => document.removeEventListener("mousemove", move))
 
-						document.querySelectorAll("a, button, .project-card, .stat-card").forEach(el => {
+						container.querySelectorAll("a, button, .project-card, .stat-card").forEach(el => {
 							const onIn = () => gsap.to(cursor, { scale: 2.5, background: "rgba(255,20,147,0.7)", duration: 0.2 })
 							const onOut = () => gsap.to(cursor, { scale: 1, background: "rgba(0,255,255,0.4)", duration: 0.2 })
 							el.addEventListener("mouseenter", onIn)

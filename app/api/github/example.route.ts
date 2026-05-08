@@ -26,7 +26,7 @@ const MAX_CACHE_SIZE = 100; // Maximum number of cache entries
 const MAX_CACHE_ITEM_SIZE = 1024 * 1024; // 1MB per cache item
 
 interface CacheEntry {
-    data: any;
+    data: unknown;
     lastUpdated: number;
     size: number;
 }
@@ -61,7 +61,7 @@ class CacheManager {
         this.lastCleanup = now;
     }
 
-    get(key: string): any | null {
+    get(key: string): unknown | null {
         this.cleanup();
         const entry = this.cache.get(key);
         if (!entry) return null;
@@ -74,7 +74,7 @@ class CacheManager {
         return entry.data;
     }
 
-    set(key: string, data: any): boolean {
+    set(key: string, data: unknown): boolean {
         this.cleanup();
         
         const size = JSON.stringify(data).length;
@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
         console.error('GitHub API error:', error);
 
         if (error instanceof Error) {
-            if (error.message.includes('fetch failed') || (error as any).code === 'ENOTFOUND') {
+            if (error.message.includes('fetch failed') || (error as { code?: string }).code === 'ENOTFOUND') {
                 return NextResponse.json(
                     { error: 'Network connectivity issue - cannot reach GitHub API' },
                     { status: 503 }

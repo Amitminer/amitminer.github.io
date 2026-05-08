@@ -26,7 +26,7 @@ export const socialLinks = [
 	},
 	{
 		id: 6,
-		url: 'https://www.buymeacoffee.com/amitxd',
+		url: 'https://www.buymeacoffee.com/?',
 		username: 'amitxd'
 	}
 ];
@@ -44,5 +44,4 @@ export default socialLinks;
 
 export const CurrentGithubLink = "https://github.com/Amitminer/amitminer.github.io/";
 export const BackendURL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_LOCAL_BACKEND_URL;
-export const PinnedRepoApiUrl = "https://pinned.berrysauce.dev/get/";
 export const TopLanguagesApiUrl = `https://github-stats-extended.vercel.app/api/top-langs/?username=${GithubUsername}&layout=compact&theme=radical&bg_color=0d1117&title_color=00ffff&text_color=ffffff&icon_color=ff1493&border_color=30363d&langs_count=8`;

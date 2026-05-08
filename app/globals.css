@@ -90,13 +90,6 @@
 		width: 100%;
 	}
 
-	/* ─────────────────────────────────────────────────────────
-     project-card & stat-card:
-     - Removed `transition-property: all` and `transform` from
-       hover/base — GSAP owns all transform/opacity animation.
-     - Kept only non-transform transitions (border-color, box-shadow)
-       so GSAP doesn't fight CSS.
-  ───────────────────────────────────────────────────────── */
 	.project-card {
 		background-color: rgb(from hsl(var(--secondary)) h s l / 0.5);
 		backdrop-filter: blur(8px);
