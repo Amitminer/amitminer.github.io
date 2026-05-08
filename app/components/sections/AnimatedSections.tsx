@@ -132,10 +132,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						const h2Out = gsap.to(h2, { opacity: 0, x: 20, duration: DUR_FAST, ease: "power2.in", paused: true })
 						ScrollTrigger.create({
 							trigger: h2, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { h2Out.pause(); h2In.restart() },
-							onLeave: () => { h2In.pause(); h2Out.restart() },
-							onEnterBack: () => { h2Out.pause(); h2In.restart() },
-							onLeaveBack: () => { h2In.pause(); gsap.set(h2, { opacity: 0, x: -40 }) }
+							onEnter: () => { h2Out.pause(0); h2In.restart() },
+							onLeave: () => { h2In.pause(0); h2Out.restart() },
+							onEnterBack: () => { h2Out.pause(0); h2In.restart() },
+							onLeaveBack: () => { h2In.pause(0); gsap.set(h2, { opacity: 0, x: -40 }) }
 						})
 					}
 					if (card && !inVP(card) && !reduced) {
@@ -144,10 +144,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						const cardOut = gsap.to(card, { opacity: 0, x: 25, duration: DUR_FAST, ease: "power2.in", paused: true })
 						ScrollTrigger.create({
 							trigger: card, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { cardOut.pause(); cardIn.restart() },
-							onLeave: () => { cardIn.pause(); cardOut.restart() },
-							onEnterBack: () => { cardOut.pause(); cardIn.restart() },
-							onLeaveBack: () => { cardIn.pause(); gsap.set(card, { opacity: 0, x: -50 }) }
+							onEnter: () => { cardOut.pause(0); cardIn.restart() },
+							onLeave: () => { cardIn.pause(0); cardOut.restart() },
+							onEnterBack: () => { cardOut.pause(0); cardIn.restart() },
+							onLeaveBack: () => { cardIn.pause(0); gsap.set(card, { opacity: 0, x: -50 }) }
 						})
 					}
 				}
@@ -162,7 +162,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						gsap.set(h2, { opacity: 0, y: 25 })
 						gsap.to(h2, {
 							opacity: 1, y: 0, duration: DUR_MED, ease: EASE_REVEAL,
-							scrollTrigger: { trigger: h2, start: "top 88%" }
+							scrollTrigger: { trigger: h2, start: "top 95%" }
 						})
 					}
 
@@ -183,11 +183,11 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						})
 
 						ScrollTrigger.create({
-							trigger: g, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { exitTween.pause(); tween.restart() },
-							onLeave: () => { tween.pause(); exitTween.restart() },
-							onEnterBack: () => { exitTween.pause(); tween.restart() },
-							onLeaveBack: () => { tween.pause(); gsap.set(g, { opacity: 0, y: 45, scale: 0.92 }) }
+							trigger: g, start: "top 120%", end: "bottom 10%",
+							onEnter: () => { exitTween.pause(0); tween.restart() },
+							onLeave: () => { tween.pause(0); exitTween.restart() },
+							onEnterBack: () => { exitTween.pause(0); tween.restart() },
+							onLeaveBack: () => { tween.pause(0); gsap.set(g, { opacity: 0, y: 45, scale: 0.92 }) }
 						})
 
 						// Icon hover bounce
@@ -233,10 +233,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
 						ScrollTrigger.create({
 							trigger: card, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { exitTween.pause(); tween.restart() },
-							onLeave: () => { tween.pause(); exitTween.restart() },
-							onEnterBack: () => { exitTween.pause(); tween.restart() },
-							onLeaveBack: () => { tween.pause(); gsap.set(card, { opacity: 0, y: 55, x: xFrom, scale: 0.87 }) }
+							onEnter: () => { exitTween.pause(0); tween.restart() },
+							onLeave: () => { tween.pause(0); exitTween.restart() },
+							onEnterBack: () => { exitTween.pause(0); tween.restart() },
+							onLeaveBack: () => { tween.pause(0); gsap.set(card, { opacity: 0, y: 55, x: xFrom, scale: 0.87 }) }
 						})
 					}
 
@@ -286,10 +286,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
 						ScrollTrigger.create({
 							trigger: el, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { exitTween.pause(); tween.restart() },
-							onLeave: () => { tween.pause(); exitTween.restart() },
-							onEnterBack: () => { exitTween.pause(); tween.restart() },
-							onLeaveBack: () => { tween.pause(); gsap.set(el, { opacity: 0, y: 55, x: xFrom, scale: 0.88 }) }
+							onEnter: () => { exitTween.pause(0); tween.restart() },
+							onLeave: () => { tween.pause(0); exitTween.restart() },
+							onEnterBack: () => { exitTween.pause(0); tween.restart() },
+							onLeaveBack: () => { tween.pause(0); gsap.set(el, { opacity: 0, y: 55, x: xFrom, scale: 0.88 }) }
 						})
 					}
 
@@ -325,10 +325,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						const exitTween = gsap.to(imgWrap, { opacity: 0, y: -25, scale: 0.92, duration: DUR_FAST, ease: "power2.in", paused: true })
 						ScrollTrigger.create({
 							trigger: imgWrap, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { exitTween.pause(); tween.restart() },
-							onLeave: () => { tween.pause(); exitTween.restart() },
-							onEnterBack: () => { exitTween.pause(); tween.restart() },
-							onLeaveBack: () => { tween.pause(); gsap.set(imgWrap, { opacity: 0, scale: 0.82, y: 35 }) }
+							onEnter: () => { exitTween.pause(0); tween.restart() },
+							onLeave: () => { tween.pause(0); exitTween.restart() },
+							onEnterBack: () => { exitTween.pause(0); tween.restart() },
+							onLeaveBack: () => { tween.pause(0); gsap.set(imgWrap, { opacity: 0, scale: 0.82, y: 35 }) }
 						})
 					}
 				}
@@ -349,10 +349,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						const h2Out = gsap.to(h2, { opacity: 0, y: -18, duration: DUR_FAST, ease: "power2.in", paused: true })
 						ScrollTrigger.create({
 							trigger: h2, start: "top 90%", end: "bottom 10%",
-							onEnter: () => { h2Out.pause(); h2In.restart() },
-							onLeave: () => { h2In.pause(); h2Out.restart() },
-							onEnterBack: () => { h2Out.pause(); h2In.restart() },
-							onLeaveBack: () => { h2In.pause(); gsap.set(h2, { opacity: 0, y: 22 }) }
+							onEnter: () => { h2Out.pause(0); h2In.restart() },
+							onLeave: () => { h2In.pause(0); h2Out.restart() },
+							onEnterBack: () => { h2Out.pause(0); h2In.restart() },
+							onLeaveBack: () => { h2In.pause(0); gsap.set(h2, { opacity: 0, y: 22 }) }
 						})
 					}
 
@@ -372,10 +372,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						})
 						ScrollTrigger.create({
 							trigger: contact, start: "top 85%", end: "bottom 20%",
-							onEnter: () => { iconsOut.pause(); iconsIn.restart() },
-							onLeave: () => { iconsIn.pause(); iconsOut.restart() },
-							onEnterBack: () => { iconsOut.pause(); iconsIn.restart() },
-							onLeaveBack: () => { iconsIn.pause(); gsap.set(hiddenIcons, { opacity: 0, scale: 0, rotation: -30 }) }
+							onEnter: () => { iconsOut.pause(0); iconsIn.restart() },
+							onLeave: () => { iconsIn.pause(0); iconsOut.restart() },
+							onEnterBack: () => { iconsOut.pause(0); iconsIn.restart() },
+							onLeaveBack: () => { iconsIn.pause(0); gsap.set(hiddenIcons, { opacity: 0, scale: 0, rotation: -30 }) }
 						})
 					}
 
@@ -393,10 +393,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						const outTween = gsap.to(el, { opacity: 0, x: xFrom * 0.5, y: -10, duration: DUR_FAST, ease: "power2.in", paused: true })
 						ScrollTrigger.create({
 							trigger: el, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { outTween.pause(); inTween.restart() },
-							onLeave: () => { inTween.pause(); outTween.restart() },
-							onEnterBack: () => { outTween.pause(); inTween.restart() },
-							onLeaveBack: () => { inTween.pause(); gsap.set(el, { opacity: 0, x: xFrom, y: 12 }) }
+							onEnter: () => { outTween.pause(0); inTween.restart() },
+							onLeave: () => { inTween.pause(0); outTween.restart() },
+							onEnterBack: () => { outTween.pause(0); inTween.restart() },
+							onLeaveBack: () => { inTween.pause(0); gsap.set(el, { opacity: 0, x: xFrom, y: 12 }) }
 						})
 					})
 				}
@@ -461,10 +461,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
 					ScrollTrigger.create({
 						trigger: sec, start: "top 88%", end: "bottom 10%",
-						onEnter: () => { exitTween.pause(); tween.restart() },
-						onLeave: () => { tween.pause(); exitTween.restart() },
-						onEnterBack: () => { exitTween.pause(); tween.restart() },
-						onLeaveBack: () => { tween.pause(); gsap.set(sec, { opacity: 0, y: 28 }) }
+						onEnter: () => { exitTween.pause(0); tween.restart() },
+						onLeave: () => { tween.pause(0); exitTween.restart() },
+						onEnterBack: () => { exitTween.pause(0); tween.restart() },
+						onLeaveBack: () => { tween.pause(0); gsap.set(sec, { opacity: 0, y: 28 }) }
 					})
 				})
 

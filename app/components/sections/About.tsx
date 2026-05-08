@@ -15,16 +15,16 @@ import { TypewriterState } from '@/app/lib/types';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Constants
-const TYPING_DELAY = 8; // ms between characters for the first paragraph
-const SECOND_TYPING_DELAY = 5; // ms between characters for the second paragraph
+const TYPING_DELAY = 2; // ms between characters for the first paragraph
+const SECOND_TYPING_DELAY = 2; // ms between characters for the second paragraph
 const CURSOR_BLINK_DELAY = 500; // ms between cursor blinks
-const LOADING_DELAY = 1000; // ms for the loading state before animations begin
+const LOADING_DELAY = 400; // ms for the loading state before animations begin
 const PARTICLE_COUNT = 5; // Number of floating particles in the background
 
 // Content
 const CONTENT = {
-	firstParagraph: "Hello! I'm AmitxD, also Amitminer, a passionate self-taught developer from India. I love creating innovative solutions and exploring new technologies. My journey in the world of programming has been exciting, and I'm always eager to learn more.",
-	secondParagraph: "I'm driven by a curiosity for problem-solving and a desire to make a positive impact through technology. When I'm not coding, you can find me exploring new frameworks, contributing to open-source projects, or sharing my knowledge with the community."
+	firstParagraph: "Hey, I'm Amit, also known as AmitxD or Amitminer. I'm a self-taught developer from India driven by a genuine obsession with understanding how things work at a fundamental level, not just making them work.",
+	secondParagraph: "I specialize in systems programming with a focus on performance, modularity and low-level control. Memory management, concurrency and architectural efficiency are where I spend most of my time. Rust is my primary language of choice for work that demands precision and reliability at scale."
 };
 
 // === Skeleton Loading Component ===
