@@ -77,7 +77,6 @@ const DetailCard = ({ title, data, loading = false }: DetailCardProps) => {
 };
 
 const GitHubStatsComponent = () => {
-	const [isVisible, setIsVisible] = useState(false)
 	const [stats, setStats] = useState<GitHubStats | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
@@ -103,6 +102,8 @@ const GitHubStatsComponent = () => {
 			}
 			const data = await response.json()
 			setStats(data)
+			// Tell AnimatedSections the cards are now in the DOM
+			window.dispatchEvent(new CustomEvent("github-stats-ready"))
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to fetch GitHub stats')
 		} finally {
@@ -117,21 +118,6 @@ const GitHubStatsComponent = () => {
 
 	useEffect(() => {
 		void fetchRef.current();
-	}, [])
-
-	// Intersection Observer for animations
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry.isIntersecting) {
-					setIsVisible(true)
-				}
-			},
-			{ threshold: 0.1 }
-		)
-		const currentRef = statsRef.current
-		if (currentRef) observer.observe(currentRef)
-		return () => { if (currentRef) observer.unobserve(currentRef) }
 	}, [])
 
 	// Refresh data handler
@@ -174,7 +160,7 @@ const GitHubStatsComponent = () => {
 	// Render loading state
 	if (loading && !stats) {
 		return (
-			<section className="py-16 w-full">
+			<section id="github-stats" className="py-16 w-full">
 				<div className="container mx-auto px-4 md:px-6">
 					<h2 className="text-3xl md:text-4xl font-bold mb-8 bg-linear-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent text-center">
 						GitHub Statistics

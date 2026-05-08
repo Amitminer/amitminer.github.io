@@ -21,7 +21,6 @@ import Turnstile from 'react-turnstile';
 
 const Contact = () => {
 	// === Refs ===
-	const contactRef = useRef<HTMLDivElement>(null);
 	const emailRef = useRef<HTMLInputElement>(null);
 	const messageRef = useRef<HTMLTextAreaElement>(null);
 	const turnstileRef = useRef<any>(null);
@@ -34,7 +33,6 @@ const Contact = () => {
 
 	// === State Management ===
 	const [state, setState] = useState<ContactState>({
-		isVisible: false,
 		formState: {
 			email: '',
 			message: ''
@@ -122,27 +120,6 @@ const Contact = () => {
 			error: null,
 			isLoading: false
 		}));
-	}, []);
-
-	// === Animation Effects ===
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				if (entry.isIntersecting) {
-					setState(prev => ({ ...prev, isVisible: true }));
-					observer.unobserve(entry.target);
-				}
-			},
-			{ threshold: 0.1 }
-		);
-
-		if (contactRef.current) {
-			observer.observe(contactRef.current);
-		}
-
-		return () => {
-			observer.disconnect();
-		};
 	}, []);
 
 	// === Form Submission Effects ===
@@ -290,9 +267,7 @@ const Contact = () => {
 	return (
 		<section
 			id="contact"
-			ref={contactRef}
-			className={`pb-11 w-full transition-all duration-1000 ${state.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-				}`}
+			className="pb-11 w-full"
 		>
 			<div className="container mx-auto px-4 md:px-6">
 				<h2 className="text-3xl md:text-4xl font-bold mb-6 gradient-text text-center">
@@ -458,7 +433,7 @@ const Contact = () => {
 						{/* Submit Button */}
 						<Button
 							type="submit"
-							className="w-full bg-linear-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-medium py-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+							className="w-full bg-linear-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-medium py-6 rounded-xl transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
 							disabled={state.isSubmitting || (captchaState.showCaptcha && !captchaState.token)}
 						>
 							{state.isSubmitting ? (

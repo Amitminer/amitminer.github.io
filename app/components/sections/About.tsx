@@ -15,11 +15,11 @@ import { TypewriterState } from '@/app/lib/types';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Constants
-const TYPING_DELAY = 8; // ms between characters for first paragraph
-const SECOND_TYPING_DELAY = 5; // ms between characters for second paragraph
+const TYPING_DELAY = 8; // ms between characters for the first paragraph
+const SECOND_TYPING_DELAY = 5; // ms between characters for the second paragraph
 const CURSOR_BLINK_DELAY = 500; // ms between cursor blinks
-const LOADING_DELAY = 1000; // ms for loading state
-const PARTICLE_COUNT = 5;
+const LOADING_DELAY = 1000; // ms for the loading state before animations begin
+const PARTICLE_COUNT = 5; // Number of floating particles in the background
 
 // Content
 const CONTENT = {
@@ -177,7 +177,7 @@ const About = () => {
 		<section
 			id="about"
 			ref={aboutRef}
-			className="py-20 w-full opacity-0 relative overflow-hidden"
+			className="py-20 w-full relative overflow-hidden"
 		>
 			{/* Floating Particles Background */}
 			<div className="absolute inset-0 pointer-events-none">
