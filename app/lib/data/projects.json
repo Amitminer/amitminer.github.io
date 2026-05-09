@@ -1,0 +1,99 @@
+[
+	{
+		"slug": "amitminer-portfolio",
+		"name": "Developer Portfolio",
+		"description": "A portfolio built with Next.js, GitHub API integration, and a custom backend proxy for secure, cached data.",
+		"image": "portfolio",
+		"technologies": [
+			"Next.js",
+			"TypeScript",
+			"Tailwind CSS",
+			"React",
+			"GSAP",
+			"GitHub API"
+		],
+		"featured": true,
+		"github": "https://github.com/Amitminer/amitminer.github.io",
+		"demo": "https://amitminer.github.io/"
+	},
+	{
+		"slug": "compressorx",
+		"name": "CompressorX",
+		"description": "A fast, lightweight desktop video compressor built with Tauri, Rust, and TypeScript.",
+		"image": "compressorx",
+		"technologies": [
+			"Rust",
+			"Tauri",
+			"TypeScript",
+			"Tailwind CSS",
+			"FFmpeg"
+		],
+		"featured": true,
+		"github": "https://github.com/Amitminer/CompressorX"
+	},
+	{
+		"slug": "encryptx",
+		"name": "EncryptX",
+		"description": "A modern, full-stack file encryption tool built with Rust and Next.js — secure, fast, and developer-friendly.",
+		"image": "encryptx",
+		"technologies": [
+			"Rust",
+			"Actix Web",
+			"Next.js",
+			"TypeScript",
+			"Tailwind CSS",
+			"AES-256-GCM"
+		],
+		"featured": true,
+		"github": "https://github.com/Amitminer/EncryptX",
+		"demo": "https://encryptx-xd.vercel.app/"
+	},
+	{
+		"slug": "docsx",
+		"name": "DocsX",
+		"description": "An AI-powered documentation platform built with Rust and Next.js — fast, modern, and made for devs.",
+		"image": "docsx",
+		"technologies": [
+			"Rust",
+			"Actix Web",
+			"Next.js 15",
+			"TypeScript",
+			"Tailwind CSS",
+			"PostgreSQL",
+			"Google Gemini"
+		],
+		"featured": true,
+		"github": "https://github.com/Amitminer/DocsX",
+		"demo": "https://docsx-xd.vercel.app/"
+	},
+	{
+		"slug": "geogusserx",
+		"name": "GeoGusserX",
+		"description": "A modern single-player GeoGuessr-inspired game where you explore real-world locations via Street View and guess where you are.",
+		"image": "geogusserx",
+		"technologies": [
+			"Next.js 15",
+			"TypeScript",
+			"Tailwind CSS",
+			"Google Maps API",
+			"Google Gemini AI"
+		],
+		"featured": true,
+		"github": "https://github.com/Amitminer/GeoGusserX",
+		"demo": "https://geogusserx.vercel.app"
+	},
+	{
+		"slug": "compresscli",
+		"name": "CompressCLI",
+		"description": "A powerful FFmpeg wrapper CLI built in Rust. Simplifies complex video and image compression and provides batch processing capabilities.",
+		"image": "compresscli",
+		"technologies": [
+			"Rust",
+			"FFmpeg",
+			"Clap",
+			"Tokio"
+		],
+		"featured": true,
+		"github": "https://github.com/amitxd75/compresscli"
+	}
+]

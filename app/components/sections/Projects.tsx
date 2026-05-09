@@ -12,14 +12,12 @@
  * - Intersection Observer animations
  * - Error handling and loading states
  * - Grid layout
- * - Custom project pages via /projects/[slug]
  */
 
 "use client"
 
 import { useEffect, useRef, useState, useCallback, useMemo, memo } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import { ArrowUpRight, Star, GitFork, AlertCircle, Code, Eye, Calendar } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import type { GitHubRepo } from "@/app/lib/types"
@@ -103,24 +101,6 @@ const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
 	const [imageError, setImageError] = useState(false);
 	const mainImage = projectImages[project.slug];
 
-	const getStatusColor = (status: CustomProject['status']) => {
-		switch (status) {
-			case 'completed': return 'text-green-400 bg-green-900/20';
-			case 'in-progress': return 'text-yellow-400 bg-yellow-900/20';
-			case 'archived': return 'text-gray-400 bg-gray-900/20';
-			default: return 'text-gray-400 bg-gray-900/20';
-		}
-	};
-
-	const getStatusText = (status: CustomProject['status']) => {
-		switch (status) {
-			case 'completed': return 'Completed';
-			case 'in-progress': return 'In Progress';
-			case 'archived': return 'Archived';
-			default: return 'Unknown';
-		}
-	};
-
 	return (
 		<div className="group bg-gray-900/50 border border-gray-700/50 rounded-xl overflow-hidden hover:border-cyan-500/50 transition-colors duration-200 h-full flex flex-col">
 			<div className="relative w-full h-48 overflow-hidden">
@@ -146,10 +126,6 @@ const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
 					</div>
 				)}
 
-				<div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs ${getStatusColor(project.status)}`}>
-					{getStatusText(project.status)}
-				</div>
-
 				<div className="absolute bottom-2 left-2 flex flex-wrap gap-1">
 					{project.technologies.slice(0, 2).map((tech) => (
 						<div key={tech} className="bg-black/60 px-2 py-1 rounded-full text-xs text-white">
@@ -173,13 +149,15 @@ const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
 					{project.description}
 				</p>
 
-				<Link
-					href={`/projects/${project.slug}`}
+				<a
+					href={project.github || "#"}
+					target="_blank"
+					rel="noopener noreferrer"
 					className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600/20 border border-purple-500/60 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-colors duration-200 font-medium text-sm"
 				>
-					Learn More
+					View Code
 					<ArrowUpRight size={14} />
-				</Link>
+				</a>
 			</div>
 		</div>
 	);

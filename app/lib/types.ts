@@ -119,41 +119,6 @@ export interface GitHubRepo {
 	slug: string;
 }
 
-export interface ProjectsState {
-	featuredProjects: PinnedProject[];
-	recentProjects: GitHubRepo[];
-	allRecentProjects: GitHubRepo[];
-	loading: boolean;
-	loadingMore: boolean;
-	error: string | null;
-	activeTab: "featured" | "recent";
-	failedImages: Set<string>;
-	showAll: boolean;
-}
-
-export interface PinnedRepoAPI {
-	author: string;
-	name: string;
-	description: string;
-	language: string;
-	languageColor: string;
-	stars: number;
-	forks: number;
-	updated_at?: string;
-}
-
-export interface PinnedProject {
-	name: string;
-	description: string;
-	image: string;
-	url: string;
-	stars: number;
-	forks: number;
-	issues: number;
-	updated_at: string | null;
-}
-
-
 // Support Component Types
 export interface SupportState {
 	isVisible: boolean;
