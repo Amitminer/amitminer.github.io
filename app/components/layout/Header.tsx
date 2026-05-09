@@ -173,27 +173,30 @@ const Header = () => {
 		return () => ctx.revert();
 	}, []);
 
-	// Active section tracker
+	// Active section tracker using ScrollTrigger for accurate and efficient scroll-based navigation.
 	useEffect(() => {
-		const handleScroll = () => {
-			const sections = document.querySelectorAll('section[id]');
-			sections.forEach((section) => {
-				const el = section as HTMLElement;
-				const top = el.offsetTop - 100;
-				if (
-					window.scrollY >= top &&
-					window.scrollY < top + el.offsetHeight
-				) {
+		const rafId = requestAnimationFrame(() => {
+			const ctx = gsap.context(() => {
+				document.querySelectorAll<HTMLElement>('section[id]').forEach((section) => {
 					const id = section.getAttribute('id') || '';
-					setState((prev) => {
-						if (prev.activeSection === id) return prev;
-						return { ...prev, activeSection: id };
+					ScrollTrigger.create({
+						trigger: section,
+						start: 'top 40%', // Fires when section's top hits 40% of viewport height
+						end: 'bottom 40%',
+						onEnter: () => setState(prev =>
+							prev.activeSection === id ? prev : { ...prev, activeSection: id }
+						),
+						onEnterBack: () => setState(prev =>
+							prev.activeSection === id ? prev : { ...prev, activeSection: id }
+						),
 					});
-				}
+				});
 			});
-		};
-		window.addEventListener('scroll', handleScroll, { passive: true });
-		return () => window.removeEventListener('scroll', handleScroll);
+
+			return () => ctx.revert();
+		});
+
+		return () => cancelAnimationFrame(rafId);
 	}, []);
 
 	// Animate the active indicator pill to slide under the correct nav link

@@ -24,20 +24,7 @@ import type { GitHubRepo } from "@/app/lib/types"
 import { BackendURL, GithubUsername } from "@/app/utils/links"
 import DefaultBanner from "@/app/assets/default_banner.jpg"
 import { projectImages } from '@/app/assets/projects';
-
 import { getCustomProjects, type CustomProject } from "@/app/lib/data/projects"
-
-// ===== PERFORMANCE UTILITIES =====
-const throttle = <Args extends unknown[]>(func: (...args: Args) => unknown, limit: number): ((...args: Args) => void) => {
-	let inThrottle: boolean;
-	return (...args: Args) => {
-		if (!inThrottle) {
-			func(...args);
-			inThrottle = true;
-			setTimeout(() => { inThrottle = false; }, limit);
-		}
-	};
-};
 
 // ===== CACHING =====
 class SimpleCache {
@@ -253,93 +240,79 @@ GitHubProjectCard.displayName = 'GitHubProjectCard';
 // ===== MAIN COMPONENT =====
 const Projects = () => {
 	// ===== STATE =====
-	const [state, setState] = useState<{
+	const [dataState, setDataState] = useState<{
 		recentProjects: GitHubRepo[];
 		loading: boolean;
 		error: string | null;
-		activeTab: "featured" | "recent";
-		showAll: boolean;
 	}>({
 		recentProjects: [],
 		loading: true,
 		error: null,
+	});
+
+	const [uiState, setUiState] = useState<{
+		activeTab: "featured" | "recent";
+		showAll: boolean;
+	}>({
 		activeTab: "featured",
-		showAll: false
+		showAll: false,
 	});
 
 	const projectsRef = useRef<HTMLDivElement>(null);
-	const [isVisible, setIsVisible] = useState(false);
+
+	// ── Visibility is handled by AnimatedSections via ScrollTrigger.
+	const customProjects = useMemo(() => getCustomProjects(), []);
 
 	// ===== DATA FETCHING =====
-	const fetchData = useCallback(async () => {
-		try {
-			setState(prev => ({ ...prev, loading: true, error: null }));
+	const fetchData = useCallback(() => {
+		const toUrlSlug = (str: string) =>
+			str
+				.toLowerCase()
+				.replace(/[^a-z0-9\-_]+/g, '-')
+				.replace(/^-+|-+$/g, '')
+				.replace(/--+/g, '-');
 
-			const recentData = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=12`).catch(() => []);
-			// Utility to generate a URL-safe slug from a string
-			const toUrlSlug = (str: string) =>
-				str
-					.toLowerCase()
-					.replace(/[^a-z0-9\-_]+/g, '-') // Replace non-url-safe chars with hyphen
-					.replace(/^-+|-+$/g, '')         // Trim leading/trailing hyphens
-					.replace(/--+/g, '-');           // Collapse multiple hyphens
-
-			const recentDataWithSlugs = Array.isArray(recentData)
-				? (recentData as { name: string }[]).map((repo) => ({
-					...repo,
-					slug: repo.name ? toUrlSlug(repo.name) : '',
-				}))
-				: [];
-			setState(prev => ({
-				...prev,
-				recentProjects: recentDataWithSlugs as GitHubRepo[],
-				loading: false
-			}));
-
-		} catch {
-			setState(prev => ({
-				...prev,
-				loading: false,
-				error: "Failed to load recent projects"
-			}));
-		}
-	}, []);
-
-	// ===== THROTTLED INTERSECTION OBSERVER =====
-	useEffect(() => {
-		const handleIntersection = throttle(([entry]: IntersectionObserverEntry[]) => {
-			if (entry.isIntersecting) {
-				setIsVisible(true);
+		const run = async () => {
+			try {
+				setDataState(prev => ({ ...prev, loading: true, error: null }));
+				const recentData = await fetchGitHubData(`/users/${GithubUsername}/repos?sort=updated&per_page=12`).catch(() => []);
+				const recentDataWithSlugs = Array.isArray(recentData)
+					? (recentData as { name: string }[]).map((repo) => ({
+						...repo,
+						slug: repo.name ? toUrlSlug(repo.name) : '',
+					}))
+					: [];
+				setDataState({
+					recentProjects: recentDataWithSlugs as GitHubRepo[],
+					loading: false,
+					error: null,
+				});
+			} catch {
+				setDataState(prev => ({
+					...prev,
+					loading: false,
+					error: "Failed to load recent projects"
+				}));
 			}
-		}, 100);
+		};
 
-		const observer = new IntersectionObserver(handleIntersection, {
-			threshold: 0.1,
-			rootMargin: '50px'
-		});
-
-		const currentRef = projectsRef.current;
-		if (currentRef) {
-			observer.observe(currentRef);
-		}
-
-		return () => observer.disconnect();
+		void run();
 	}, []);
 
 	useEffect(() => {
-		(async () => { await fetchData(); })();
+		fetchData();
 	}, [fetchData]);
 
 	// ===== MEMOIZED PROJECTS =====
 	const displayedProjects = useMemo(() => {
-		if (state.activeTab === "featured") {
-			return getCustomProjects();
-		}
-		return state.showAll ? state.recentProjects : state.recentProjects.slice(0, 6);
-	}, [state.activeTab, state.recentProjects, state.showAll]);
+		if (uiState.activeTab === "featured") return customProjects;
+		return uiState.showAll
+			? dataState.recentProjects
+			: dataState.recentProjects.slice(0, 6);
+	}, [uiState.activeTab, uiState.showAll, dataState.recentProjects, customProjects]);
 
 	// ===== ERROR STATE =====
-	if (state.error && state.activeTab === "recent") {
+	if (dataState.error && uiState.activeTab === "recent") {
 		return (
 			<section id="projects" className="py-16 w-full">
 				<div className="container mx-auto px-4">
@@ -349,7 +322,7 @@ const Projects = () => {
 					<div className="text-center text-red-400 bg-red-900/20 border border-red-500/20 p-6 rounded-lg">
 						<AlertCircle className="mx-auto mb-4 h-12 w-12" />
 						<p className="text-lg font-medium mb-2">Something went wrong</p>
-						<p className="text-sm text-gray-400">{state.error}</p>
+						<p className="text-sm text-gray-400">{dataState.error}</p>
 						<Button onClick={fetchData} className="mt-4 bg-red-600 hover:bg-red-700">
 							Try Again
 						</Button>
@@ -364,8 +337,7 @@ const Projects = () => {
 		<section
 			id="projects"
 			ref={projectsRef}
-			className={`py-16 w-full transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'
-				}`}
+			className="py-16 w-full"
 		>
 			<div className="container mx-auto px-4">
 				<h2 className="text-3xl font-bold mb-4 text-center bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -379,28 +351,28 @@ const Projects = () => {
 				<div className="flex justify-center mb-8">
 					<div className="bg-gray-800/50 rounded-full p-1 border border-gray-700">
 						<button
-							onClick={() => setState(prev => ({ ...prev, activeTab: "featured" }))}
-							className={`px-4 py-2 rounded-full transition-colors duration-200 text-sm font-medium ${state.activeTab === "featured"
+							onClick={() => setUiState(prev => ({ ...prev, activeTab: "featured" }))}
+							className={`px-4 py-2 rounded-full transition-colors duration-200 text-sm font-medium ${uiState.activeTab === "featured"
 								? "bg-cyan-500 text-black"
 								: "text-gray-400 hover:text-cyan-300"
 								}`}
 						>
-							Featured ({getCustomProjects().length})
+							Featured ({customProjects.length})
 						</button>
 						<button
-							onClick={() => setState(prev => ({ ...prev, activeTab: "recent" }))}
-							className={`px-4 py-2 rounded-full transition-colors duration-200 text-sm font-medium ${state.activeTab === "recent"
+							onClick={() => setUiState(prev => ({ ...prev, activeTab: "recent" }))}
+							className={`px-4 py-2 rounded-full transition-colors duration-200 text-sm font-medium ${uiState.activeTab === "recent"
 								? "bg-cyan-500 text-black"
 								: "text-gray-400 hover:text-cyan-300"
 								}`}
 						>
-							Recent ({state.recentProjects.length})
+							Recent ({dataState.recentProjects.length})
 						</button>
 					</div>
 				</div>
 
 				{/* Projects Grid */}
-				{state.loading && state.activeTab === "recent" ? (
+				{dataState.loading && uiState.activeTab === "recent" ? (
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 						{[...Array(6)].map((_, i) => (
 							<ProjectCardSkeleton key={i} />
@@ -409,20 +381,16 @@ const Projects = () => {
 				) : (
 					<>
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-							{state.activeTab === "featured" ? (
+							{uiState.activeTab === "featured" ? (
 								displayedProjects.map((project) => (
 									<div className="animated-section" key={project.slug}>
-										<CustomProjectCard
-											project={project as CustomProject}
-										/>
+										<CustomProjectCard project={project as CustomProject} />
 									</div>
 								))
 							) : (
 								displayedProjects.map((project) => (
 									<div className="animated-section" key={project.name}>
-										<GitHubProjectCard
-											project={project as GitHubRepo}
-										/>
+										<GitHubProjectCard project={project as GitHubRepo} />
 									</div>
 								))
 							)}
@@ -436,13 +404,13 @@ const Projects = () => {
 				)}
 
 				{/* Show More Button */}
-				{!state.loading && state.activeTab === "recent" && state.recentProjects.length > 6 && (
+				{!dataState.loading && uiState.activeTab === "recent" && dataState.recentProjects.length > 6 && (
 					<div className="text-center mt-8">
 						<Button
-							onClick={() => setState(prev => ({ ...prev, showAll: !prev.showAll }))}
+							onClick={() => setUiState(prev => ({ ...prev, showAll: !prev.showAll }))}
 							className="bg-cyan-600/20 border border-cyan-500/50 text-cyan-300 hover:bg-cyan-600/30"
 						>
-							{state.showAll ? "Show Less" : "Show More Projects"}
+							{uiState.showAll ? "Show Less" : "Show More Projects"}
 						</Button>
 					</div>
 				)}

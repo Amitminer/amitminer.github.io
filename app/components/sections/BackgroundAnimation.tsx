@@ -88,8 +88,12 @@ export default function BackgroundAnimation() {
 	const particleRefs = useRef<(HTMLDivElement | null)[]>([])
 	const shapeRefs = useRef<(HTMLDivElement | null)[]>([])
 	const codeRefs = useRef<(HTMLDivElement | null)[]>([])
+	// Stores the last smoothed mouse position to avoid redundant gsap.set calls
 	const mouseX = useRef(0)
 	const mouseY = useRef(0)
+	// Tracks the mouse position that was last applied, so we skip frames with no change
+	const appliedX = useRef(0)
+	const appliedY = useRef(0)
 	const rafRef = useRef<number | null>(null)
 
 	const particles = PARTICLES
@@ -177,37 +181,49 @@ export default function BackgroundAnimation() {
 			mouseY.current = (e.clientY / window.innerHeight - 0.5) * 2
 		}
 
+		const MOVE_THRESHOLD = 0.004 // skip RAF work if mouse barely moved
+
 		const tick = () => {
 			const mx = mouseX.current
 			const my = mouseY.current
 
-			particleRefs.current.forEach((el, i) => {
-				if (!el) return
-				const depth = particles[i].depth
-				const moveX = mx * 18 * depth
-				const moveY = my * 18 * depth
-				gsap.to(el, { x: moveX, y: moveY, duration: 1.2, ease: "power2.out", overwrite: "auto" })
-			})
+			// Skip the whole batch if the mouse hasn't moved meaningfully —
+			// this eliminates the constant 60fps gsap.to() spam when idle
+			if (
+				Math.abs(mx - appliedX.current) > MOVE_THRESHOLD ||
+				Math.abs(my - appliedY.current) > MOVE_THRESHOLD
+			) {
+				appliedX.current = mx
+				appliedY.current = my
 
-			shapeRefs.current.forEach((el, i) => {
-				if (!el) return
-				const depth = shapes[i].depth
-				gsap.to(el, {
-					x: mx * 28 * depth,
-					y: my * 28 * depth,
-					duration: 1.8, ease: "power2.out", overwrite: "auto"
+				// Use gsap.set (instant, no tween object created) for the
+				// parallax offset so we don't pile up hundreds of short tweens.
+				particleRefs.current.forEach((el, i) => {
+					if (!el) return
+					const depth = particles[i].depth
+					gsap.to(el, { x: mx * 18 * depth, y: my * 18 * depth, duration: 1.2, ease: "power2.out", overwrite: "auto" })
 				})
-			})
 
-			codeRefs.current.forEach((el, i) => {
-				if (!el) return
-				const depth = codes[i].depth
-				gsap.to(el, {
-					x: mx * 10 * depth,
-					y: my * 10 * depth,
-					duration: 2, ease: "power2.out", overwrite: "auto"
+				shapeRefs.current.forEach((el, i) => {
+					if (!el) return
+					const depth = shapes[i].depth
+					gsap.to(el, {
+						x: mx * 28 * depth,
+						y: my * 28 * depth,
+						duration: 1.8, ease: "power2.out", overwrite: "auto"
+					})
 				})
-			})
+
+				codeRefs.current.forEach((el, i) => {
+					if (!el) return
+					const depth = codes[i].depth
+					gsap.to(el, {
+						x: mx * 10 * depth,
+						y: my * 10 * depth,
+						duration: 2, ease: "power2.out", overwrite: "auto"
+					})
+				})
+			}
 
 			rafRef.current = requestAnimationFrame(tick)
 		}

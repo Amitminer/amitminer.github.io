@@ -13,72 +13,76 @@
  */
 
 "use client"
-import { useRef, useEffect, useCallback } from "react"
+import { useRef, useEffect } from "react"
 import type React from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
+// Easing function for reveal animations (e.g., slide-ins)
 const EASE_REVEAL = "expo.out"
+// Easing function for pop-in animations (e.g., scale-ups)
 const EASE_POP = "back.out(1.4)"
+// Duration for fast animations (seconds)
 const DUR_FAST = 0.5
+// Duration for medium animations (seconds)
 const DUR_MED = 0.7
+// Duration for slow animations (seconds)
 const DUR_SLOW = 0.9
+// Small stagger delay for sequential animations (seconds)
 const STAGGER_SM = 0.06
-const STAGGER_MD = 0.08
 
 const inVP = (el: Element) => {
 	const r = el.getBoundingClientRect()
 	return r.top < window.innerHeight * 0.98 && r.bottom > 0
 }
 
+// ── Stable helpers  ──────────────────
+const isDesktop = () =>
+	window.innerWidth >= 1024 &&
+	window.matchMedia("(pointer: fine)").matches &&
+	!("ontouchstart" in window)
+
+const reducedMotion = () =>
+	window.matchMedia("(prefers-reduced-motion: reduce)").matches
+
 export default function AnimatedSections({ children }: { children: React.ReactNode }) {
 	const containerRef = useRef<HTMLDivElement>(null)
 	const cursorRef = useRef<HTMLDivElement>(null)
 	const cleanupRef = useRef<(() => void)[]>([])
-	const addCleanup = useCallback((fn: () => void) => { cleanupRef.current.push(fn) }, [])
-
-	const isDesktop = useCallback(() =>
-		window.innerWidth >= 1024 &&
-		window.matchMedia("(pointer: fine)").matches &&
-		!("ontouchstart" in window)
-		, [])
-
-	const reducedMotion = useCallback(() =>
-		window.matchMedia("(prefers-reduced-motion: reduce)").matches
-		, [])
 
 	// Page restore — un-hide anything stuck invisible
 	useEffect(() => {
-		const restore = () => setTimeout(() => {
-			document.querySelectorAll<HTMLElement>(
-				".animated-section, .project-card, .stat-card, .contact-card, #about, #tech-stack, #github-stats, #projects, #languages, #contact, #support"
-			).forEach(el => {
-				if (inVP(el)) gsap.set(el, { clearProps: "opacity,transform,x,y,scale,rotation" })
-			})
-			ScrollTrigger.refresh()
-		}, 50)
+		const restore = () => {
+			// Defer one tick so the browser has painted before we clear props
+			setTimeout(() => {
+				document.querySelectorAll<HTMLElement>(
+					".animated-section, .project-card, .stat-card, .contact-card, #about, #tech-stack, #github-stats, #projects, #languages, #contact, #support"
+				).forEach(el => {
+					if (inVP(el)) gsap.set(el, { clearProps: "opacity,transform,x,y,scale,rotation" })
+				})
+				ScrollTrigger.refresh()
+			}, 50)
+		}
 
-		const onShow = () => restore()
 		document.addEventListener("visibilitychange", restore)
-		window.addEventListener("pageshow", onShow)
+		window.addEventListener("pageshow", restore)
 		window.addEventListener("focus", restore)
-		addCleanup(() => {
+		return () => {
 			document.removeEventListener("visibilitychange", restore)
-			window.removeEventListener("pageshow", onShow)
+			window.removeEventListener("pageshow", restore)
 			window.removeEventListener("focus", restore)
-		})
-	}, [addCleanup])
+		}
+	}, [])
 
 	useEffect(() => {
+		// Defer setup one frame so React has fully committed the DOM
 		const rafId = requestAnimationFrame(() => {
 			const ctx = gsap.context(() => {
 				const container = containerRef.current!
 				const desktop = isDesktop()
 				const reduced = reducedMotion()
-
-				gsap.defaults({ overwrite: "auto" })
 
 				// ── Progress bar ────────────────────────────────
 				if (desktop) {
@@ -90,10 +94,56 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						zIndex: "1000", pointerEvents: "none"
 					})
 					document.body.appendChild(bar)
-					addCleanup(() => bar.remove())
+					cleanupRef.current.push(() => bar.remove())
+
+					const bg = document.createElement("div")
+					Object.assign(bg.style, {
+						position: "fixed", inset: "0", pointerEvents: "none", zIndex: "-1",
+						background: "linear-gradient(135deg,rgba(255,20,147,0.02) 0%,transparent 30%,rgba(0,255,255,0.02) 70%,transparent 100%)"
+					})
+					document.body.appendChild(bg)
+					cleanupRef.current.push(() => bg.remove())
+
+					// ── Single ScrollTrigger for both progress bar + bg morph ──
+					// Gradient string is expensive to rebuild every scroll tick — cache
+					// the last applied progress and skip the style write when it hasn't
+					// changed meaningfully (< 0.5% movement).
+					let lastBgProgress = -1
 					ScrollTrigger.create({
 						trigger: document.body, start: "top top", end: "bottom bottom",
-						onUpdate: s => { bar.style.width = s.progress * 100 + "%" }
+						onUpdate: s => {
+							const p = s.progress
+							bar.style.width = p * 100 + "%"
+							if (Math.abs(p - lastBgProgress) > 0.005) {
+								lastBgProgress = p
+								const deg = (135 + p * 120).toFixed(1)
+								const alpha = (0.02 + p * 0.015).toFixed(4)
+								bg.style.background = `linear-gradient(${deg}deg,rgba(255,20,147,${alpha}) 0%,transparent 30%,rgba(0,255,255,${alpha}) 70%,transparent 100%)`
+							}
+						}
+					})
+				} else {
+					// Non-desktop still gets the bg morph, just no progress bar
+					const bg = document.createElement("div")
+					Object.assign(bg.style, {
+						position: "fixed", inset: "0", pointerEvents: "none", zIndex: "-1",
+						background: "linear-gradient(135deg,rgba(255,20,147,0.02) 0%,transparent 30%,rgba(0,255,255,0.02) 70%,transparent 100%)"
+					})
+					document.body.appendChild(bg)
+					cleanupRef.current.push(() => bg.remove())
+
+					let lastBgProgressMobile = -1
+					ScrollTrigger.create({
+						trigger: document.body, start: "top top", end: "bottom bottom",
+						onUpdate: s => {
+							const p = s.progress
+							if (Math.abs(p - lastBgProgressMobile) > 0.005) {
+								lastBgProgressMobile = p
+								const deg = (135 + p * 120).toFixed(1)
+								const alpha = (0.02 + p * 0.015).toFixed(4)
+								bg.style.background = `linear-gradient(${deg}deg,rgba(255,20,147,${alpha}) 0%,transparent 30%,rgba(0,255,255,${alpha}) 70%,transparent 100%)`
+							}
+						}
 					})
 				}
 
@@ -154,7 +204,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				const tech = container.querySelector<HTMLElement>("#tech-stack")
 				if (tech) {
 					const h2 = tech.querySelector<HTMLElement>("h2")
-					const groups = tech.querySelectorAll<HTMLElement>("[class*='rounded-lg'][class*='bg-secondary']")
+					const groups = Array.from(tech.querySelectorAll<HTMLElement>("[class*='rounded-lg'][class*='bg-secondary']"))
 
 					if (h2 && !inVP(h2) && !reduced) {
 						gsap.set(h2, { opacity: 0, y: 25 })
@@ -164,37 +214,57 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						})
 					}
 
-					groups.forEach((g, i) => {
-						if (inVP(g) || reduced) return
-						gsap.set(g, { opacity: 0, y: 45, scale: 0.92 })
+					if (groups.length && !reduced) {
+						// Hide all groups upfront
+						gsap.set(groups, { opacity: 0, y: 40, scale: 0.92 })
 
-						// Entrance tween
-						const tween = gsap.to(g, {
-							opacity: 1, y: 0, scale: 1, duration: DUR_MED,
-							delay: i * STAGGER_MD, ease: EASE_POP, paused: true
+						// One timeline — stagger is baked in, no per-group delay.
+						// This means even on fast scroll the whole set snaps in together
+						// rather than groups revealing one-by-one with growing wait times.
+						const tl = gsap.timeline({ paused: true })
+						tl.to(groups, {
+							opacity: 1, y: 0, scale: 1,
+							duration: DUR_FAST,   // faster than DUR_MED so it feels snappy
+							ease: EASE_POP,
+							stagger: { amount: 0.25, from: "start" }  // total spread capped at 250ms
 						})
 
-						// Exit tween — faster, slides back up slightly
-						const exitTween = gsap.to(g, {
-							opacity: 0, y: -25, scale: 0.95, duration: DUR_FAST,
-							ease: "power2.in", paused: true
+						const exitTl = gsap.timeline({ paused: true })
+						exitTl.to(groups, {
+							opacity: 0, y: -20, scale: 0.95,
+							duration: DUR_FAST * 0.6,
+							ease: "power2.in",
+							stagger: { amount: 0.15, from: "end" }
 						})
 
+						// Single ScrollTrigger on the section — fires as soon as ANY part
+						// of #tech-stack enters the viewport. "top 100%" means the very
+						// bottom edge of the viewport touching the top of the section,
+						// so even a fast scroll that blows past will have triggered it.
 						ScrollTrigger.create({
-							trigger: g, start: "top 120%", end: "bottom 10%",
-							onEnter: () => { exitTween.pause(0); tween.restart() },
-							onLeave: () => { tween.pause(0); exitTween.restart() },
-							onEnterBack: () => { exitTween.pause(0); tween.restart() },
-							onLeaveBack: () => { tween.pause(0); gsap.set(g, { opacity: 0, y: 45, scale: 0.92 }) }
+							trigger: tech,
+							start: "top 100%",
+							end: "bottom 5%",
+							onEnter: () => { exitTl.pause(0); tl.restart() },
+							onLeave: () => { tl.pause(0); exitTl.restart() },
+							onEnterBack: () => { exitTl.pause(0); tl.restart() },
+							onLeaveBack: () => {
+								tl.pause(0)
+								gsap.set(groups, { opacity: 0, y: 40, scale: 0.92 })
+							}
 						})
+					}
 
-						// Icon hover bounce
+					groups.forEach(g => {
 						g.querySelectorAll<HTMLElement>("[class*='text-2xl']").forEach(icon => {
 							const onIn = () => gsap.to(icon, { scale: 1.35, duration: 0.18, ease: "back.out(2)" })
 							const onOut = () => gsap.to(icon, { scale: 1, duration: 0.2, ease: "power2.out" })
 							icon.addEventListener("mouseenter", onIn)
 							icon.addEventListener("mouseleave", onOut)
-							addCleanup(() => { icon.removeEventListener("mouseenter", onIn); icon.removeEventListener("mouseleave", onOut) })
+							cleanupRef.current.push(() => {
+								icon.removeEventListener("mouseenter", onIn)
+								icon.removeEventListener("mouseleave", onOut)
+							})
 						})
 					})
 				}
@@ -249,11 +319,12 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 								delete card.dataset.ga
 								animateStatCard(card, i)
 							})
+							// Single refresh after all cards are wired up
 							ScrollTrigger.refresh()
 						})
 					}
 					window.addEventListener("github-stats-ready", onStatsReady)
-					addCleanup(() => window.removeEventListener("github-stats-ready", onStatsReady))
+					cleanupRef.current.push(() => window.removeEventListener("github-stats-ready", onStatsReady))
 				}
 
 				// ── PROJECTS ────────────────────────────────────
@@ -278,15 +349,16 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						const xFrom = col === 0 ? -35 : col === 2 ? 35 : 0
 						gsap.set(el, { opacity: 0, y: 55, x: xFrom, scale: 0.88 })
 
-						const tween = gsap.to(el, { opacity: 1, y: 0, x: 0, scale: 1, duration: DUR_MED, delay: col * 0.07, ease: EASE_POP, paused: true })
-						const exitTween = gsap.to(el, { opacity: 0, y: -20, scale: 0.93, duration: DUR_FAST, ease: "power2.in", paused: true })
-
+						// Projects section is a long grid — skip exit tweens here.
+						// Having onLeave/onLeaveBack fire on 6–12 cards simultaneously
+						// while scrolling causes tween pile-up and frame drops.
+						// One-shot reveal is visually identical and far cheaper.
 						ScrollTrigger.create({
-							trigger: el, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { exitTween.pause(0); tween.restart() },
-							onLeave: () => { tween.pause(0); exitTween.restart() },
-							onEnterBack: () => { exitTween.pause(0); tween.restart() },
-							onLeaveBack: () => { tween.pause(0); gsap.set(el, { opacity: 0, y: 55, x: xFrom, scale: 0.88 }) }
+							trigger: el, start: "top 88%",
+							once: true,
+							onEnter: () => {
+								gsap.to(el, { opacity: 1, y: 0, x: 0, scale: 1, duration: DUR_MED, delay: col * 0.07, ease: EASE_POP })
+							}
 						})
 					}
 
@@ -295,15 +367,23 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						animateCard(inner, i)
 					})
 
-					// Re-animate on tab switch
+					let moRafId: number | null = null
 					const mo = new MutationObserver(() => {
-						proj.querySelectorAll<HTMLElement>(".animated-section").forEach((el, i) => {
-							const inner = el.querySelector<HTMLElement>("[class*='rounded-xl']") || el
-							if (!inner.dataset.ga) { animateCard(inner, i); ScrollTrigger.refresh() }
+						if (moRafId !== null) return
+						moRafId = requestAnimationFrame(() => {
+							moRafId = null
+							proj.querySelectorAll<HTMLElement>(".animated-section").forEach((el, i) => {
+								const inner = el.querySelector<HTMLElement>("[class*='rounded-xl']") || el
+								if (!inner.dataset.ga) animateCard(inner, i)
+							})
+							requestAnimationFrame(() => ScrollTrigger.refresh())
 						})
 					})
-					mo.observe(proj, { childList: true, subtree: true })
-					addCleanup(() => mo.disconnect())
+					mo.observe(proj, { childList: true, subtree: false })
+					cleanupRef.current.push(() => {
+						mo.disconnect()
+						if (moRafId !== null) cancelAnimationFrame(moRafId)
+					})
 				}
 
 				// ── LANGUAGES ───────────────────────────────────
@@ -423,7 +503,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						const onOut = () => gsap.to(btn, { scale: 1, y: 0, duration: 0.22, ease: "power2.out" })
 						btn.addEventListener("mouseenter", onIn)
 						btn.addEventListener("mouseleave", onOut)
-						addCleanup(() => { btn.removeEventListener("mouseenter", onIn); btn.removeEventListener("mouseleave", onOut) })
+						cleanupRef.current.push(() => {
+							btn.removeEventListener("mouseenter", onIn)
+							btn.removeEventListener("mouseleave", onOut)
+						})
 					}
 				}
 
@@ -453,52 +536,37 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 					if (cursor) {
 						const move = (e: MouseEvent) => gsap.set(cursor, { x: e.clientX, y: e.clientY })
 						document.addEventListener("mousemove", move)
-						addCleanup(() => document.removeEventListener("mousemove", move))
+						cleanupRef.current.push(() => document.removeEventListener("mousemove", move))
 
 						container.querySelectorAll("a, button, .project-card, .stat-card").forEach(el => {
 							const onIn = () => gsap.to(cursor, { scale: 2.5, background: "rgba(255,20,147,0.7)", duration: 0.2 })
 							const onOut = () => gsap.to(cursor, { scale: 1, background: "rgba(0,255,255,0.4)", duration: 0.2 })
 							el.addEventListener("mouseenter", onIn)
 							el.addEventListener("mouseleave", onOut)
-							addCleanup(() => { el.removeEventListener("mouseenter", onIn); el.removeEventListener("mouseleave", onOut) })
+							cleanupRef.current.push(() => {
+								el.removeEventListener("mouseenter", onIn)
+								el.removeEventListener("mouseleave", onOut)
+							})
 						})
 					}
 				}
 
-				// ── BACKGROUND MORPH ────────────────────────────
-				const bg = document.createElement("div")
-				Object.assign(bg.style, {
-					position: "fixed", inset: "0", pointerEvents: "none", zIndex: "-1",
-					background: "linear-gradient(135deg,rgba(255,20,147,0.02) 0%,transparent 30%,rgba(0,255,255,0.02) 70%,transparent 100%)"
-				})
-				document.body.appendChild(bg)
-				addCleanup(() => bg.remove())
-				ScrollTrigger.create({
-					trigger: document.body, start: "top top", end: "bottom bottom",
-					onUpdate: s => {
-						const p = s.progress
-						bg.style.background = `linear-gradient(${135 + p * 120}deg,
-              rgba(255,20,147,${0.02 + p * 0.015}) 0%,transparent 30%,
-              rgba(0,255,255,${0.02 + p * 0.015}) 70%,transparent 100%)`
-					}
-				})
-
+				// Single deferred refresh after all ScrollTriggers are registered
 				setTimeout(() => ScrollTrigger.refresh(), 200)
 
 			}, containerRef)
 
-			return () => { ctx.revert(); ScrollTrigger.getAll().forEach(t => t.kill()) }
+			return () => { ctx.revert() }
 		})
 
 		return () => { cancelAnimationFrame(rafId) }
-	}, [isDesktop, reducedMotion, addCleanup])
+	}, [])
 
+	// Teardown for non-GSAP listeners and injected DOM nodes
 	useEffect(() => {
 		return () => {
 			cleanupRef.current.forEach(fn => { try { fn() } catch { } })
 			cleanupRef.current = []
-			ScrollTrigger.getAll().forEach(t => t.kill())
-			gsap.killTweensOf("*")
 		}
 	}, [])
 
