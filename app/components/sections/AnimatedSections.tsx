@@ -307,28 +307,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				}
 
 				// ── LANGUAGES ───────────────────────────────────
-				const lang = container.querySelector<HTMLElement>("#languages")
-				if (lang) {
-					const h2 = lang.querySelector<HTMLElement>("h2")
-					const imgWrap = lang.querySelector<HTMLElement>("[class*='rounded-xl']")
-
-					if (h2 && !inVP(h2) && !reduced) {
-						gsap.set(h2, { opacity: 0, y: 22 })
-						gsap.to(h2, { opacity: 1, y: 0, duration: DUR_MED, ease: EASE_REVEAL, scrollTrigger: { trigger: h2, start: "top 88%" } })
-					}
-					if (imgWrap && !inVP(imgWrap) && !reduced) {
-						gsap.set(imgWrap, { opacity: 0, scale: 0.82, y: 35 })
-						const tween = gsap.to(imgWrap, { opacity: 1, scale: 1, y: 0, duration: DUR_SLOW, ease: EASE_POP, paused: true })
-						const exitTween = gsap.to(imgWrap, { opacity: 0, y: -25, scale: 0.92, duration: DUR_FAST, ease: "power2.in", paused: true })
-						ScrollTrigger.create({
-							trigger: imgWrap, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { exitTween.pause(0); tween.restart() },
-							onLeave: () => { tween.pause(0); exitTween.restart() },
-							onEnterBack: () => { exitTween.pause(0); tween.restart() },
-							onLeaveBack: () => { tween.pause(0); gsap.set(imgWrap, { opacity: 0, scale: 0.82, y: 35 }) }
-						})
-					}
-				}
+				// h2 and card animations are handled entirely inside Languages.tsx
+				// via its own IntersectionObserver + GSAP. Doing it here too causes
+				// the heading to go invisible when ScrollTrigger onLeave fires before
+				// the component's own animation runs (especially on fast scroll).
 
 				// ── CONTACT ─────────────────────────────────────
 				const contact = container.querySelector<HTMLElement>("#contact")

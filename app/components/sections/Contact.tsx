@@ -15,7 +15,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from '@/app/components/ui/button';
 
 import { XIcon, DiscordIcon, InstagramIcon, GitHubIcon, EmailIcon } from '../icons/index';
-import { DiscordLink, GithubLink, InstagramLink, XLink } from '@/app/utils/Links';
+import { DiscordLink, GithubLink, InstagramLink, XLink } from '@/app/utils/links';
 import { ContactState, FormState } from '@/app/lib/types';
 import Turnstile from 'react-turnstile';
 
@@ -272,7 +272,7 @@ const Contact = () => {
 	return (
 		<section
 			id="contact"
-			className="pb-11 w-full"
+			className="py-20 w-full"
 		>
 			<div className="container mx-auto px-4 md:px-6">
 				<h2 className="text-3xl md:text-4xl font-bold mb-6 gradient-text text-center">
@@ -281,17 +281,17 @@ const Contact = () => {
 
 				<div className="max-w-2xl mx-auto">
 					{/* Social Media Links */}
-					<div className="flex justify-center mb-10 space-x-4">
+					<div className="flex flex-wrap justify-center mb-10 gap-4 sm:gap-6">
 						{socialLinks.map(({ href, icon: Icon, label }) => (
 							<a
 								key={label}
 								href={href}
 								target="_blank"
-								className="social-icon group scale-75 border-2 border-gray-700/50 hover:border-pink-500/70"
+								className="social-icon group border-2 border-gray-700/50 hover:border-pink-500/70 transition-all duration-300 hover:scale-110 active:scale-95"
 								aria-label={label}
 								rel="noopener noreferrer"
 							>
-								<Icon className="w-4 h-4 group-hover:text-pink-500 transition-colors duration-300" />
+								<Icon className="w-5 h-5 sm:w-6 sm:h-6 group-hover:text-pink-500 transition-colors duration-300" />
 							</a>
 						))}
 					</div>

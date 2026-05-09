@@ -146,11 +146,17 @@
 	}
 
 	.social-icon {
-		padding: 1rem;
+		padding: 0.75rem;
 		color: rgb(from white r g b / 0.7);
 		border-radius: 9999px;
-		transition: color 300ms, background-color 300ms;
+		transition: all 300ms;
 		will-change: transform;
+	}
+
+	@media (min-width: 640px) {
+		.social-icon {
+			padding: 1rem;
+		}
 	}
 
 	.social-icon:hover {

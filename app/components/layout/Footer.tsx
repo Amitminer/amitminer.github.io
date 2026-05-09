@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { GitHubIcon } from '../icons/index';
-import { CurrentGithubLink } from '@/app/utils/Links';
+import { CurrentGithubLink } from '@/app/utils/links';
 import VisitorCounter from '../ui/VisitorCounter';
 
 const Footer = () => {
@@ -73,7 +73,7 @@ const Footer = () => {
 							rel="noopener noreferrer"
 							className="flex items-center space-x-2 text-sm text-gray-400 hover:text-[#00FFFF] transition-colors duration-300"
 						>
-							<GitHubIcon className="w-4 h-4" />
+							<GitHubIcon className="w-5 h-5" />
 							<span>Open Source</span>
 						</a>
 						<span className="text-gray-600">•</span>

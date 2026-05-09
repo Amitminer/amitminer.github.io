@@ -7,7 +7,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Heart, Coffee, Copy, Check } from 'lucide-react';
-import { BuyMeACoffeeLink } from '@/app/utils/Links';
+import { BuyMeACoffeeLink } from '@/app/utils/links';
 
 interface ExtendedSupportState {
 	isHovered: boolean;

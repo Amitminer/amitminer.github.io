@@ -28,7 +28,7 @@ export interface GitHubStats {
 	longestStreak: number
 	accountCreated: string
 	lastActivity: string
-	topLanguages: { [key: string]: number }
+	topLanguages?: Record<string, number>
 	recentActivity: number
 	privateRepos: number
 	lastUpdated: string

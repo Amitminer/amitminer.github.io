@@ -23,7 +23,7 @@ import Link from "next/link"
 import { ArrowUpRight, Star, GitFork, AlertCircle, Code, Eye, Calendar } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import type { GitHubRepo } from "@/app/lib/types"
-import { BackendURL, GithubUsername } from "@/app/utils/Links"
+import { BackendURL, GithubUsername } from "@/app/utils/links"
 import DefaultBanner from "@/app/assets/default_banner.jpg"
 import { projectImages } from '@/app/assets/projects';
 

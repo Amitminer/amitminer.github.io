@@ -18,7 +18,7 @@ import { ArrowDownCircle, ExternalLink } from "lucide-react"
 import ProfileImage from "@/app/assets/pfp.webp"
 import BackgroundAnimation from "./BackgroundAnimation"
 import { GitHubIcon } from "../icons/index"
-import { GithubUsername } from "@/app/utils/Links"
+import { GithubUsername } from "@/app/utils/links"
 import type { ThrottleOptions } from "@/app/lib/types"
 import Image from "next/image"
 
@@ -289,9 +289,9 @@ const Hero = () => {
 								rel="noopener noreferrer"
 								className="flex items-center gap-2"
 							>
-								<GitHubIcon size={18} />
+								<GitHubIcon className="w-5 h-5" />
 								View Profile
-								<ExternalLink size={14} className="group-hover:translate-x-1 transition-transform" />
+								<ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
 							</a>
 						</Button>
 					</div>

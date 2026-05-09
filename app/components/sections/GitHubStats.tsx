@@ -6,6 +6,9 @@
  * - Repository statistics
  * - Contribution data
  * - Activity timeline
+ *
+ * Also passes topLanguages from the single stats fetch directly to
+ * <Languages>.
  */
 
 "use client"
@@ -18,7 +21,7 @@ import {
 	RefreshCw,
 	AlertCircle,
 } from "lucide-react"
-import { BackendURL, GithubUsername } from "@/app/utils/Links"
+import { BackendURL, GithubUsername } from "@/app/utils/links"
 import type { GitHubStats, DetailCardProps, StatCardProps } from "@/app/lib/types"
 
 // Skeleton Components
@@ -102,10 +105,12 @@ const GitHubStatsComponent = () => {
 			}
 			const data = await response.json()
 			setStats(data)
-			// Tell AnimatedSections the cards are now in the DOM
-			window.dispatchEvent(new CustomEvent("github-stats-ready"))
+			// Tell AnimatedSections and standalone Languages the data is ready
+			window.dispatchEvent(new CustomEvent("github-stats-ready", { detail: data }))
 		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Failed to fetch GitHub stats')
+			const errorMessage = err instanceof Error ? err.message : 'Failed to fetch GitHub stats'
+			setError(errorMessage)
+			window.dispatchEvent(new CustomEvent("github-stats-error", { detail: { error: errorMessage } }))
 		} finally {
 			setLoading(false)
 		}
