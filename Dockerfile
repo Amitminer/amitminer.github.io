@@ -1,22 +1,23 @@
 # Install dependencies only when needed
-FROM node:22-alpine AS deps
+FROM oven/bun:alpine AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 # Rebuild the source code only when needed
-FROM node:22-alpine AS builder
+FROM oven/bun:alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm install -g pnpm && pnpm run build
+RUN bun run build
 
 # Production image, copy necessary files and run next
-FROM node:22-alpine AS runner
+FROM oven/bun:alpine AS runner
 WORKDIR /app
 ENV NODE_ENV production
 
-COPY .env .
+# Only copy .env if it exists, but typically you'd use env vars in production
+# COPY .env . 
 
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
@@ -24,4 +25,4 @@ COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
 
-CMD ["npm", "install", "-g", "pnpm", "&&", "pnpm", "start"] 
+CMD ["bun", "start"]

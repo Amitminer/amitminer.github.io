@@ -1,171 +1,407 @@
 /**
+ * @file app/components/layout/Header.tsx
  * Header Component
- * 
- * A responsive navigation header that includes:
- * - Desktop and mobile navigation
- * - Scroll-based styling
- * - Smooth animations
- * - Accessibility features
+ *
+ * A responsive and interactive navigation header that provides site-wide navigation
+ * and dynamic branding with smooth animations.
+ *
+ * Features:
+ * - GSAP-powered sticky header with background blur and height transitions
+ * - Dynamic logo carousel with typewriter effect for role transitions
+ * - Interactive desktop navigation with a sliding active indicator pill
+ * - Mobile menu with GSAP-staggered entry/exit animations
+ * - Active section tracking via ScrollTrigger for scroll-sync navigation
+ * - Responsive design with mobile-optimized visitor counter placement
  */
-
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import VisitorCounter from '../ui/VisitorCounter';
 import { HeaderState, NavItem } from '@/app/lib/types';
+import { HeaderRoles } from '@/app/utils/config';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const navItems: NavItem[] = [
+	{ label: 'About', href: '#about' },
+	{ label: 'Projects', href: '#projects' },
+	{ label: 'Tech Stack', href: '#tech-stack' },
+	{ label: 'Github Stats', href: '#github-stats' },
+	{ label: 'Languages', href: '#languages' },
+	{ label: 'Contact', href: '#contact' },
+];
 
 const Header = () => {
-  const [state, setState] = useState<HeaderState>({
-    isMenuOpen: false,
-    scrolled: false,
-    activeSection: ''
-  });
+	const [state, setState] = useState<HeaderState>({
+		isMenuOpen: false,
+		scrolled: false,
+		activeSection: '',
+	});
 
-  // Navigation items
-  const navItems: NavItem[] = [
-    { label: 'About', href: '#about' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Tech Stack', href: '#tech-stack' },
-    {label: 'Github Stats', href: '#github-stats'},
-    { label: 'Languages', href: '#languages' },
-    { label: 'Contact', href: '#contact' }
-  ];
+	const [logoText, setLogoText] = useState(HeaderRoles[0]);
+	const roleIndexRef = useRef(0);
 
-  // Detect scroll to change header style and active section
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
+	// Refs for GSAP animations
+	const headerRef = useRef<HTMLElement>(null);
+	const logoRef = useRef<HTMLAnchorElement>(null);
+	const navRef = useRef<HTMLElement>(null);
+	const mobileToggleRef = useRef<HTMLButtonElement>(null);
+	const mobileMenuRef = useRef<HTMLDivElement>(null);
+	const indicatorRef = useRef<HTMLSpanElement>(null);
+	const navLinkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+	const bgRef = useRef<HTMLDivElement>(null);
+	const menuOpenTlRef = useRef<gsap.core.Timeline | null>(null);
 
-      // Update scrolled state
-      setState(prev => ({ ...prev, scrolled: scrollPosition > 20 }));
+	// Logo Typewriter/Carousel Effect
+	useEffect(() => {
+		const interval = setInterval(() => {
+			if (!logoRef.current) return;
 
-      // Update active section
-      const sections = document.querySelectorAll('section[id]');
-      sections.forEach(section => {
-        const sectionElement = section as HTMLElement;
-        const sectionTop = sectionElement.offsetTop - 100;
-        const sectionHeight = sectionElement.offsetHeight;
-        const sectionId = section.getAttribute('id') || '';
+			// Fade out and move up slightly
+			gsap.to(logoRef.current, {
+				opacity: 0,
+				y: -5,
+				duration: 0.3,
+				onComplete: () => {
+					roleIndexRef.current = (roleIndexRef.current + 1) % HeaderRoles.length;
+					setLogoText(HeaderRoles[roleIndexRef.current]);
 
-        if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-          setState(prev => ({ ...prev, activeSection: sectionId }));
-        }
-      });
-    };
+					// Fade in and come back to position
+					gsap.to(logoRef.current, {
+						opacity: 1,
+						y: 0,
+						duration: 0.3,
+						ease: 'back.out(1.7)'
+					});
+				}
+			});
+		}, 4000);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+		return () => clearInterval(interval);
+	}, []);
 
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (state.isMenuOpen && !target.closest('nav') && !target.closest('button')) {
-        setState(prev => ({ ...prev, isMenuOpen: false }));
-      }
-    };
+	// Entrance animation on mount: Using matchMedia for responsive-aware timing
+	useEffect(() => {
+		const mm = gsap.matchMedia();
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [state.isMenuOpen]);
+		mm.add({
+			isDesktop: "(min-width: 1024px)",
+			isMobile: "(max-width: 1023px)"
+		}, (context) => {
+			const { isDesktop } = context.conditions as gsap.Conditions;
+			const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-  // Close menu on escape key
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && state.isMenuOpen) {
-        setState(prev => ({ ...prev, isMenuOpen: false }));
-      }
-    };
+			// Common: Logo entrance
+			tl.fromTo(
+				logoRef.current,
+				{ opacity: 0, x: -20 },
+				{ opacity: 1, x: 0, duration: 0.5 }
+			);
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [state.isMenuOpen]);
+			if (isDesktop) {
+				// Desktop: Stagger the nav links
+				tl.fromTo(
+					navLinkRefs.current.filter(Boolean),
+					{ opacity: 0, y: -10, scale: 0.9 },
+					{
+						opacity: 1,
+						y: 0,
+						scale: 1,
+						duration: 0.4,
+						stagger: 0.05,
+						ease: 'back.out(1.2)'
+					},
+					'-=0.35'
+				);
+			} else {
+				// Mobile: Snappy pop for the toggle
+				tl.fromTo(
+					mobileToggleRef.current,
+					{ opacity: 0, scale: 0.5 },
+					{
+						opacity: 1,
+						scale: 1,
+						duration: 0.4,
+						ease: 'back.out(1.7)'
+					},
+					'-=0.35'
+				);
+			}
+		}, headerRef);
 
-  const toggleMenu = useCallback(() => {
-    setState(prev => ({ ...prev, isMenuOpen: !prev.isMenuOpen }));
-  }, []);
+		return () => mm.revert();
+	}, []);
 
-  return (
-    <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${state.scrolled
-        ? 'bg-secondary/90 backdrop-blur-xs py-3 shadow-lg'
-        : 'bg-transparent py-5'
-        }`}
-    >
-      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
-        <Link
-          href="/"
-          className="text-2xl font-bold gradient-text hover:opacity-80 transition-opacity"
-          aria-label="Home"
-        >
-          AmitxD
-        </Link>
+	// Scroll-based header background via GSAP (replaces className toggling)
+	useEffect(() => {
+		const ctx = gsap.context(() => {
+			ScrollTrigger.create({
+				start: 'top+=20 top',
+				onEnter: () => {
+					gsap.to(bgRef.current, {
+						opacity: 1,
+						duration: 0.35,
+						ease: 'power2.out',
+					});
+					gsap.to(headerRef.current, {
+						paddingTop: '12px',
+						paddingBottom: '12px',
+						duration: 0.35,
+						ease: 'power2.out',
+					});
+				},
+				onLeaveBack: () => {
+					gsap.to(bgRef.current, {
+						opacity: 0,
+						duration: 0.35,
+						ease: 'power2.out',
+					});
+					gsap.to(headerRef.current, {
+						paddingTop: '20px',
+						paddingBottom: '20px',
+						duration: 0.35,
+						ease: 'power2.out',
+					});
+				},
+			});
+		});
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8" aria-label="Main navigation">
-          {navItems.map(({ label, href }) => (
-            <Link
-              key={label}
-              href={href}
-              className={`nav-link transition-colors duration-300 ${state.activeSection === href.slice(1)
-                ? 'text-pink-500'
-                : 'text-gray-300 hover:text-white'
-                }`}
-              aria-current={state.activeSection === href.slice(1) ? 'page' : undefined}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
+		return () => ctx.revert();
+	}, []);
 
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden text-white focus:outline-hidden focus:ring-2 focus:ring-pink-500 rounded-lg p-1"
-          onClick={toggleMenu}
-          aria-expanded={state.isMenuOpen}
-          aria-controls="mobile-menu"
-          aria-label="Toggle menu"
-        >
-          {state.isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
+	// Active section tracker using ScrollTrigger for accurate and efficient scroll-based navigation.
+	useEffect(() => {
+		let ctx: gsap.Context | null = null;
 
-      {/* Mobile Menu */}
-      <div
-        id="mobile-menu"
-        className={`md:hidden bg-secondary/95 backdrop-blur-xs absolute w-full transition-all duration-300 ${state.isMenuOpen
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 -translate-y-2 pointer-events-none'
-          }`}
-      >
-        <nav
-          className="flex flex-col items-center py-4 space-y-4"
-          aria-label="Mobile navigation"
-        >
-          {navItems.map(({ label, href }) => (
-            <Link
-              key={label}
-              href={href}
-              className={`nav-link transition-all duration-300 font-medium ${state.activeSection === href.slice(1)
-                  ? 'text-cyan-400'
-                  : 'text-gray-400 hover:text-cyan-300 active:text-cyan-300'
-                }`}
-              onClick={() => setState(prev => ({ ...prev, isMenuOpen: false }))}
-              aria-current={state.activeSection === href.slice(1) ? 'page' : undefined}
-            >
-              {label}
-            </Link>
-          ))}
+		const rafId = requestAnimationFrame(() => {
+			ctx = gsap.context(() => {
+				document.querySelectorAll<HTMLElement>('section[id]').forEach((section) => {
+					const id = section.getAttribute('id') || '';
+					ScrollTrigger.create({
+						trigger: section,
+						start: 'top 40%', // Fires when section's top hits 40% of viewport height
+						end: 'bottom 40%',
+						onEnter: () => setState(prev =>
+							prev.activeSection === id ? prev : { ...prev, activeSection: id }
+						),
+						onEnterBack: () => setState(prev =>
+							prev.activeSection === id ? prev : { ...prev, activeSection: id }
+						),
+					});
+				});
+			});
+		});
 
-          <div className="w-full flex justify-end pr-6 -mt-2 scale-[0.85] text-gray-400">            <VisitorCounter />
-          </div>
-        </nav>
-      </div>
-    </header>
-  );
+		return () => {
+			cancelAnimationFrame(rafId);
+			ctx?.revert();
+		};
+	}, []);
+
+	// Animate the active indicator pill to slide under the correct nav link
+	useEffect(() => {
+		if (!indicatorRef.current || !navRef.current) return;
+		const idx = navItems.findIndex(
+			(item) => item.href.slice(1) === state.activeSection
+		);
+		if (idx === -1) {
+			gsap.to(indicatorRef.current, { opacity: 0, duration: 0.2 });
+			return;
+		}
+		const linkEl = navLinkRefs.current[idx];
+		if (!linkEl) return;
+		const navRect = navRef.current.getBoundingClientRect();
+		const linkRect = linkEl.getBoundingClientRect();
+		gsap.to(indicatorRef.current, {
+			opacity: 1,
+			x: linkRect.left - navRect.left,
+			width: linkRect.width,
+			duration: 0.35,
+			ease: 'power3.out',
+		});
+	}, [state.activeSection]);
+
+	// Mobile menu open/close with GSAP
+	useEffect(() => {
+		const menu = mobileMenuRef.current;
+		if (!menu) return;
+
+		if (menuOpenTlRef.current) menuOpenTlRef.current.kill();
+		const links = menu.querySelectorAll('a');
+
+		if (state.isMenuOpen) {
+			menu.style.display = 'block';
+			menu.style.pointerEvents = 'auto';
+			const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+			menuOpenTlRef.current = tl;
+			tl.fromTo(
+				menu,
+				{ opacity: 0, y: -12 },
+				{ opacity: 1, y: 0, duration: 0.3 }
+			).fromTo(
+				links,
+				{ opacity: 0, y: -8 },
+				{ opacity: 1, y: 0, duration: 0.25, stagger: 0.05 },
+				'-=0.15'
+			);
+		} else {
+			const tl = gsap.timeline({
+				defaults: { ease: 'power2.in' },
+				onComplete: () => {
+					if (menu) menu.style.display = 'none';
+				},
+			});
+			menuOpenTlRef.current = tl;
+			tl.to(menu, { opacity: 0, y: -8, duration: 0.25 });
+		}
+	}, [state.isMenuOpen]);
+
+	// Click-outside + Escape key handlers
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			const t = e.target as HTMLElement;
+			if (state.isMenuOpen && !t.closest('nav') && !t.closest('button')) {
+				setState((prev) => ({ ...prev, isMenuOpen: false }));
+			}
+		};
+		const handleEscape = (e: KeyboardEvent) => {
+			if (e.key === 'Escape' && state.isMenuOpen)
+				setState((prev) => ({ ...prev, isMenuOpen: false }));
+		};
+		document.addEventListener('mousedown', handleClickOutside);
+		document.addEventListener('keydown', handleEscape);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+			document.removeEventListener('keydown', handleEscape);
+		};
+	}, [state.isMenuOpen]);
+
+	const toggleMenu = useCallback(() => {
+		setState((prev) => ({ ...prev, isMenuOpen: !prev.isMenuOpen }));
+	}, []);
+
+	return (
+		<header
+			ref={headerRef}
+			className="fixed top-0 left-0 w-full z-50"
+			style={{ paddingTop: '20px', paddingBottom: '20px' }}
+		>
+			{/* Animated background layer — always present, opacity driven by GSAP */}
+			<div
+				ref={bgRef}
+				className="absolute inset-0 bg-secondary/90 backdrop-blur-sm shadow-lg"
+				style={{ opacity: 0, pointerEvents: 'none' }}
+				aria-hidden="true"
+			/>
+
+			<div className="relative container mx-auto px-4 lg:px-6 flex justify-between items-center">
+				{/* Logo */}
+				<Link
+					ref={logoRef}
+					href="/"
+					className="text-xl sm:text-2xl font-bold gradient-text hover:opacity-80 transition-opacity whitespace-nowrap"
+					aria-label="Home"
+					style={{ opacity: 0 }}
+				>
+					{logoText}
+				</Link>
+
+				{/* Desktop Navigation */}
+				<nav
+					ref={navRef}
+					className="hidden lg:flex items-center space-x-4 xl:space-x-8 relative"
+					aria-label="Main navigation"
+				>
+					{/* Sliding active indicator */}
+					<span
+						ref={indicatorRef}
+						className="absolute bottom-1.5 h-0.5 bg-pink-500 rounded-full"
+						style={{ opacity: 0, width: 0, x: 0 } as React.CSSProperties}
+						aria-hidden="true"
+					/>
+
+					{navItems.map(({ label, href }, i) => (
+						<Link
+							key={label}
+							href={href}
+							ref={(el) => { navLinkRefs.current[i] = el; }}
+							className={`nav-link transition-colors duration-200 whitespace-nowrap ${state.activeSection === href.slice(1)
+								? 'text-pink-400'
+								: 'text-gray-300 hover:text-white'
+								}`}
+							style={{ opacity: 0 }}
+							aria-current={
+								state.activeSection === href.slice(1) ? 'page' : undefined
+							}
+						>
+							{label}
+						</Link>
+					))}
+				</nav>
+
+				{/* Mobile Menu Toggle */}
+				<button
+					ref={mobileToggleRef}
+					className="lg:hidden relative text-white focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-lg p-1 transition-transform active:scale-95"
+					onClick={toggleMenu}
+					style={{ opacity: 0 }}
+					aria-expanded={state.isMenuOpen}
+					aria-controls="mobile-menu"
+					aria-label="Toggle menu"
+				>
+					{/* Animate the icon swap */}
+					<span
+						className="block transition-transform duration-200"
+						style={{
+							transform: state.isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+						}}
+					>
+						{state.isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+					</span>
+				</button>
+			</div>
+
+			{/* Mobile Menu — display toggled by GSAP, not className */}
+			<div
+				id="mobile-menu"
+				ref={mobileMenuRef}
+				className="lg:hidden bg-secondary/95 backdrop-blur-sm absolute w-full"
+				style={{ display: 'none', opacity: 0 }}
+			>
+				<nav
+					className="flex flex-col items-center py-4 space-y-4"
+					aria-label="Mobile navigation"
+				>
+					{navItems.map(({ label, href }) => (
+						<Link
+							key={label}
+							href={href}
+							className={`nav-link font-medium transition-colors duration-200 ${state.activeSection === href.slice(1)
+								? 'text-cyan-400'
+								: 'text-gray-400 hover:text-cyan-300 active:text-cyan-300'
+								}`}
+							onClick={() =>
+								setState((prev) => ({ ...prev, isMenuOpen: false }))
+							}
+							aria-current={
+								state.activeSection === href.slice(1) ? 'page' : undefined
+							}
+						>
+							{label}
+						</Link>
+					))}
+
+					<div className="w-full flex justify-end pr-6 -mt-2 scale-[0.85] text-gray-400">
+						<VisitorCounter />
+					</div>
+				</nav>
+			</div>
+		</header>
+	);
 };
 
 export default Header;

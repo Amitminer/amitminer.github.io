@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Header from '@/app/components/layout/Header';
 import Footer from '@/app/components/layout/Footer';
+import { Name, PortfolioURL } from '@/app/utils/config';
 
 const inter = Inter({
 	subsets: ['latin'],
@@ -13,19 +14,19 @@ const inter = Inter({
 
 // SEO metadata for the entire website
 export const metadata: Metadata = {
-	title: "AmitxD – Rust & Web Developer",
+	title: `${Name} – Rust & Web Developer`,
 	description: "Crafting high-quality Rust backends and modern web frontends. Explore projects, tools, and my developer workflow.",
 	keywords: [
 		"Rust developer", "TypeScript", "Next.js", "Actix", "PostgreSQL",
 		"Full-stack", "Python", "Open Source", "Developer Portfolio"
 	],
-	authors: [{ name: "AmitxD" }],
+	authors: [{ name: Name }],
 	openGraph: {
-		title: "AmitxD – Rust & Web Developer",
+		title: `${Name} – Rust & Web Developer`,
 		description: "Explore my projects, tech stack, and contributions in Rust, TypeScript, and more.",
 		type: "website"
 	},
-	metadataBase: new URL('https://amitminer.github.io'),
+	metadataBase: new URL(PortfolioURL),
 };
 
 
