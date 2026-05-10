@@ -158,11 +158,13 @@ const GitHubProjectCard = memo(({ project }: { project: GitHubRepo }) => {
 	const formatDate = useCallback((dateString: string) => {
 		const date = new Date(dateString);
 		const now = new Date();
-		const diffTime = Math.abs(now.getTime() - date.getTime());
-		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+		const diffTime = Math.max(0, now.getTime() - date.getTime());
+		const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+		const diffDays = Math.floor(diffHours / 24);
 
-		if (diffDays === 1) return "1 day ago";
-		if (diffDays < 30) return `${diffDays} days ago`;
+		if (diffHours < 1) return "1h ago";
+		if (diffHours < 24) return `${diffHours}h ago`;
+		if (diffDays < 30) return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
 		if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
 		return `${Math.floor(diffDays / 365)} years ago`;
 	}, []);
