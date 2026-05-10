@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { PortfolioURL } from '@/app/utils/config'
 
+export const dynamic = 'force-static';
+
 // Generates the sitemap for the website.
 export default function sitemap(): MetadataRoute.Sitemap {
 	return [
