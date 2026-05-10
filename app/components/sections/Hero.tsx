@@ -116,69 +116,60 @@ const Hero = () => {
 		}
 	}, [displayedText, isErasing, roleIndex])
 
-	// Scroll handler with throttling
+	// Scroll handler
 	const handleScroll = useCallback(() => {
-		const throttledScroll = throttle(
-			() => {
-				const scrollY = window.scrollY
-				const heroHeight = heroRef.current?.offsetHeight ?? 0
-				const windowHeight = window.innerHeight
-				const documentHeight = document.documentElement.scrollHeight
+		const scrollY = window.scrollY
+		const heroHeight = heroRef.current?.offsetHeight ?? 0
+		const windowHeight = window.innerHeight
+		const documentHeight = document.documentElement.scrollHeight
 
-				const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD
-				const isNotAtBottom = scrollY + windowHeight < documentHeight - 100
-				const hasScrolled = scrollY > SCROLL_THRESHOLD
+		const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD
+		const isNotAtBottom = scrollY + windowHeight < documentHeight - 100
+		const hasScrolled = scrollY > SCROLL_THRESHOLD
 
-				const shouldShow = hasScrolled && isInHeroSection && isNotAtBottom
+		const shouldShow = hasScrolled && isInHeroSection && isNotAtBottom
 
-				if (shouldShow !== showScrollArrow) {
-					setShowScrollArrow(shouldShow)
-				}
+		if (shouldShow !== showScrollArrow) {
+			setShowScrollArrow(shouldShow)
+		}
 
-				// Auto-hide after delay
-				if (hideArrowTimeoutRef.current) {
-					clearTimeout(hideArrowTimeoutRef.current)
-				}
+		// Auto-hide after delay
+		if (hideArrowTimeoutRef.current) {
+			clearTimeout(hideArrowTimeoutRef.current)
+		}
 
-				if (shouldShow) {
-					hideArrowTimeoutRef.current = setTimeout(() => {
-						setShowScrollArrow(false)
-					}, ARROW_HIDE_DELAY)
-				}
-			},
-			{ delay: SCROLL_THROTTLE_DELAY },
-		)
-		throttledScroll()
+		if (shouldShow) {
+			hideArrowTimeoutRef.current = setTimeout(() => {
+				setShowScrollArrow(false)
+			}, ARROW_HIDE_DELAY)
+		}
 	}, [showScrollArrow])
 
 	// Mouse move handler for showing arrow
 	const handleMouseMove = useCallback(() => {
-		const throttledMouseMove = throttle(
-			() => {
-				const scrollY = window.scrollY
-				const heroHeight = heroRef.current?.offsetHeight ?? 0
-				const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD
-				const hasScrolled = scrollY > SCROLL_THRESHOLD
+		const scrollY = window.scrollY
+		const heroHeight = heroRef.current?.offsetHeight ?? 0
+		const isInHeroSection = scrollY < heroHeight * HERO_SECTION_THRESHOLD
+		const hasScrolled = scrollY > SCROLL_THRESHOLD
 
-				if (isInHeroSection && hasScrolled && !showScrollArrow) {
-					setShowScrollArrow(true)
-				}
-			},
-			{ delay: MOUSE_MOVE_THROTTLE_DELAY },
-		)
-		throttledMouseMove()
+		if (isInHeroSection && hasScrolled && !showScrollArrow) {
+			setShowScrollArrow(true)
+		}
 	}, [showScrollArrow])
 
-	// Setup scroll listeners
+	// Setup scroll listeners — throttled wrappers are created once per effect run,
 	useEffect(() => {
-		window.addEventListener("scroll", handleScroll, { passive: true })
-		window.addEventListener("mousemove", handleMouseMove, { passive: true })
+		const throttledScroll = throttle(handleScroll, { delay: SCROLL_THROTTLE_DELAY })
+		const throttledMouseMove = throttle(handleMouseMove, { delay: MOUSE_MOVE_THROTTLE_DELAY })
 
-		handleScroll()
+		window.addEventListener("scroll", throttledScroll, { passive: true })
+		window.addEventListener("mousemove", throttledMouseMove, { passive: true })
+
+		throttledScroll()
 
 		return () => {
-			window.removeEventListener("scroll", handleScroll)
-			window.removeEventListener("mousemove", handleMouseMove)
+			window.removeEventListener("scroll", throttledScroll)
+			window.removeEventListener("mousemove", throttledMouseMove)
 			if (hideArrowTimeoutRef.current) {
 				clearTimeout(hideArrowTimeoutRef.current)
 			}

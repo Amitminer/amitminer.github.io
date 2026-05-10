@@ -94,7 +94,7 @@ interface SegmentedBarProps {
 const SegmentedBar = ({ segments, shouldAnimate }: SegmentedBarProps) => {
 	const segMap = useRef<Map<string, HTMLDivElement>>(new Map());
 	const didAnim = useRef(false);
-	const segKey = segments.map((s) => s.name).join(',');
+	const segKey = segments.map((s) => `${s.name}:${s.pct.toFixed(4)}`).join(',');
 
 	// Re-arm animation when the segment list changes (e.g. data refresh)
 	useEffect(() => {
@@ -180,7 +180,7 @@ interface VerticalBarsProps {
 const VerticalBars = ({ segments, shouldAnimate }: VerticalBarsProps) => {
 	const barMap = useRef<Map<string, HTMLDivElement>>(new Map());
 	const didAnim = useRef(false);
-	const segKey = segments.map((s) => s.name).join(',');
+	const segKey = segments.map((s) => `${s.name}:${s.pct.toFixed(4)}`).join(',');
 
 	// Re-arm animation when the segment list changes (e.g. data refresh)
 	useEffect(() => {
@@ -347,22 +347,19 @@ const Languages = ({ topLanguages: propTopLanguages, loading: propLoading = fals
 
 	// Animation fires when both conditions are true: section is visible AND data
 	// is ready. Either can arrive first, so both paths call this.
-	// setShouldAnimate(true/false) replays bars/legend on each scroll entry.
 	const tryTriggerAnimation = useCallback(() => {
 		if (!isVisibleRef.current || !dataReadyRef.current) return;
-		setShouldAnimate(true);
+		requestAnimationFrame(() => setShouldAnimate(true));
 	}, []);
 
 	useEffect(() => {
 		const handleStats = onCustomEvent<{ topLanguages?: Record<string, number> }>(
 			'github-stats-ready',
 			(detail) => {
-				if (detail?.topLanguages) {
-					setInternalTopLanguages(detail.topLanguages);
-					setInternalLoading(false);
-					dataReadyRef.current = true;
-					tryTriggerAnimation();
-				}
+				setInternalTopLanguages(detail?.topLanguages ?? null);
+				setInternalLoading(false);
+				dataReadyRef.current = true;
+				tryTriggerAnimation();
 			},
 		);
 		const handleError = () => setInternalLoading(false);
@@ -488,7 +485,7 @@ const Languages = ({ topLanguages: propTopLanguages, loading: propLoading = fals
 								}}
 							/>
 
-							{loading || (!topLanguages && !segments.length) ? (
+							{loading ? (
 								<LanguagesSkeleton />
 							) : segments.length === 0 ? (
 								<p className="text-center text-gray-600 py-8 text-sm font-mono">
