@@ -1,4 +1,4 @@
-export const socialLinks = [
+const socialLinks = [
 	{
 		id: 1,
 		url: 'https://github.com/Amitminer',
@@ -6,8 +6,8 @@ export const socialLinks = [
 	},
 	{
 		id: 2,
-		url: 'https://linkedin.com/in/Amitminer',
-		username: 'Amitminer'
+		url: 'https://linkedin.com/in/amitxd',
+		username: 'amitxd'
 	},
 	{
 		id: 3,
@@ -26,7 +26,6 @@ export const socialLinks = [
 	}
 ];
 
-// Social media links
 export const GithubLink = socialLinks[0].url;
 export const GithubUsername = socialLinks[0].username;
 export const LinkedinLink = socialLinks[1].url;
@@ -35,7 +34,6 @@ export const InstagramLink = socialLinks[3].url;
 export const DiscordLink = socialLinks[4].url;
 export const BuyMeACoffeeLink = process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME ? `https://buymeacoffee.com/${process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME}` : null;
 export const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || '';
-export default socialLinks;
 
 export const CurrentGithubLink = "https://github.com/Amitminer/amitminer.github.io/";
 export const BackendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api/github';

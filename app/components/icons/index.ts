@@ -3,6 +3,7 @@ export { InstagramIcon } from './InstagramIcon';
 export { XIcon } from './XIcon';
 export { DiscordIcon } from './DiscordIcon';
 export { GitHubIcon } from './GitHubIcon';
+export { LinkedinIcon } from './LinkedinIcon';
 
 // From react-icons (only what's needed)
 export { SiRust, SiPython, SiCplusplus, SiPhp } from 'react-icons/si';
@@ -12,8 +13,5 @@ export { SiDocker, SiGooglecloud, SiGit } from 'react-icons/si';
 export { SiArchlinux, SiGnubash } from 'react-icons/si';
 
 export { FaWindows, FaAws } from 'react-icons/fa';
-// export { VscCode } from 'react-icons/vsc';
-
-export { RefreshCw } from 'lucide-react';
 
 export { EmailIcon } from './EmailIcon';

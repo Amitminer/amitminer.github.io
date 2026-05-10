@@ -309,7 +309,7 @@ const LegendItem = ({ name, pct, rank, shouldAnimate }: LegendItemProps) => {
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
-export interface LanguagesProps {
+interface LanguagesProps {
 	topLanguages?: Record<string, number> | null;
 	loading?: boolean;
 }

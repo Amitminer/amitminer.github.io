@@ -34,37 +34,6 @@ export interface GitHubStats {
 	lastUpdated: string
 }
 
-export interface CachedData {
-	data: GitHubStats
-	timestamp: number
-}
-
-export interface CacheUtils {
-	isValid: (timestamp: number) => boolean;
-	get: () => GitHubStats | null;
-	set: (data: GitHubStats) => void;
-}
-
-export interface GitHubRepoInfo {
-	name: string
-	stargazers_count: number
-	forks_count: number
-	language: string
-	size: number
-	updated_at: string
-	pushed_at: string
-	private: boolean
-	owner: {
-		login: string
-	}
-}
-
-export interface GitHubEvent {
-	type: string
-	created_at: string
-	payload: unknown
-}
-
 export interface StatCardProps {
 	icon: React.ReactNode;
 	value: string | number;
@@ -119,26 +88,22 @@ export interface GitHubRepo {
 	slug: string;
 }
 
-// Support Component Types
-export interface SupportState {
-	isVisible: boolean;
-	isHovered: boolean;
-}
-
 // TechStack Section
-export interface TechIcon {
-	name: string;
-	icon: React.ReactElement;
-	color: string;
-}
-
 export interface TechGroup {
 	title: string;
-	technologies: TechIcon[];
+	technologies: {
+		name: string;
+		icon: React.ReactElement;
+		color: string;
+	}[];
 }
 
 export interface TechItemProps {
-	tech: TechIcon;
+	tech: {
+		name: string;
+		icon: React.ReactElement;
+		color: string;
+	};
 	isLast: boolean;
 }
 

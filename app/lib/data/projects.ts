@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import projectsData from './projects.json';
 
-export const ProjectSchema = z.object({
+const ProjectSchema = z.object({
   name: z.string(),
   description: z.string(),
   slug: z.string(),

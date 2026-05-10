@@ -17,8 +17,8 @@ import { Button } from "@/app/components/ui/button"
 import { ArrowDownCircle, ExternalLink } from "lucide-react"
 import ProfileImage from "@/app/assets/pfp.webp"
 import BackgroundAnimation from "./BackgroundAnimation"
-import { GitHubIcon } from "../icons/index"
-import { GithubUsername } from "@/app/utils/links"
+import { GitHubIcon, LinkedinIcon } from "../icons/index"
+import { GithubLink, LinkedinLink } from "@/app/utils/links"
 import type { ThrottleOptions } from "@/app/lib/types"
 import Image from "next/image"
 
@@ -68,6 +68,7 @@ const PAUSE_DELAY = 250      // ms pause before typing next string
 
 const Hero = () => {
 	const [showScrollArrow, setShowScrollArrow] = useState(false)
+	const [showProfileOptions, setShowProfileOptions] = useState(false)
 
 	// Typewriter state
 	const [displayedText, setDisplayedText] = useState("")
@@ -77,6 +78,7 @@ const Hero = () => {
 	const heroRef = useRef<HTMLDivElement>(null)
 	const arrowRef = useRef<HTMLButtonElement>(null)
 	const hideArrowTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const profileOptionsRef = useRef<HTMLDivElement>(null)
 
 	// --- Typewriter effect ---
 	useEffect(() => {
@@ -183,6 +185,25 @@ const Hero = () => {
 		}
 	}, [handleScroll, handleMouseMove])
 
+	// Handle click outside for profile options
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+			if (profileOptionsRef.current && !profileOptionsRef.current.contains(event.target as Node)) {
+				setShowProfileOptions(false)
+			}
+		}
+
+		if (showProfileOptions) {
+			document.addEventListener("mousedown", handleClickOutside)
+			document.addEventListener("touchstart", handleClickOutside)
+		}
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside)
+			document.removeEventListener("touchstart", handleClickOutside)
+		}
+	}, [showProfileOptions])
+
 	// Scroll to about section
 	const scrollToAbout = useCallback(() => {
 		const aboutSection = document.getElementById("about")
@@ -278,22 +299,58 @@ const Hero = () => {
 						</Button>
 
 						{/* GitHub Profile Button */}
-						<Button
-							variant="outline"
-							className="border-[#FF1493]/30 text-white hover:bg-[#FF1493]/10 hover:border-[#FF1493] shadow-lg shadow-[#FF1493]/10 hover:shadow-[#FF1493]/20 transition-all duration-300 group"
-							asChild
-						>
-							<a
-								href={`https://github.com/${GithubUsername}`}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center gap-2"
+						<div className="relative" ref={profileOptionsRef}>
+							<Button
+								variant="outline"
+								className="border-[#FF1493]/30 text-white hover:bg-[#FF1493]/10 hover:border-[#FF1493] shadow-lg shadow-[#FF1493]/10 hover:shadow-[#FF1493]/20 transition-all duration-300 group"
+								onClick={() => setShowProfileOptions(!showProfileOptions)}
 							>
-								<GitHubIcon className="w-5 h-5" />
-								View Profile
-								<ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
-							</a>
-						</Button>
+								<div className="flex items-center gap-2">
+									<GitHubIcon className="w-5 h-5" />
+									View Profile
+									<ArrowDownCircle
+										size={16}
+										className={`transition-transform duration-300 ${showProfileOptions ? "rotate-180" : ""}`}
+									/>
+								</div>
+							</Button>
+
+							{/* Profile Options Dropdown */}
+							{showProfileOptions && (
+								<div className="absolute top-full mt-2 left-0 right-0 min-w-[200px] bg-[#0C0715]/95 backdrop-blur-md border border-[#FF1493]/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+									<div className="p-1.5 flex flex-col gap-1">
+										<a
+											href={GithubLink}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#FF1493]/10 transition-colors group"
+											onClick={() => setShowProfileOptions(false)}
+										>
+											<GitHubIcon className="w-5 h-5 text-[#FF1493]" />
+											<div className="flex flex-col items-start">
+												<span className="text-sm font-semibold text-white">GitHub</span>
+												<span className="text-[10px] text-gray-400">View repositories & stats</span>
+											</div>
+											<ExternalLink size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+										</a>
+										<a
+											href={LinkedinLink}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#00FFFF]/10 transition-colors group"
+											onClick={() => setShowProfileOptions(false)}
+										>
+											<LinkedinIcon className="w-5 h-5 text-[#00FFFF]" />
+											<div className="flex flex-col items-start">
+												<span className="text-sm font-semibold text-white">LinkedIn</span>
+												<span className="text-[10px] text-gray-400">Professional profile</span>
+											</div>
+											<ExternalLink size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+										</a>
+									</div>
+								</div>
+							)}
+						</div>
 					</div>
 
 					{/* Scroll Indicator Arrow */}
