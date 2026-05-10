@@ -11,6 +11,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			url: PortfolioURL,
 			// The last modified date of the homepage.
 			lastModified: new Date(),
+			// How often the page is likely to change.
+			changeFrequency: 'monthly',
+			// Priority of this page relative to other pages on the site.
+			priority: 1,
 		},
 	]
 }
