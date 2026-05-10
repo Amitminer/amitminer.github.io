@@ -22,7 +22,7 @@ import { ArrowUpRight, Star, GitFork, AlertCircle, Code, Eye, Calendar } from "l
 import { Button } from "@/app/components/ui/button"
 import type { GitHubRepo } from "@/app/lib/types"
 import { BackendURL, GithubUsername } from "@/app/utils/links"
-import DefaultBanner from "@/app/assets/default_banner.jpg"
+import DefaultBanner from "@/app/assets/default_banner.webp"
 import { projectImages } from '@/app/assets/projects';
 import { getCustomProjects, type CustomProject } from "@/app/lib/data/projects"
 

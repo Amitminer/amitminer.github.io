@@ -1,9 +1,15 @@
 /** @type {import('next').NextConfig} */
+
+const isGithubPages = process.env.GITHUB_PAGES === 'true';
+
 const nextConfig = {
-	allowedDevOrigins: ['192.168.0.105'], // Local development
+	// Static export for GitHub Pages; omit when deploying to a Node server
+	...(isGithubPages && { output: 'export' }),
+	// allowedDevOrigins: ['192.168.0.105'], // Local development
 	// Image optimization
 	images: {
-		unoptimized: false,
+		// Static export cannot use the built-in image optimizer (server feature)
+		unoptimized: isGithubPages,
 		remotePatterns: [
 			{ protocol: 'https', hostname: 'avatars.githubusercontent.com' },
 			{ protocol: 'https', hostname: 'githubusercontent.com' },
@@ -23,33 +29,25 @@ const nextConfig = {
 	compress: true,
 	productionBrowserSourceMaps: false,
 
-	// Security headers
-	async headers() {
-		return [
-			{
-				source: '/:path*',
-				headers: [
-					{ key: 'X-DNS-Prefetch-Control', value: 'on' },
-					{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-					{ key: 'X-XSS-Protection', value: '1; mode=block' },
-					{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-					{ key: 'X-Content-Type-Options', value: 'nosniff' },
-					{ key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-					{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-				],
-			},
-		];
-	},
-
-	// Rewrite rule
-	async rewrites() {
-		return [
-			{
-				source: '/api/:path*',
-				destination: '/api/:path*',
-			},
-		];
-	},
+	// Security headers — Node/server only; skipped in static-export mode
+	...(!isGithubPages && {
+		async headers() {
+			return [
+				{
+					source: '/:path*',
+					headers: [
+						{ key: 'X-DNS-Prefetch-Control', value: 'on' },
+						{ key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+						{ key: 'X-XSS-Protection', value: '1; mode=block' },
+						{ key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+						{ key: 'X-Content-Type-Options', value: 'nosniff' },
+						{ key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+						{ key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+					],
+				},
+			];
+		},
+	}),
 };
 
 export default nextConfig;

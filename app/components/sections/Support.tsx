@@ -7,7 +7,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Button } from '@/app/components/ui/button';
 import { Heart, Coffee, Copy, Check } from 'lucide-react';
-import { BuyMeACoffeeLink } from '@/app/utils/links';
+import { BuyMeACoffeeLink, UPI_ID } from '@/app/utils/links';
 
 interface ExtendedSupportState {
 	isHovered: boolean;
@@ -22,8 +22,6 @@ const Support = () => {
 		copied: false,
 		showOptions: false,
 	});
-
-	const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || '';
 
 	// Handle click outside to close dropdown
 	useEffect(() => {
@@ -50,7 +48,9 @@ const Support = () => {
 	const toggleOptions = () => setState((prev) => ({ ...prev, showOptions: !prev.showOptions }));
 
 	const handleCoffeeClick = () => {
-		window.open(BuyMeACoffeeLink, '_blank');
+		if (BuyMeACoffeeLink) {
+			window.open(BuyMeACoffeeLink, '_blank');
+		}
 		setState((prev) => ({ ...prev, showOptions: false }));
 	};
 

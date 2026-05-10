@@ -23,11 +23,6 @@ export const socialLinks = [
 		id: 5,
 		url: 'https://discord.com/users/amit_xd',
 		username: 'amit_xd'
-	},
-	{
-		id: 6,
-		url: 'https://www.buymeacoffee.com/?',
-		username: 'amitxd'
 	}
 ];
 
@@ -38,9 +33,9 @@ export const LinkedinLink = socialLinks[1].url;
 export const XLink = socialLinks[2].url;
 export const InstagramLink = socialLinks[3].url;
 export const DiscordLink = socialLinks[4].url;
-export const BuyMeACoffeeLink = socialLinks[5].url;
-
+export const BuyMeACoffeeLink = process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME ? `https://buymeacoffee.com/${process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME}` : null;
+export const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || '';
 export default socialLinks;
 
 export const CurrentGithubLink = "https://github.com/Amitminer/amitminer.github.io/";
-export const BackendURL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_LOCAL_BACKEND_URL;
+export const BackendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api/github';
