@@ -129,16 +129,21 @@ const Contact = () => {
 
 	// === Form Submission Effects ===
 	useEffect(() => {
+		const timers: ReturnType<typeof setTimeout>[] = [];
+		let mounted = true;
+
 		if (formspreeState.succeeded) {
-			setTimeout(() => {
+			timers.push(setTimeout(() => {
+				if (!mounted) return;
 				setSubmitStatus({
 					type: 'success',
 					message: "Message sent successfully! I'll get back to you soon."
 				});
-			}, 0);
+			}, 0));
 
 			// Reset form and captcha after a delay
-			setTimeout(() => {
+			timers.push(setTimeout(() => {
+				if (!mounted) return;
 				setState(prev => ({
 					...prev,
 					formState: { email: '', message: '' },
@@ -159,15 +164,17 @@ const Contact = () => {
 				// Clear form fields
 				if (emailRef.current) emailRef.current.value = '';
 				if (messageRef.current) messageRef.current.value = '';
-			}, 3000);
+			}, 3000));
 		}
 
-		if (formspreeState.errors && Object.keys(formspreeState.errors).length > 0) {
+		if (formspreeState.errors && formspreeState.errors.getFormErrors().length > 0) {
+			const formErrors = formspreeState.errors.getFormErrors();
 			const errorMessage =
-				Object.values(formspreeState.errors)[0]?.message ||
+				formErrors[0]?.message ||
 				'Failed to send message. Please try again.';
 
-			setTimeout(() => {
+			timers.push(setTimeout(() => {
+				if (!mounted) return;
 				setSubmitStatus({
 					type: 'error',
 					message: errorMessage
@@ -175,8 +182,13 @@ const Contact = () => {
 
 				setState(prev => ({ ...prev, isSubmitting: false }));
 				resetCaptcha();
-			}, 0);
+			}, 0));
 		}
+
+		return () => {
+			mounted = false;
+			timers.forEach(clearTimeout);
+		};
 	}, [formspreeState.succeeded, formspreeState.errors, resetCaptcha]);
 
 	// === Event Handlers ===

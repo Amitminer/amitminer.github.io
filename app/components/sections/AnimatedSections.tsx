@@ -78,8 +78,10 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 
 	useEffect(() => {
 		// Defer setup one frame so React has fully committed the DOM
+		let ctx: gsap.Context | null = null
+
 		const rafId = requestAnimationFrame(() => {
-			const ctx = gsap.context(() => {
+			ctx = gsap.context(() => {
 				const container = containerRef.current!
 				const desktop = isDesktop()
 				const reduced = reducedMotion()
@@ -368,6 +370,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 					})
 
 					let moRafId: number | null = null
+					const gridEl = proj.querySelector<HTMLElement>(".grid") ?? proj
 					const mo = new MutationObserver(() => {
 						if (moRafId !== null) return
 						moRafId = requestAnimationFrame(() => {
@@ -379,7 +382,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 							requestAnimationFrame(() => ScrollTrigger.refresh())
 						})
 					})
-					mo.observe(proj, { childList: true, subtree: false })
+					mo.observe(gridEl, { childList: true, subtree: false })
 					cleanupRef.current.push(() => {
 						mo.disconnect()
 						if (moRafId !== null) cancelAnimationFrame(moRafId)
@@ -555,11 +558,12 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				setTimeout(() => ScrollTrigger.refresh(), 200)
 
 			}, containerRef)
-
-			return () => { ctx.revert() }
 		})
 
-		return () => { cancelAnimationFrame(rafId) }
+		return () => {
+			cancelAnimationFrame(rafId)
+			ctx?.revert()
+		}
 	}, [])
 
 	// Teardown for non-GSAP listeners and injected DOM nodes

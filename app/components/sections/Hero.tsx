@@ -14,7 +14,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Button } from "@/app/components/ui/button"
-import { ArrowDownCircle, ExternalLink } from "lucide-react"
+import { ArrowDownCircle, ExternalLink, User, ChevronDown } from "lucide-react"
 import ProfileImage from "@/app/assets/pfp.webp"
 import BackgroundAnimation from "./BackgroundAnimation"
 import { GitHubIcon, LinkedinIcon } from "../icons/index"
@@ -298,18 +298,18 @@ const Hero = () => {
 							<a href="#contact">Contact Me</a>
 						</Button>
 
-						{/* GitHub Profile Button */}
-						<div className="relative" ref={profileOptionsRef}>
+						{/* Profile Options Button */}
+						<div className="relative w-full sm:w-auto" ref={profileOptionsRef}>
 							<Button
 								variant="outline"
-								className="border-[#FF1493]/30 text-white hover:bg-[#FF1493]/10 hover:border-[#FF1493] shadow-lg shadow-[#FF1493]/10 hover:shadow-[#FF1493]/20 transition-all duration-300 group"
+								className="w-full sm:w-auto border-[#FF1493]/30 text-white hover:bg-[#FF1493]/10 hover:border-[#FF1493] shadow-lg shadow-[#FF1493]/10 hover:shadow-[#FF1493]/20 transition-all duration-300 group"
 								onClick={() => setShowProfileOptions(!showProfileOptions)}
 							>
 								<div className="flex items-center gap-2">
-									<GitHubIcon className="w-5 h-5" />
-									View Profile
-									<ArrowDownCircle
-										size={16}
+									<User className="w-4 h-4" />
+									Profiles
+									<ChevronDown
+										size={14}
 										className={`transition-transform duration-300 ${showProfileOptions ? "rotate-180" : ""}`}
 									/>
 								</div>
@@ -317,35 +317,35 @@ const Hero = () => {
 
 							{/* Profile Options Dropdown */}
 							{showProfileOptions && (
-								<div className="absolute top-full mt-2 left-0 right-0 min-w-[200px] bg-[#0C0715]/95 backdrop-blur-md border border-[#FF1493]/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-									<div className="p-1.5 flex flex-col gap-1">
+								<div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-44 sm:w-52 bg-[#0C0715]/95 backdrop-blur-md border border-[#FF1493]/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+									<div className="p-1 flex flex-col gap-0.5">
 										<a
 											href={GithubLink}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#FF1493]/10 transition-colors group"
+											className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FF1493]/10 transition-colors group"
 											onClick={() => setShowProfileOptions(false)}
 										>
-											<GitHubIcon className="w-5 h-5 text-[#FF1493]" />
-											<div className="flex flex-col items-start">
-												<span className="text-sm font-semibold text-white">GitHub</span>
-												<span className="text-[10px] text-gray-400">View repositories & stats</span>
+											<GitHubIcon className="w-4 h-4 text-[#FF1493]" />
+											<div className="flex flex-col items-start leading-tight">
+												<span className="text-xs font-semibold text-white">GitHub</span>
+												<span className="text-[9px] text-gray-400">Contributions</span>
 											</div>
-											<ExternalLink size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+											<ExternalLink size={12} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
 										</a>
 										<a
 											href={LinkedinLink}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[#00FFFF]/10 transition-colors group"
+											className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#00FFFF]/10 transition-colors group"
 											onClick={() => setShowProfileOptions(false)}
 										>
-											<LinkedinIcon className="w-5 h-5 text-[#00FFFF]" />
-											<div className="flex flex-col items-start">
-												<span className="text-sm font-semibold text-white">LinkedIn</span>
-												<span className="text-[10px] text-gray-400">Professional profile</span>
+											<LinkedinIcon className="w-4 h-4 text-[#00FFFF]" />
+											<div className="flex flex-col items-start leading-tight">
+												<span className="text-xs font-semibold text-white">LinkedIn</span>
+												<span className="text-[9px] text-gray-400">Professional</span>
 											</div>
-											<ExternalLink size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+											<ExternalLink size={12} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
 										</a>
 									</div>
 								</div>

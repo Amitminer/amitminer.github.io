@@ -175,8 +175,10 @@ const Header = () => {
 
 	// Active section tracker using ScrollTrigger for accurate and efficient scroll-based navigation.
 	useEffect(() => {
+		let ctx: gsap.Context | null = null;
+
 		const rafId = requestAnimationFrame(() => {
-			const ctx = gsap.context(() => {
+			ctx = gsap.context(() => {
 				document.querySelectorAll<HTMLElement>('section[id]').forEach((section) => {
 					const id = section.getAttribute('id') || '';
 					ScrollTrigger.create({
@@ -192,11 +194,12 @@ const Header = () => {
 					});
 				});
 			});
-
-			return () => ctx.revert();
 		});
 
-		return () => cancelAnimationFrame(rafId);
+		return () => {
+			cancelAnimationFrame(rafId);
+			ctx?.revert();
+		};
 	}, []);
 
 	// Animate the active indicator pill to slide under the correct nav link

@@ -265,13 +265,20 @@ interface LegendItemProps {
 
 const LegendItem = ({ name, pct, rank, shouldAnimate }: LegendItemProps) => {
 	const itemRef = useRef<HTMLDivElement>(null);
-	// State (not ref) so React re-renders and removes the opacity:0 style after
-	// GSAP finishes — prevents React and GSAP fighting over the opacity property.
-	const [hasAnimated, setHasAnimated] = useState(false);
+	const hasAnimatedRef = useRef(false);
 	const color = getLangColor(name);
 
+	// Reset ref + collapse element when shouldAnimate flips to false (scroll-out)
+	// so the entry animation replays on the next scroll-in.
 	useEffect(() => {
-		if (!shouldAnimate || hasAnimated || !itemRef.current) return;
+		if (!shouldAnimate) {
+			hasAnimatedRef.current = false;
+			if (itemRef.current) gsap.set(itemRef.current, { opacity: 0, y: 7 });
+		}
+	}, [shouldAnimate]);
+
+	useEffect(() => {
+		if (!shouldAnimate || hasAnimatedRef.current || !itemRef.current) return;
 
 		gsap.fromTo(
 			itemRef.current,
@@ -282,16 +289,15 @@ const LegendItem = ({ name, pct, rank, shouldAnimate }: LegendItemProps) => {
 				duration: 0.45,
 				delay: 0.15 + rank * 0.055,
 				ease: 'power2.out',
-				onComplete: () => setHasAnimated(true),
+				onComplete: () => { hasAnimatedRef.current = true; },
 			},
 		);
-	}, [shouldAnimate, rank, hasAnimated]);
+	}, [shouldAnimate, rank]);
 
 	return (
 		<div
 			ref={itemRef}
 			className="flex items-center gap-2.5 group cursor-default min-w-0"
-			style={{ opacity: shouldAnimate && !hasAnimated ? 0 : undefined }}
 		>
 			<span
 				className="w-2.5 h-2.5 rounded-full shrink-0 transition-transform duration-200 group-hover:scale-[1.35]"
