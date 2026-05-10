@@ -56,6 +56,9 @@ export const DiscordLink = socialLinks[4].url;
 export const BuyMeACoffeeLink = process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME ? `https://buymeacoffee.com/${process.env.NEXT_PUBLIC_BUYMEACOFFEE_USERNAME}` : null;
 export const UPI_ID = process.env.NEXT_PUBLIC_UPI_ID || '';
 
+// --- SEO & Verification ---
+export const GoogleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '';
+
 // --- Portfolio Metadata ---
 export const CurrentGithubLink = "https://github.com/Amitminer/amitminer.github.io/";
 export const PortfolioURL = "https://amitminer.github.io";

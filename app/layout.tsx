@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Header from '@/app/components/layout/Header';
 import Footer from '@/app/components/layout/Footer';
-import { Name, PortfolioURL } from '@/app/utils/config';
+import { Name, PortfolioURL, GoogleSiteVerification } from '@/app/utils/config';
 
 const inter = Inter({
 	subsets: ['latin'],
@@ -27,8 +27,10 @@ export const metadata: Metadata = {
 		type: "website"
 	},
 	metadataBase: new URL(PortfolioURL),
+	verification: {
+    google: GoogleSiteVerification,
+  },
 };
-
 
 // Root layout component that wraps all pages
 export default function RootLayout({

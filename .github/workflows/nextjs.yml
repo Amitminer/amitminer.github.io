@@ -27,6 +27,9 @@ jobs:
 
       # Contact form (Formspree)
       NEXT_PUBLIC_FORMSPREE_FORM_ID: ${{ secrets.FORMSPREE_FORM_ID }}
+      
+      # SEO & Verification
+      NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
 
       # Anti-spam CAPTCHA (Cloudflare Turnstile — public site key only)
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
