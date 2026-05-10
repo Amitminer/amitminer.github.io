@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { GitHubIcon } from '../icons/index';
-import { CurrentGithubLink } from '@/app/utils/links';
+import { CurrentGithubLink, Name } from '@/app/utils/config';
 import VisitorCounter from '../ui/VisitorCounter';
 
 const Footer = () => {
@@ -50,7 +50,7 @@ const Footer = () => {
 			<div className="container mx-auto px-4 md:px-6 relative">
 				<div className="flex flex-col items-center space-y-4">
 					<Link href="/" className="text-xl font-bold gradient-text block text-center">
-						AmitxD
+						{Name}
 					</Link>
 
 					{/* Show counter only if user is on desktop and scrolled to bottom */}
@@ -63,7 +63,6 @@ const Footer = () => {
 					<div className="flex items-center space-x-2 text-sm text-gray-400">
 						<span>Made with</span>
 						<Heart className="w-4 h-4 text-[#FF1493] animate-pulse" />
-						<span>by AmitxD</span>
 					</div>
 
 					<div className="flex items-center space-x-4">

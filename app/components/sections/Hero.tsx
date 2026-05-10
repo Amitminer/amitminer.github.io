@@ -18,7 +18,7 @@ import { ArrowDownCircle, ExternalLink, User, ChevronDown } from "lucide-react"
 import ProfileImage from "@/app/assets/pfp.webp"
 import BackgroundAnimation from "./BackgroundAnimation"
 import { GitHubIcon, LinkedinIcon } from "../icons/index"
-import { GithubLink, LinkedinLink } from "@/app/utils/links"
+import { Name, HeroRoles, GithubLink, LinkedinLink } from "@/app/utils/config"
 import type { ThrottleOptions } from "@/app/lib/types"
 import Image from "next/image"
 
@@ -47,24 +47,18 @@ const throttle = <T extends (...args: unknown[]) => unknown>(
 	}
 }
 
-// Constants
-const SCROLL_THROTTLE_DELAY = 16 // ~60fps
-const MOUSE_MOVE_THROTTLE_DELAY = 100
-const ARROW_HIDE_DELAY = 2000
-const SCROLL_THRESHOLD = 50
-const HERO_SECTION_THRESHOLD = 0.7
+// Constants for performance and responsiveness
+const SCROLL_THROTTLE_DELAY = 16 // Throttle scroll events to ~60fps (16ms)
+const MOUSE_MOVE_THROTTLE_DELAY = 100 // Throttle mouse move events to 100ms
+const ARROW_HIDE_DELAY = 2000 // Auto-hide scroll arrow after 2 seconds of inactivity
+const SCROLL_THRESHOLD = 50 // Minimum scroll distance to show scroll arrow
+const HERO_SECTION_THRESHOLD = 0.7 // Threshold for considering user still in the hero section
 
-// Typewriter constants
-const ROLES = [
-	"Self-taught developer building cool stuff",
-	"Focused on backend and performance",
-	"Rust enthusiast and Linux user",
-	"Obsessed with optimization and clean code",
-]
-const TYPEWRITER_SPEED = 28  // ms per character (typing)
-const ERASE_SPEED = 15       // ms per character (erasing)
-const HOLD_DELAY = 1600      // ms to hold full string before erasing
-const PAUSE_DELAY = 250      // ms pause before typing next string
+// Constants for typewriter effect
+const TYPEWRITER_SPEED = 28 // Delay in ms for typing each character
+const ERASE_SPEED = 15 // Delay in ms for erasing each character
+const HOLD_DELAY = 1600 // Delay in ms to hold the full string before starting to erase
+const PAUSE_DELAY = 250 // Delay in ms between erasing and typing the next string
 
 const Hero = () => {
 	const [showScrollArrow, setShowScrollArrow] = useState(false)
@@ -82,7 +76,7 @@ const Hero = () => {
 
 	// --- Typewriter effect ---
 	useEffect(() => {
-		const currentRole = ROLES[roleIndex]
+		const currentRole = HeroRoles[roleIndex]
 
 		if (!isErasing) {
 			// Typing phase
@@ -109,7 +103,7 @@ const Hero = () => {
 				// Move to next role after short pause
 				const timeout = setTimeout(() => {
 					setIsErasing(false)
-					setRoleIndex((prev) => (prev + 1) % ROLES.length)
+					setRoleIndex((prev) => (prev + 1) % HeroRoles.length)
 				}, PAUSE_DELAY)
 				return () => clearTimeout(timeout)
 			}
@@ -249,7 +243,7 @@ const Hero = () => {
 					</div>
 
 					{/* Name */}
-					<h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 gradient-text">AmitxD</h1>
+					<h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 gradient-text">{Name}</h1>
 
 					{/* Typewriter Role Description */}
 					<p

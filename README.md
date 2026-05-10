@@ -41,6 +41,10 @@ bun dev
 
 📍 [http://localhost:3000](http://localhost:3000)
 
+### 5. Personalization
+
+Modify `app/utils/config.ts` to update your name, social links, section content (Hero/About), and portfolio domain.
+
 ---
 
 ## 🌍 GitHub Pages Deployment

@@ -8,7 +8,7 @@
  * - Instant loading with smart caching
  * - Minimal API calls
  */
-import { GithubUsername } from '@/app/utils/links';
+import { GithubUsername } from '@/app/utils/config';
 import { Users } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 

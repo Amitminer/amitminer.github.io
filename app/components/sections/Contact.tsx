@@ -15,7 +15,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button } from '@/app/components/ui/button';
 
 import { XIcon, DiscordIcon, InstagramIcon, GitHubIcon, EmailIcon } from '../icons/index';
-import { DiscordLink, GithubLink, InstagramLink, XLink } from '@/app/utils/links';
+import { DiscordLink, GithubLink, InstagramLink, XLink } from '@/app/utils/config';
 import { ContactState, FormState } from '@/app/lib/types';
 import Turnstile from 'react-turnstile';
 

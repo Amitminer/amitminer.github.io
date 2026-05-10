@@ -15,11 +15,12 @@
  */
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import VisitorCounter from '../ui/VisitorCounter';
 import { HeaderState, NavItem } from '@/app/lib/types';
+import { HeaderRoles } from '@/app/utils/config';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -41,8 +42,7 @@ const Header = () => {
 		activeSection: '',
 	});
 
-	const [logoText, setLogoText] = useState('AmitxD');
-	const logoRoles = useMemo(() => ['Amitminer', 'Rust Enthusiast', 'Developer', '<_/>', 'Rustacean', 'Open-Source', 'Hello! :D'], []);
+	const [logoText, setLogoText] = useState(HeaderRoles[0]);
 	const roleIndexRef = useRef(0);
 
 	// Refs for GSAP animations
@@ -67,8 +67,8 @@ const Header = () => {
 				y: -5,
 				duration: 0.3,
 				onComplete: () => {
-					roleIndexRef.current = (roleIndexRef.current + 1) % logoRoles.length;
-					setLogoText(logoRoles[roleIndexRef.current]);
+					roleIndexRef.current = (roleIndexRef.current + 1) % HeaderRoles.length;
+					setLogoText(HeaderRoles[roleIndexRef.current]);
 
 					// Fade in and come back to position
 					gsap.to(logoRef.current, {
@@ -82,7 +82,7 @@ const Header = () => {
 		}, 4000);
 
 		return () => clearInterval(interval);
-	}, [logoRoles]);
+	}, []);
 
 	// Entrance animation on mount: Using matchMedia for responsive-aware timing
 	useEffect(() => {

@@ -12,6 +12,7 @@
 'use client';
 
 import { TypewriterState } from '@/app/lib/types';
+import { Name, FullName, AboutContent } from '@/app/utils/config';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Constants
@@ -20,12 +21,6 @@ const SECOND_TYPING_DELAY = 2; // ms between characters for the second paragraph
 const CURSOR_BLINK_DELAY = 500; // ms between cursor blinks
 const LOADING_DELAY = 400; // ms for the loading state before animations begin
 const PARTICLE_COUNT = 5; // Number of floating particles in the background
-
-// Content
-const CONTENT = {
-	firstParagraph: "Hey, I'm Amit, also known as AmitxD or Amitminer. I'm a self-taught developer from India driven by a genuine obsession with understanding how things work at a fundamental level, not just making them work.",
-	secondParagraph: "I specialize in systems programming with a focus on performance, modularity and low-level control. Memory management, concurrency and architectural efficiency are where I spend most of my time. Rust is my primary language of choice for work that demands precision and reliability at scale."
-};
 
 // === Skeleton Loading Component ===
 const SkeletonLoader = () => (
@@ -105,7 +100,7 @@ const About = () => {
 	 * First Paragraph Typewriter Effect
 	 */
 	useEffect(() => {
-		if (isVisible && typewriterState.currentIndex < CONTENT.firstParagraph.length) {
+		if (isVisible && typewriterState.currentIndex < AboutContent.firstParagraph.length) {
 			const timeout = setTimeout(() => {
 				setTypewriterState(prev => ({
 					...prev,
@@ -121,9 +116,9 @@ const About = () => {
 	 * Second Paragraph Typewriter Effect
 	 */
 	useEffect(() => {
-		const isFirstParagraphComplete = typewriterState.currentIndex >= CONTENT.firstParagraph.length;
+		const isFirstParagraphComplete = typewriterState.currentIndex >= AboutContent.firstParagraph.length;
 
-		if (isVisible && isFirstParagraphComplete && typewriterState.secondIndex < CONTENT.secondParagraph.length) {
+		if (isVisible && isFirstParagraphComplete && typewriterState.secondIndex < AboutContent.secondParagraph.length) {
 			const timeout = setTimeout(() => {
 				setTypewriterState(prev => ({
 					...prev,
@@ -144,8 +139,8 @@ const About = () => {
 		return text.split('').map((char, index) => {
 			const isRevealed = index < currentIdx;
 			const isHighlighted =
-				(text.slice(index, index + 6) === 'AmitxD') ||
-				(text.slice(index, index + 9) === 'Amitminer');
+				(text.slice(index, index + Name.length) === Name) ||
+				(text.slice(index, index + FullName.length) === FullName);
 
 			let className = 'transition-all duration-300 ';
 			if (isRevealed) {
@@ -167,8 +162,8 @@ const About = () => {
 	}, []);
 
 	// === Animation State Checks ===
-	const isFirstParagraphComplete = typewriterState.currentIndex >= CONTENT.firstParagraph.length;
-	const isSecondParagraphComplete = typewriterState.secondIndex >= CONTENT.secondParagraph.length;
+	const isFirstParagraphComplete = typewriterState.currentIndex >= AboutContent.firstParagraph.length;
+	const isSecondParagraphComplete = typewriterState.secondIndex >= AboutContent.secondParagraph.length;
 	const showFirstCursor = !isFirstParagraphComplete && typewriterState.showCursor;
 	const showSecondCursor = isFirstParagraphComplete && !isSecondParagraphComplete && typewriterState.showCursor;
 
@@ -218,7 +213,7 @@ const About = () => {
 					>
 						{/* First Paragraph with Typewriter Effect */}
 						<div className="text-base leading-relaxed relative">
-							{renderTextWithTypewriter(CONTENT.firstParagraph, typewriterState.currentIndex)}
+							{renderTextWithTypewriter(AboutContent.firstParagraph, typewriterState.currentIndex)}
 							{showFirstCursor && (
 								<span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>
 							)}
@@ -226,7 +221,7 @@ const About = () => {
 
 						{/* Second Paragraph with Typewriter Effect */}
 						<div className="text-base leading-relaxed relative mt-4">
-							{renderTextWithTypewriter(CONTENT.secondParagraph, typewriterState.secondIndex)}
+							{renderTextWithTypewriter(AboutContent.secondParagraph, typewriterState.secondIndex)}
 							{showSecondCursor && (
 								<span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>
 							)}

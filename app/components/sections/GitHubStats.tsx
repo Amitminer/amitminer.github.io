@@ -21,7 +21,7 @@ import {
 	RefreshCw,
 	AlertCircle,
 } from "lucide-react"
-import { BackendURL, GithubUsername } from "@/app/utils/links"
+import { BackendURL, GithubUsername } from "@/app/utils/config"
 import type { GitHubStats, DetailCardProps, StatCardProps } from "@/app/lib/types"
 
 // Skeleton Components
