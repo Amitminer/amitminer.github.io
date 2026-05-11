@@ -12,115 +12,81 @@ import { GithubUsername } from '@/app/utils/config';
 import { Users } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+const SESSION_KEY = `visitor_${GithubUsername}`;
+
+const getSessionData = (): { count: number } | null => {
+	try {
+		const data = sessionStorage.getItem(SESSION_KEY);
+		return data ? JSON.parse(data) : null;
+	} catch { return null; }
+};
+
+const setSessionData = (count: number): void => {
+	try {
+		sessionStorage.setItem(SESSION_KEY, JSON.stringify({ count }));
+	} catch { }
+};
+
 const VisitorCounter = () => {
-	const [count, setCount] = useState<number>(0);
+	const [count, setCount] = useState<number | null>(null);
 	const [isUpdating, setIsUpdating] = useState(false);
 	const hasRun = useRef(false);
-
 	const counterId = GithubUsername;
-	const SESSION_KEY = `visitor_${counterId}`;
-
-	/**
-	 * Session storage operations - faster than cookies
-	 */
-	const getSessionData = useCallback((): { count: number; fetched: boolean } | null => {
-		if (typeof window === 'undefined') return null;
-		try {
-			const data = sessionStorage.getItem(SESSION_KEY);
-			return data ? JSON.parse(data) : null;
-		} catch {
-			return null;
-		}
-	}, [SESSION_KEY]);
-
-	const setSessionData = useCallback((count: number, fetched: boolean = true): void => {
-		if (typeof window === 'undefined') return;
-		try {
-			sessionStorage.setItem(SESSION_KEY, JSON.stringify({ count, fetched }));
-		} catch {
-			// Ignore errors
-		}
-	}, [SESSION_KEY]);
 
 	/**
 	 * Fast count fetch - API auto-increments, so we handle it properly
+	 * Note: This API is not my own and may break at any time. I am dependent on it.
 	 */
 	const fetchCount = useCallback(async (): Promise<void> => {
+		// Set updating state inside async function
+		setIsUpdating(true);
 		try {
-			const sessionData = getSessionData();
-
-			// If we already fetched this session, don't fetch again
-			if (sessionData?.fetched) {
-				setCount(sessionData.count);
-				setIsUpdating(false);
-				return;
-			}
-
-			// Fetch with timeout
 			const controller = new AbortController();
-			const timeoutId = setTimeout(() => controller.abort(), 2000);
+			const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-			// Note: This API is not my own and may break at any time. I am dependent on it.
 			const response = await fetch(`https://counterpro.vercel.app/api/count/id/${counterId}`, {
 				signal: controller.signal,
 				headers: { 'Accept': 'application/json' }
 			});
-
 			clearTimeout(timeoutId);
 
 			if (response.ok) {
 				const data = await response.json();
 				const apiCount = data?.count || 0;
-
 				// API auto-incremented, so this is our new count
 				setCount(apiCount);
-				setSessionData(apiCount, true);
-			} else {
-				// Fallback to cached or estimated
-				const fallbackCount = sessionData?.count || Math.floor(Math.random() * 100) + 50;
-				setCount(fallbackCount);
+				setSessionData(apiCount);
 			}
 		} catch {
-			// Use cached data or show estimated count
-			const sessionData = getSessionData();
-			const fallbackCount = sessionData?.count || Math.floor(Math.random() * 100) + 50;
-			setCount(fallbackCount);
+			// API failed — keep showing cached value already set from sessionStorage
 		} finally {
 			setIsUpdating(false);
 		}
-	}, [counterId, getSessionData, setSessionData]);
+	}, [counterId]);
 
 	useEffect(() => {
 		if (hasRun.current) return;
 		hasRun.current = true;
 
-		setTimeout(() => {
-			// IMMEDIATE: Show cached count from session
-			const sessionData = getSessionData();
-			if (sessionData) {
-				setCount(sessionData.count);
+		const cached = getSessionData();
+		if (cached) {
+			// Already visited this session — show cached count, skip API call
+			setTimeout(() => setCount(cached.count), 0);
+			return;
+		}
 
-				// If we already fetched this session, don't fetch again
-				if (sessionData.fetched) return;
-			} else {
-				// Show estimated count for new sessions
-				setCount(Math.floor(Math.random() * 100) + 50);
-			}
-
-			// BACKGROUND: Fetch real count if not already done this session
-			setIsUpdating(true);
-			fetchCount();
-		}, 0);
-	}, [counterId, fetchCount, getSessionData]);
+		const id = setTimeout(fetchCount, 0);
+		return () => clearTimeout(id);
+	}, [fetchCount]);
 
 	return (
 		<div
 			className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-300 transition-all duration-200 scale-[0.95]"
-			aria-label={`${count.toLocaleString()} total visitors`}
+			aria-label={count !== null ? `${count.toLocaleString()} total visitors` : 'Loading visitor count'}
 		>
 			<Users className={`text-cyan-400 w-4 h-4 shrink-0 ${isUpdating ? 'animate-pulse' : ''}`} />
 			<span className="tabular-nums">
-				{count.toLocaleString()} visitors
+				{count !== null ? `${count.toLocaleString()} visitors` : '... visitors'}
 			</span>
 		</div>
 	);
