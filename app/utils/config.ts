@@ -61,7 +61,7 @@ export const GoogleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFI
 
 // --- Portfolio Metadata ---
 export const CurrentGithubLink = "https://github.com/Amitminer/amitminer.github.io/";
-export const PortfolioURL = "https://amitminer.github.io";
+export const PortfolioURL = "https://amitxd.in";
 
 // --- Backend API ---
 export const BackendURL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api/github';
