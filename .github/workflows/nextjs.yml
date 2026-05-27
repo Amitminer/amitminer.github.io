@@ -27,7 +27,7 @@ jobs:
 
       # Contact form (Formspree)
       NEXT_PUBLIC_FORMSPREE_FORM_ID: ${{ secrets.FORMSPREE_FORM_ID }}
-      
+
       # SEO & Verification
       NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ secrets.GOOGLE_SITE_VERIFICATION }}
 
@@ -69,6 +69,9 @@ jobs:
 
       - name: Build with Next.js
         run: bun run build
+
+      - name: Add CNAME
+        run: echo "amitxd.in" > ./out/CNAME
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
