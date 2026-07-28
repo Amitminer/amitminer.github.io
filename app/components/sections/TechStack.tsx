@@ -1,100 +1,116 @@
 /**
  * TechStack Component
  *
- * A dynamic technology stack showcase that displays:
- * - Categorized technology groups
- * - Animated tech icons with hover effects
- * - Grid layout
+ * Tailored technology stack showcase focusing on:
+ * - Systems Programming (Rust, C++, Tokio, Async Rust, IPC, Networking)
+ * - Backend & Infra (Actix Web, Axum, Express, Firecracker, Docker, Cloudflare, AWS)
+ * - Databases (PostgreSQL, Redis, SQLite)
+ * - Operating Systems & Tools (Arch Linux, Windows, Neovim, Zed, tmux, SSH)
  */
 
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-	SiArchlinux, SiGnubash,
-	SiRust, SiPython, SiCplusplus, SiPhp,
-	SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiFlask,
-	SiRedis, SiMysql, SiSqlite,
-	SiDocker, FaAws, SiGooglecloud,
-	SiGit, FaWindows
+	SiArchlinux,
+	SiRust, SiPython, SiCplusplus, SiPhp, SiTypescript, SiGo,
+	SiReact, SiNextdotjs, SiExpress, SiTauri,
+	SiRedis, SiSqlite, SiPostgresql,
+	SiDocker, SiCloudflare, SiGithubactions, SiNeovim,
+	SiGit, FaWindows, FaAws
 } from '../icons/index';
-import { Code } from 'lucide-react';
+import { Server, Cpu, Zap, Layers, Network, Radio, Terminal } from 'lucide-react';
 import { TechGroup, TechGroupProps, TechItemProps } from '@/app/lib/types';
 
 // Constants
-const ANIMATION_DELAY = 50; // ms between group animations
+const ANIMATION_DELAY = 50;
 const OBSERVER_THRESHOLD = 0.1;
 const OBSERVER_ROOT_MARGIN = '50px';
 
-// Tech groups data
+// Tech groups data strictly matching defense-grade interview skills
 const techGroups: TechGroup[] = [
 	{
 		title: "Languages",
 		technologies: [
-			{ name: 'Rust', icon: <SiRust />, color: 'text-orange-500' },
-			{ name: 'Python', icon: <SiPython />, color: 'text-blue-500' },
-			{ name: 'C++', icon: <SiCplusplus />, color: 'text-blue-400' },
-			{ name: 'PHP', icon: <SiPhp />, color: 'text-blue-600' },
+			{ name: 'Rust', icon: <SiRust />, color: 'text-amber-500' },
+			{ name: 'Go', icon: <SiGo />, color: 'text-cyan-400' },
+			{ name: 'C++', icon: <SiCplusplus />, color: 'text-sky-400' },
+			{ name: 'TypeScript', icon: <SiTypescript />, color: 'text-blue-400' },
+			{ name: 'Python', icon: <SiPython />, color: 'text-emerald-400' },
+			{ name: 'PHP', icon: <SiPhp />, color: 'text-indigo-400' },
 		]
 	},
 	{
 		title: "Frontend",
 		technologies: [
-			{ name: 'React', icon: <SiReact />, color: 'text-cyan-400' },
-			{ name: 'Next.js', icon: <SiNextdotjs />, color: 'text-white' },
-			{ name: 'Tailwind', icon: <SiTailwindcss />, color: 'text-cyan-300' },
+			{ name: 'Next.js', icon: <SiNextdotjs />, color: 'text-slate-100' },
+			{ name: 'React', icon: <SiReact />, color: 'text-sky-400' },
+			{ name: 'Tauri', icon: <SiTauri />, color: 'text-amber-400' },
 		]
 	},
 	{
 		title: "Backend",
 		technologies: [
-			{ name: 'Express', icon: <SiExpress />, color: 'text-white' },
-			{ name: 'Flask', icon: <SiFlask />, color: 'text-white' },
+			{ name: 'Actix Web', icon: <Server />, color: 'text-amber-400' },
+			{ name: 'Axum', icon: <Cpu />, color: 'text-orange-400' },
+			{ name: 'Express.js', icon: <SiExpress />, color: 'text-slate-200' },
 		]
 	},
 	{
 		title: "Databases",
 		technologies: [
-			{ name: 'Redis', icon: <SiRedis />, color: 'text-red-500' },
-			{ name: 'MySQL', icon: <SiMysql />, color: 'text-blue-600' },
-			{ name: 'SQLite', icon: <SiSqlite />, color: 'text-blue-300' },
+			{ name: 'PostgreSQL', icon: <SiPostgresql />, color: 'text-sky-400' },
+			{ name: 'Redis', icon: <SiRedis />, color: 'text-rose-500' },
+			{ name: 'SQLite', icon: <SiSqlite />, color: 'text-cyan-400' },
 		]
 	},
 	{
-		title: "DevOps & Cloud",
+		title: "DevOps & Infrastructure",
 		technologies: [
-			{ name: 'Docker', icon: <SiDocker />, color: 'text-blue-500' },
-			{ name: 'AWS', icon: <FaAws />, color: 'text-orange-500' },
-			{ name: 'GCP', icon: <SiGooglecloud />, color: 'text-blue-500' },
+			{ name: 'Docker', icon: <SiDocker />, color: 'text-sky-400' },
+			{ name: 'GitHub Actions', icon: <SiGithubactions />, color: 'text-blue-400' },
+			{ name: 'AWS', icon: <FaAws />, color: 'text-amber-500' },
+			{ name: 'Cloudflare', icon: <SiCloudflare />, color: 'text-orange-400' },
+			{ name: 'Firecracker', icon: <Zap />, color: 'text-amber-400' },
 		]
 	},
 	{
-		title: "Tools & Others",
+		title: "Systems Programming",
 		technologies: [
-			{ name: 'Git & GitHub', icon: <SiGit />, color: 'text-orange-500' },
-			{ name: 'VS Code', icon: <Code />, color: 'text-blue-500' },
-			{ name: 'Bash', icon: <SiGnubash />, color: 'text-yellow-500' },
+			{ name: 'Tokio', icon: <Cpu />, color: 'text-amber-400' },
+			{ name: 'Async Rust', icon: <SiRust />, color: 'text-orange-400' },
+			{ name: 'Multithreading', icon: <Layers />, color: 'text-teal-400' },
+			{ name: 'IPC & Networking', icon: <Network />, color: 'text-cyan-400' },
+			{ name: 'gRPC & WebSockets', icon: <Radio />, color: 'text-emerald-400' },
 		]
 	},
 	{
 		title: "Operating Systems",
 		technologies: [
-			{ name: 'Windows', icon: <FaWindows />, color: 'text-blue-500' },
-			{ name: 'Arch Linux', icon: <SiArchlinux />, color: 'text-purple-500' },
+			{ name: 'Arch Linux', icon: <SiArchlinux />, color: 'text-cyan-400' },
+			{ name: 'Windows', icon: <FaWindows />, color: 'text-sky-400' },
+		]
+	},
+	{
+		title: "Developer Tools",
+		technologies: [
+			{ name: 'Git', icon: <SiGit />, color: 'text-orange-500' },
+			{ name: 'Zed & Neovim', icon: <SiNeovim />, color: 'text-emerald-400' },
+			{ name: 'tmux & SSH', icon: <Terminal />, color: 'text-slate-300' },
 		]
 	}
 ];
 
 // Memoized tech item component
 const TechItem = React.memo<TechItemProps>(({ tech, isLast }) => (
-	<div id="tech-items" className={`flex flex-col items-center group ${!isLast ? 'border-r border-gray-700/50' : ''} py-2`}>
+	<div id="tech-items" className={`flex flex-col items-center group ${!isLast ? 'border-r border-slate-800/60' : ''} py-1.5 px-0.5 sm:py-2 sm:px-1`}>
 		<div
-			className={`text-2xl mb-1 ${tech.color} group-hover:scale-110 transition-transform duration-200`}
+			className={`text-xl sm:text-2xl mb-1 ${tech.color} group-hover:scale-110 transition-transform duration-200`}
 			style={{ willChange: 'transform' }}
 		>
 			{tech.icon}
 		</div>
-		<span className="text-xs text-gray-300 text-center leading-tight">{tech.name}</span>
+		<span className="text-[11px] sm:text-xs text-slate-300 font-medium text-center leading-tight">{tech.name}</span>
 	</div>
 ));
 
@@ -107,20 +123,20 @@ const TechGroupComponent = React.memo<TechGroupProps>(({
 	groupIndex
 }) => (
 	<div
-		className={`p-4 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/20 border border-gray-700/30 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+		className={`p-3 sm:p-4 rounded-xl bg-slate-900/60 hover:bg-slate-900/90 transition-all duration-300 transform hover:scale-[1.02] border border-slate-800/80 hover:border-slate-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
 			}`}
 		style={{
 			transitionDelay: `${groupIndex * ANIMATION_DELAY}ms`,
 			willChange: 'transform, opacity'
 		}}
 	>
-		<h3 className="text-lg font-semibold mb-3 text-white text-center">{group.title}</h3>
-		<div className="grid grid-cols-3 gap-3">
+		<h3 className="text-sm sm:text-base font-bold mb-2 sm:mb-3 text-slate-100 text-center tracking-wide">{group.title}</h3>
+		<div className="grid grid-cols-3 gap-1.5 sm:gap-2">
 			{group.technologies.map((tech, index) => (
 				<TechItem
 					key={tech.name}
 					tech={tech}
-					isLast={index === group.technologies.length - 1}
+					isLast={(index + 1) % 3 === 0 || index === group.technologies.length - 1}
 				/>
 			))}
 		</div>
@@ -133,7 +149,6 @@ const TechStack = () => {
 	const [isVisible, setIsVisible] = useState(false);
 	const techStackRef = React.useRef<HTMLDivElement>(null);
 
-	// Memoized intersection observer callback
 	const handleIntersection = useCallback((entries: IntersectionObserverEntry[]) => {
 		const [entry] = entries;
 		if (entry.isIntersecting) {
@@ -141,7 +156,6 @@ const TechStack = () => {
 		}
 	}, []);
 
-	// Intersection observer setup
 	useEffect(() => {
 		const observer = new IntersectionObserver(handleIntersection, {
 			threshold: OBSERVER_THRESHOLD,
@@ -165,7 +179,7 @@ const TechStack = () => {
 		<section
 			id="tech-stack"
 			ref={techStackRef}
-			className="py-16 w-full bg-secondary/20"
+			className="py-16 w-full"
 		>
 			<div className="container mx-auto px-4 md:px-6">
 				<h2 className="text-3xl md:text-4xl font-bold mb-8 gradient-text text-center">
@@ -174,7 +188,7 @@ const TechStack = () => {
 
 				<div className="max-w-7xl mx-auto">
 					<div
-						className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-800 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+						className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-800 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
 							}`}
 						style={{ willChange: 'transform, opacity' }}
 					>

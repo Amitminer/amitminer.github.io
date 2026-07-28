@@ -378,7 +378,7 @@ const Contact = () => {
 										{captchaState.isLoading && (
 											<div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 rounded-xl">
 												<div className="flex items-center space-x-2">
-													<div className="w-4 h-4 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+													<div className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
 													<span className="text-sm text-gray-300">Loading verification...</span>
 												</div>
 											</div>
@@ -450,13 +450,14 @@ const Contact = () => {
 						{/* Submit Button */}
 						<Button
 							type="submit"
-							className="w-full bg-linear-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-medium py-6 rounded-xl transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+							size="lg"
+							className="w-full h-13 bg-gradient-to-r from-cyan-400/90 via-sky-400/90 to-blue-500/90 backdrop-blur-md text-slate-950 font-bold py-3.5 rounded-xl hover:from-cyan-300 hover:via-sky-300 hover:to-blue-400 active:scale-[0.97] transition-all duration-300 border border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
 							disabled={state.isSubmitting || (captchaState.showCaptcha && !captchaState.token)}
 						>
 							{state.isSubmitting ? (
 								<span className="flex items-center justify-center space-x-2">
-									<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-									<span>Sending...</span>
+									<div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
+									<span>Sending Message...</span>
 								</span>
 							) : captchaState.showCaptcha && !captchaState.token ? (
 								'Complete Verification First'

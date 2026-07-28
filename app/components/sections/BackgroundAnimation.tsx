@@ -5,7 +5,8 @@
  * - Floating particles with random sizes and movements
  * - Geometric shapes (squares, circles, triangles)
  * - Floating code snippets from Rust
- * - Pulsing dots with gradient effects
+ * - Pulsing dots with subtle multi-accent gradients
+ * - GSAP mouse parallax movement
  */
 
 "use client"
@@ -34,13 +35,13 @@ const RUST_SNIPPETS = [
 	"async fn fetch()",
 ]
 
-const mkParticles = () => Array.from({ length: 10 }, (_, i) => ({
+const mkParticles = () => Array.from({ length: 12 }, (_, i) => ({
 	id: i,
 	left: r() * 100,
-	top: r() * 100,
+	top: r() * 90,
 	dur: 4 + r() * 4,
 	delay: r() * 4,
-	depth: 0.2 + r() * 0.8,   // parallax depth (0 = stationary, 1 = full move)
+	depth: 0.2 + r() * 0.8,
 }))
 
 const mkShapes = () => Array.from({ length: 6 }, (_, i) => {
@@ -52,7 +53,7 @@ const mkShapes = () => Array.from({ length: 6 }, (_, i) => {
 		type: i % 3,
 		size,
 		left: isLeft ? r() * 25 : 75 + r() * 25,
-		top: isTop ? r() * 30 : 70 + r() * 30,
+		top: isTop ? r() * 30 : 60 + r() * 30,
 		dur: 8 + r() * 6,
 		delay: r() * 6,
 		depth: 0.1 + r() * 0.4,
@@ -62,22 +63,22 @@ const mkShapes = () => Array.from({ length: 6 }, (_, i) => {
 const mkCode = () => RUST_SNIPPETS.map((code, i) => ({
 	id: i,
 	code,
-	left: i % 2 === 0 ? r() * 18 : 82 + r() * 14,
-	top: 18 + i * 14 + r() * 8,
+	left: i % 2 === 0 ? r() * 18 : 80 + r() * 15,
+	top: 15 + i * 12 + r() * 6,
 	dur: 7 + r() * 4,
 	delay: i * 1.8,
 	depth: 0.05 + r() * 0.15,
 }))
 
-const mkDots = () => Array.from({ length: 8 }, (_, i) => ({
+const mkDots = () => Array.from({ length: 6 }, (_, i) => ({
 	id: i,
-	left: r() * 100,
-	top: r() * 100,
-	dur: 2 + r() * 2,
+	left: 5 + r() * 90,
+	top: 5 + r() * 85,
+	dur: 2.5 + r() * 2,
 	delay: r() * 3,
 }))
 
-// ── Generate once at module level — never changes between server and client ──
+// Generate once at module level
 const PARTICLES = mkParticles()
 const SHAPES = mkShapes()
 const CODES = mkCode()
@@ -88,10 +89,8 @@ export default function BackgroundAnimation() {
 	const particleRefs = useRef<(HTMLDivElement | null)[]>([])
 	const shapeRefs = useRef<(HTMLDivElement | null)[]>([])
 	const codeRefs = useRef<(HTMLDivElement | null)[]>([])
-	// Stores the last smoothed mouse position to avoid redundant gsap.set calls
 	const mouseX = useRef(0)
 	const mouseY = useRef(0)
-	// Tracks the mouse position that was last applied, so we skip frames with no change
 	const appliedX = useRef(0)
 	const appliedY = useRef(0)
 	const rafRef = useRef<number | null>(null)
@@ -101,7 +100,6 @@ export default function BackgroundAnimation() {
 	const codes = CODES
 	const dots = DOTS
 
-	// ── Fade in container immediately ─────────────────────────
 	useEffect(() => {
 		if (!containerRef.current) return
 		gsap.fromTo(containerRef.current,
@@ -110,11 +108,8 @@ export default function BackgroundAnimation() {
 		)
 	}, [])
 
-	// ── GSAP floating animations ────────────────────────────────────────────────
 	useEffect(() => {
 		const ctx = gsap.context(() => {
-
-			// Particles — float up/down with slight x drift
 			particleRefs.current.forEach((el, i) => {
 				if (!el) return
 				const p = particles[i]
@@ -129,7 +124,6 @@ export default function BackgroundAnimation() {
 				})
 			})
 
-			// Shapes — slow rotation + float
 			shapeRefs.current.forEach((el, i) => {
 				if (!el) return
 				const s = shapes[i]
@@ -150,15 +144,14 @@ export default function BackgroundAnimation() {
 				})
 			})
 
-			// Code snippets — drift + fade
 			codeRefs.current.forEach((el, i) => {
 				if (!el) return
 				const c = codes[i]
 				gsap.fromTo(el,
-					{ opacity: 0.1, x: 0 },
+					{ opacity: 0.08, x: 0 },
 					{
-						opacity: 0.5,
-						x: 10,
+						opacity: 0.35,
+						x: 12,
 						duration: c.dur,
 						delay: c.delay,
 						ease: "sine.inOut",
@@ -167,28 +160,23 @@ export default function BackgroundAnimation() {
 					}
 				)
 			})
-
 		}, containerRef)
 
 		return () => ctx.revert()
 	}, [particles, shapes, codes])
 
-	// ── Mouse parallax ──────────────────────────────────────────────────────────
 	useEffect(() => {
 		const onMove = (e: MouseEvent) => {
-			// Normalise to -1 → +1 from center
 			mouseX.current = (e.clientX / window.innerWidth - 0.5) * 2
 			mouseY.current = (e.clientY / window.innerHeight - 0.5) * 2
 		}
 
-		const MOVE_THRESHOLD = 0.004 // skip RAF work if mouse barely moved
+		const MOVE_THRESHOLD = 0.004
 
 		const tick = () => {
 			const mx = mouseX.current
 			const my = mouseY.current
 
-			// Skip the whole batch if the mouse hasn't moved meaningfully —
-			// this eliminates the constant 60fps gsap.to() spam when idle
 			if (
 				Math.abs(mx - appliedX.current) > MOVE_THRESHOLD ||
 				Math.abs(my - appliedY.current) > MOVE_THRESHOLD
@@ -196,8 +184,6 @@ export default function BackgroundAnimation() {
 				appliedX.current = mx
 				appliedY.current = my
 
-				// Use gsap.set (instant, no tween object created) for the
-				// parallax offset so we don't pile up hundreds of short tweens.
 				particleRefs.current.forEach((el, i) => {
 					if (!el) return
 					const depth = particles[i].depth
@@ -240,42 +226,42 @@ export default function BackgroundAnimation() {
 	return (
 		<div
 			ref={containerRef}
-			className="fixed inset-0 pointer-events-none overflow-hidden"
-			style={{ opacity: 0 }}   // starts transparent — GSAP fades it in
+			className="fixed inset-0 pointer-events-none overflow-hidden z-0"
+			style={{ opacity: 0 }}
 		>
-			{/* Grid */}
+			{/* Architectural Grid */}
 			<div
-				className="absolute inset-0 opacity-15"
+				className="absolute inset-0 opacity-[0.08]"
 				style={{
 					backgroundImage: `
-            linear-gradient(rgba(0,255,255,0.08) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,255,255,0.08) 1px, transparent 1px)
+            linear-gradient(rgba(56,189,248,0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(56,189,248,0.15) 1px, transparent 1px)
           `,
-					backgroundSize: "50px 50px"
+					backgroundSize: "60px 60px"
 				}}
 			/>
 
-			{/* Particles */}
+			{/* Floating Particles */}
 			{particles.map((p, i) => (
 				<div
 					key={`p-${p.id}`}
 					ref={el => { particleRefs.current[i] = el }}
-					className="absolute w-1 h-1 bg-cyan-400 rounded-full"
+					className="absolute w-1.5 h-1.5 bg-sky-400/60 rounded-full"
 					style={{
 						left: `${p.left}%`,
 						top: `${p.top}%`,
-						opacity: 0.5 + p.depth * 0.3,
+						opacity: 0.3 + p.depth * 0.3,
 						willChange: "transform",
 					}}
 				/>
 			))}
 
-			{/* Geometric shapes */}
+			{/* Geometric Shapes */}
 			{shapes.map((s, i) => (
 				<div
 					key={`s-${s.id}`}
 					ref={el => { shapeRefs.current[i] = el }}
-					className="absolute opacity-25"
+					className="absolute opacity-20"
 					style={{
 						left: `${s.left}%`,
 						top: `${s.top}%`,
@@ -283,11 +269,11 @@ export default function BackgroundAnimation() {
 					}}
 				>
 					{s.type === 0 && (
-						<div className="border border-cyan-400"
+						<div className="border border-sky-400/60 rounded-sm"
 							style={{ width: s.size, height: s.size }} />
 					)}
 					{s.type === 1 && (
-						<div className="border border-pink-500 rounded-full"
+						<div className="border border-emerald-400/60 rounded-full"
 							style={{ width: s.size, height: s.size }} />
 					)}
 					{s.type === 2 && (
@@ -295,22 +281,21 @@ export default function BackgroundAnimation() {
 							width: 0, height: 0,
 							borderLeft: `${s.size / 2}px solid transparent`,
 							borderRight: `${s.size / 2}px solid transparent`,
-							borderBottom: `${s.size}px solid rgba(255,20,147,0.55)`,
+							borderBottom: `${s.size}px solid rgba(56,189,248,0.4)`,
 						}} />
 					)}
 				</div>
 			))}
 
-			{/* Rust code snippets */}
+			{/* Rust Floating Code Snippets */}
 			{codes.map((c, i) => (
 				<div
 					key={`c-${c.id}`}
 					ref={el => { codeRefs.current[i] = el }}
-					className="absolute text-xs font-mono text-cyan-300 whitespace-nowrap select-none"
+					className="absolute text-xs font-mono text-sky-300/60 whitespace-nowrap select-none"
 					style={{
 						left: `${c.left}%`,
 						top: `${c.top}%`,
-						opacity: 0.1,
 						willChange: "transform, opacity",
 					}}
 				>
@@ -318,7 +303,7 @@ export default function BackgroundAnimation() {
 				</div>
 			))}
 
-			{/* Pulsing dots */}
+			{/* Ambient Pulsing Dots */}
 			{dots.map(d => (
 				<div
 					key={`d-${d.id}`}
@@ -326,18 +311,19 @@ export default function BackgroundAnimation() {
 					style={{
 						left: `${d.left}%`,
 						top: `${d.top}%`,
-						background: "linear-gradient(135deg, #FF1493, #00FFFF)",
-						opacity: 0.4,
+						background: "linear-gradient(135deg, rgba(56,189,248,0.5), rgba(16,185,129,0.5))",
+						opacity: 0.3,
 						animationDuration: `${d.dur}s`,
 						animationDelay: `${d.delay}s`,
 					}}
 				/>
 			))}
 
-			{/* Radial glow — follows no one, just ambient */}
-			<div className="absolute inset-0"
+			{/* Soft Ambient Radial Vignette */}
+			<div
+				className="absolute inset-0"
 				style={{
-					background: "radial-gradient(ellipse 60% 50% at 20% 30%, rgba(255,20,147,0.04) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 80% 70%, rgba(0,255,255,0.04) 0%, transparent 70%)"
+					background: "radial-gradient(ellipse 70% 50% at 50% 20%, rgba(14,165,233,0.04) 0%, transparent 80%)"
 				}}
 			/>
 		</div>

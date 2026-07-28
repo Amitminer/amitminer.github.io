@@ -107,8 +107,8 @@ const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
 				<div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
 
 				{project.featured && (
-					<div className="absolute top-2 right-2 bg-linear-to-r from-pink-500 to-purple-500 px-2 py-1 rounded-full text-xs text-white font-medium">
-						<Star size={10} className="inline mr-1" />
+					<div className="absolute top-2 right-2 bg-gradient-to-r from-cyan-500 to-blue-500 px-2 py-1 rounded-full text-xs text-slate-950 font-bold">
+						<Star size={10} className="inline mr-1 fill-current" />
 						Featured
 					</div>
 				)}
@@ -140,7 +140,7 @@ const CustomProjectCard = memo(({ project }: { project: CustomProject }) => {
 					href={project.github || "#"}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600/20 border border-purple-500/60 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-colors duration-200 font-medium text-sm"
+					className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-900/80 border border-slate-700/80 text-slate-200 rounded-full hover:bg-slate-800 hover:border-cyan-400/50 hover:text-cyan-300 transition-all duration-200 font-semibold text-sm active:scale-[0.98]"
 				>
 					View Code
 					<ArrowUpRight size={14} />
@@ -227,7 +227,7 @@ const GitHubProjectCard = memo(({ project }: { project: GitHubRepo }) => {
 					href={project.html_url}
 					target="_blank"
 					rel="noopener noreferrer"
-					className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600/20 border border-purple-500/60 text-purple-300 rounded-lg hover:bg-purple-600/30 transition-colors duration-200 font-medium text-sm"
+					className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-slate-900/80 border border-slate-700/80 text-slate-200 rounded-full hover:bg-slate-800 hover:border-cyan-400/50 hover:text-cyan-300 transition-all duration-200 font-semibold text-sm active:scale-[0.98]"
 				>
 					<Eye size={14} />
 					View Project
@@ -342,7 +342,7 @@ const Projects = () => {
 			className="py-16 w-full"
 		>
 			<div className="container mx-auto px-4">
-				<h2 className="text-3xl font-bold mb-4 text-center bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+				<h2 className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
 					Projects
 				</h2>
 				<p className="text-gray-400 text-center mb-8 max-w-2xl mx-auto">
@@ -350,22 +350,22 @@ const Projects = () => {
 				</p>
 
 				{/* Tab Navigation */}
-				<div className="flex justify-center mb-8">
-					<div className="bg-gray-800/50 rounded-full p-1 border border-gray-700">
+				<div className="flex justify-center mb-10">
+					<div className="bg-slate-950/80 p-1.5 rounded-full border border-slate-800 flex items-center gap-1 backdrop-blur-xl">
 						<button
 							onClick={() => setUiState(prev => ({ ...prev, activeTab: "featured" }))}
-							className={`px-4 py-2 rounded-full transition-colors duration-200 text-sm font-medium ${uiState.activeTab === "featured"
-								? "bg-cyan-500 text-black"
-								: "text-gray-400 hover:text-cyan-300"
+							className={`px-5 py-2.5 rounded-full transition-all duration-300 text-sm font-semibold active:scale-95 ${uiState.activeTab === "featured"
+								? "bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 text-slate-950 font-bold border border-emerald-200/40"
+								: "text-slate-400 hover:text-white hover:bg-white/5"
 								}`}
 						>
 							Featured ({customProjects.length})
 						</button>
 						<button
 							onClick={() => setUiState(prev => ({ ...prev, activeTab: "recent" }))}
-							className={`px-4 py-2 rounded-full transition-colors duration-200 text-sm font-medium ${uiState.activeTab === "recent"
-								? "bg-cyan-500 text-black"
-								: "text-gray-400 hover:text-cyan-300"
+							className={`px-5 py-2.5 rounded-full transition-all duration-300 text-sm font-semibold active:scale-95 ${uiState.activeTab === "recent"
+								? "bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 text-slate-950 font-bold border border-emerald-200/40"
+								: "text-slate-400 hover:text-white hover:bg-white/5"
 								}`}
 						>
 							Recent ({dataState.recentProjects.length})
@@ -407,10 +407,12 @@ const Projects = () => {
 
 				{/* Show More Button */}
 				{!dataState.loading && uiState.activeTab === "recent" && dataState.recentProjects.length > 6 && (
-					<div className="text-center mt-8">
+					<div className="text-center mt-10">
 						<Button
+							variant="outline"
+							size="lg"
 							onClick={() => setUiState(prev => ({ ...prev, showAll: !prev.showAll }))}
-							className="bg-cyan-600/20 border border-cyan-500/50 text-cyan-300 hover:bg-cyan-600/30"
+							className="rounded-full border-amber-500/40 bg-amber-950/40 text-amber-300 hover:bg-amber-900/60 hover:border-amber-400 hover:text-amber-100 active:scale-[0.98] transition-all duration-300"
 						>
 							{uiState.showAll ? "Show Less" : "Show More Projects"}
 						</Button>

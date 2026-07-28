@@ -27,12 +27,13 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const navItems: NavItem[] = [
-	{ label: 'About', href: '#about' },
-	{ label: 'Projects', href: '#projects' },
-	{ label: 'Tech Stack', href: '#tech-stack' },
-	{ label: 'Github Stats', href: '#github-stats' },
-	{ label: 'Languages', href: '#languages' },
-	{ label: 'Contact', href: '#contact' },
+	{ label: 'About', href: '/#about' },
+	{ label: 'Projects', href: '/#projects' },
+	{ label: 'Tech Stack', href: '/#tech-stack' },
+	{ label: 'Github Stats', href: '/#github-stats' },
+	{ label: 'Languages', href: '/#languages' },
+	{ label: 'Contact', href: '/#contact' },
+	{ label: 'Blogs', href: '/blogs' },
 ];
 
 const Header = () => {
@@ -319,34 +320,36 @@ const Header = () => {
 					{/* Sliding active indicator */}
 					<span
 						ref={indicatorRef}
-						className="absolute bottom-1.5 h-0.5 bg-pink-500 rounded-full"
+						className="absolute bottom-1.5 h-0.5 bg-sky-400 rounded-full"
 						style={{ opacity: 0, width: 0, x: 0 } as React.CSSProperties}
 						aria-hidden="true"
 					/>
 
-					{navItems.map(({ label, href }, i) => (
-						<Link
-							key={label}
-							href={href}
-							ref={(el) => { navLinkRefs.current[i] = el; }}
-							className={`nav-link transition-colors duration-200 whitespace-nowrap ${state.activeSection === href.slice(1)
-								? 'text-pink-400'
-								: 'text-gray-300 hover:text-white'
-								}`}
-							style={{ opacity: 0 }}
-							aria-current={
-								state.activeSection === href.slice(1) ? 'page' : undefined
-							}
-						>
-							{label}
-						</Link>
-					))}
+					{navItems.map(({ label, href }, i) => {
+						const cleanHref = href.replace('/#', '').replace('#', '').replace('/', '');
+						const isActive = state.activeSection === cleanHref;
+						return (
+							<Link
+								key={label}
+								href={href}
+								ref={(el) => { navLinkRefs.current[i] = el; }}
+								className={`nav-link transition-colors duration-200 whitespace-nowrap ${isActive
+									? 'text-sky-400 font-semibold'
+									: 'text-slate-300 hover:text-white'
+									}`}
+								style={{ opacity: 0 }}
+								aria-current={isActive ? 'page' : undefined}
+							>
+								{label}
+							</Link>
+						);
+					})}
 				</nav>
 
 				{/* Mobile Menu Toggle */}
 				<button
 					ref={mobileToggleRef}
-					className="lg:hidden relative text-white focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-lg p-1 transition-transform active:scale-95"
+					className="lg:hidden relative text-slate-200 hover:text-white bg-slate-900/70 hover:bg-slate-800/80 border border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-cyan-400 rounded-full p-2.5 transition-all duration-300 active:scale-95 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
 					onClick={toggleMenu}
 					style={{ opacity: 0 }}
 					aria-expanded={state.isMenuOpen}
@@ -355,12 +358,12 @@ const Header = () => {
 				>
 					{/* Animate the icon swap */}
 					<span
-						className="block transition-transform duration-200"
+						className="block transition-transform duration-300"
 						style={{
 							transform: state.isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)',
 						}}
 					>
-						{state.isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+						{state.isMenuOpen ? <X size={20} /> : <Menu size={20} />}
 					</span>
 				</button>
 			</div>

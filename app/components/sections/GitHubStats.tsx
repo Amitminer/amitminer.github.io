@@ -172,7 +172,7 @@ const GitHubStatsComponent = () => {
 		return (
 			<section id="github-stats" className="py-16 w-full">
 				<div className="container mx-auto px-4 md:px-6">
-					<h2 className="text-3xl md:text-4xl font-bold mb-8 bg-linear-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent text-center">
+					<h2 className="text-3xl md:text-4xl font-bold mb-8 bg-linear-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent text-center">
 						GitHub Statistics
 					</h2>
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -203,16 +203,16 @@ const GitHubStatsComponent = () => {
 						</p>
 						<button
 							onClick={handleRefresh}
-							className="bg-linear-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-4 py-2 rounded-lg transition-colors"
+							className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-400 to-sky-400 hover:from-cyan-300 hover:to-sky-300 text-slate-950 font-bold px-6 py-2.5 rounded-full border border-cyan-200/40 active:scale-[0.98] transition-all duration-300 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
 							disabled={isRefreshing}
 						>
 							{isRefreshing ? (
 								<>
-									<RefreshCw className="inline-block animate-spin mr-2" />
-									<span className="text-cyan-200">Refreshing...</span>
+									<RefreshCw className="animate-spin h-4 w-4 text-slate-950" />
+									<span>Refreshing...</span>
 								</>
 							) : (
-								<span className="text-white">Try Again</span>
+								<span>Try Again</span>
 							)}
 						</button>
 					</div>
@@ -230,7 +230,7 @@ const GitHubStatsComponent = () => {
 		>
 			<div className="container mx-auto px-4 md:px-6">
 				<div className="flex justify-between items-center mb-8">
-					<h2 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+					<h2 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-cyan-300 via-sky-400 to-blue-400 bg-clip-text text-transparent">
 						GitHub Statistics
 					</h2>
 					<div className="flex items-center gap-4">
@@ -262,7 +262,7 @@ const GitHubStatsComponent = () => {
 						value={stats?.totalRepos || 0}
 						label="Public Repositories"
 						loading={loading}
-						color="text-purple-400"
+						color="text-sky-400"
 					/>
 					<StatCard
 						icon={<Users />}
@@ -304,7 +304,7 @@ const GitHubStatsComponent = () => {
 
 				{/* Account Info */}
 				<div className="mt-8 text-center text-sm">
-					<p className="text-indigo-300">Account created on {stats ? formatDate(stats.accountCreated) : '...'}</p>
+					<p className="text-sky-300">Account created on {stats ? formatDate(stats.accountCreated) : '...'}</p>
 					<p className="text-teal-300">Last activity: {stats ? formatDate(stats.lastActivity) : '...'}</p>
 				</div>
 			</div>

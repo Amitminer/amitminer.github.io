@@ -6,10 +6,10 @@ export { GitHubIcon } from './GitHubIcon';
 export { LinkedinIcon } from './LinkedinIcon';
 
 // From react-icons (only what's needed)
-export { SiRust, SiPython, SiCplusplus, SiPhp } from 'react-icons/si';
-export { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiFlask } from 'react-icons/si';
-export { SiRedis, SiMysql, SiSqlite } from 'react-icons/si';
-export { SiDocker, SiGooglecloud, SiGit } from 'react-icons/si';
+export { SiRust, SiPython, SiCplusplus, SiPhp, SiTypescript, SiGo } from 'react-icons/si';
+export { SiReact, SiNextdotjs, SiTailwindcss, SiExpress, SiFlask, SiTauri } from 'react-icons/si';
+export { SiRedis, SiMysql, SiSqlite, SiPostgresql } from 'react-icons/si';
+export { SiDocker, SiGooglecloud, SiGit, SiCloudflare, SiGithubactions, SiNeovim } from 'react-icons/si';
 export { SiArchlinux, SiGnubash } from 'react-icons/si';
 
 export { FaWindows, FaAws } from 'react-icons/fa';

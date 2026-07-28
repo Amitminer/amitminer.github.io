@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 :root {
-	--foreground-rgb: 255, 255, 255;
-	--background-start-rgb: 15, 10, 25;
-	--background-end-rgb: 10, 5, 20;
+	--foreground-rgb: 248, 250, 252;
+	--background-start-rgb: 9, 9, 11;
+	--background-end-rgb: 15, 23, 42;
 
-	/* Cyberpunk colors */
-	--primary: 326, 100%, 60%;
-	/* Neon Pink */
-	--primary-foreground: 0, 0%, 98%;
-	--secondary: 265, 80%, 15%;
-	/* Dark Purple */
-	--secondary-foreground: 0, 0%, 98%;
-	--accent: 195, 100%, 50%;
-	/* Cyan */
-	--muted: 265, 30%, 20%;
-	--muted-foreground: 0, 0%, 70%;
+	/* Refined dark tech colors */
+	--primary: 187, 100%, 42%;
+	/* Electric Cyan */
+	--primary-foreground: 222, 47%, 11%;
+	--secondary: 222, 47%, 11%;
+	/* Obsidian Slate */
+	--secondary-foreground: 210, 40%, 98%;
+	--accent: 199, 89%, 48%;
+	/* Sky Cyan */
+	--muted: 215, 27.9%, 16.9%;
+	--muted-foreground: 215, 20.2%, 65.1%;
 
 	/* Stats colors */
-	--stats-php: 326, 100%, 60%;
-	--stats-cpp: 195, 100%, 50%;
-	--stats-python: 285, 100%, 65%;
-	--stats-rust: 35, 100%, 50%;
-	--stats-typescript: 155, 100%, 50%;
-	--stats-javascript: 55, 100%, 50%;
-	--stats-java: 0, 100%, 50%;
-	--stats-go: 200, 100%, 50%;
-	--stats-ruby: 340, 100%, 50%;
-	--stats-swift: 200, 100%, 50%;
+	--stats-php: 326, 80%, 60%;
+	--stats-cpp: 195, 85%, 50%;
+	--stats-python: 285, 75%, 65%;
+	--stats-rust: 35, 85%, 50%;
+	--stats-typescript: 199, 89%, 48%;
+	--stats-javascript: 55, 85%, 50%;
+	--stats-java: 0, 80%, 55%;
+	--stats-go: 200, 85%, 50%;
+	--stats-ruby: 340, 80%, 50%;
+	--stats-swift: 200, 85%, 50%;
 }
 
 @layer base {
@@ -62,7 +62,7 @@
 	.gradient-text {
 		color: transparent;
 		background-clip: text;
-		background-image: linear-gradient(to right, #FF1493, #00FFFF);
+		background-image: linear-gradient(to right, #38bdf8, #22d3ee);
 	}
 
 	.nav-link {

@@ -333,7 +333,7 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 				const proj = container.querySelector<HTMLElement>("#projects")
 				if (proj) {
 					const h2 = proj.querySelector<HTMLElement>("h2")
-					const tabs = proj.querySelector<HTMLElement>("[class*='bg-gray-800\\/50'][class*='rounded-full']")
+					const tabs = proj.querySelector<HTMLElement>(".backdrop-blur-xl") || proj.querySelector<HTMLElement>("[class*='rounded-full']")
 
 					if (h2 && !inVP(h2) && !reduced) {
 						gsap.set(h2, { opacity: 0, y: 22 })
@@ -407,41 +407,25 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 					// ── Heading ──
 					if (h2 && !inVP(h2)) {
 						gsap.set(h2, { opacity: 0, y: 22 })
-						const h2In = gsap.to(h2, { opacity: 1, y: 0, duration: DUR_MED, ease: EASE_REVEAL, paused: true })
-						const h2Out = gsap.to(h2, { opacity: 0, y: -18, duration: DUR_FAST, ease: "power2.in", paused: true })
-						ScrollTrigger.create({
-							trigger: h2, start: "top 90%", end: "bottom 10%",
-							onEnter: () => { h2Out.pause(0); h2In.restart() },
-							onLeave: () => { h2In.pause(0); h2Out.restart() },
-							onEnterBack: () => { h2Out.pause(0); h2In.restart() },
-							onLeaveBack: () => { h2In.pause(0); gsap.set(h2, { opacity: 0, y: 22 }) }
+						gsap.to(h2, {
+							opacity: 1, y: 0, duration: DUR_MED, ease: EASE_REVEAL,
+							scrollTrigger: { trigger: h2, start: "top 90%", once: true }
 						})
 					}
 
-					// ── Social icons — spin in, spin out ──
+					// ── Social icons — spin in ──
 					const hiddenIcons = icons.filter(el => !inVP(el))
 					if (hiddenIcons.length) {
 						gsap.set(hiddenIcons, { opacity: 0, scale: 0, rotation: -30 })
-						const iconsIn = gsap.to(hiddenIcons, {
+						gsap.to(hiddenIcons, {
 							opacity: 1, scale: 1, rotation: 0,
 							duration: DUR_FAST, ease: EASE_POP,
-							stagger: STAGGER_SM, paused: true
-						})
-						const iconsOut = gsap.to(hiddenIcons, {
-							opacity: 0, scale: 0.5, rotation: 20,
-							duration: DUR_FAST * 0.7, ease: "power2.in",
-							stagger: { amount: 0.2, from: "end" }, paused: true
-						})
-						ScrollTrigger.create({
-							trigger: contact, start: "top 85%", end: "bottom 20%",
-							onEnter: () => { iconsOut.pause(0); iconsIn.restart() },
-							onLeave: () => { iconsIn.pause(0); iconsOut.restart() },
-							onEnterBack: () => { iconsOut.pause(0); iconsIn.restart() },
-							onLeaveBack: () => { iconsIn.pause(0); gsap.set(hiddenIcons, { opacity: 0, scale: 0, rotation: -30 }) }
+							stagger: STAGGER_SM,
+							scrollTrigger: { trigger: contact, start: "top 88%", once: true }
 						})
 					}
 
-					// ── Form fields — stagger in from alternating sides ──
+					// ── Form fields — stagger in ──
 					const fieldPairs: [HTMLElement | null, number][] = [
 						[email, 0],
 						[msg, 1],
@@ -451,14 +435,9 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						if (!el || inVP(el)) return
 						const xFrom = i % 2 === 0 ? -24 : 24
 						gsap.set(el, { opacity: 0, x: xFrom, y: 12 })
-						const inTween = gsap.to(el, { opacity: 1, x: 0, y: 0, duration: DUR_MED, delay: i * 0.1, ease: EASE_REVEAL, paused: true })
-						const outTween = gsap.to(el, { opacity: 0, x: xFrom * 0.5, y: -10, duration: DUR_FAST, ease: "power2.in", paused: true })
-						ScrollTrigger.create({
-							trigger: el, start: "top 88%", end: "bottom 10%",
-							onEnter: () => { outTween.pause(0); inTween.restart() },
-							onLeave: () => { inTween.pause(0); outTween.restart() },
-							onEnterBack: () => { outTween.pause(0); inTween.restart() },
-							onLeaveBack: () => { inTween.pause(0); gsap.set(el, { opacity: 0, x: xFrom, y: 12 }) }
+						gsap.to(el, {
+							opacity: 1, x: 0, y: 0, duration: DUR_MED, delay: i * 0.1, ease: EASE_REVEAL,
+							scrollTrigger: { trigger: el, start: "top 90%", once: true }
 						})
 					})
 				}
@@ -474,26 +453,27 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						gsap.set(h2, { opacity: 0, y: 30, scale: 0.92 })
 						gsap.to(h2, {
 							opacity: 1, y: 0, scale: 1, duration: DUR_MED, ease: EASE_POP,
-							scrollTrigger: { trigger: h2, start: "top 88%", toggleActions: "play none none reverse" }
+							scrollTrigger: { trigger: h2, start: "top 98%", once: true }
 						})
 					}
 					if (p) {
 						gsap.set(p, { opacity: 0, y: 20 })
 						gsap.to(p, {
 							opacity: 1, y: 0, duration: DUR_MED, ease: EASE_REVEAL,
-							scrollTrigger: { trigger: p, start: "top 90%", toggleActions: "play none none reverse" }
+							scrollTrigger: { trigger: p, start: "top 98%", once: true }
 						})
 					}
 					if (btn) {
 						gsap.set(btn, { opacity: 0, scale: 0.8, y: 20 })
 						gsap.to(btn, {
 							opacity: 1, scale: 1, y: 0, duration: DUR_SLOW, ease: EASE_POP,
-							scrollTrigger: { trigger: btn, start: "top 92%", toggleActions: "play none none reverse" }
+							scrollTrigger: { trigger: btn, start: "top 98%", once: true }
 						})
 						// Subtle pulse after reveal
 						ScrollTrigger.create({
 							trigger: btn,
-							start: "top 92%",
+							start: "top 98%",
+							once: true,
 							onEnter: () => {
 								gsap.to(btn, {
 									scale: 1.04, duration: 0.6, ease: "sine.inOut",
@@ -521,16 +501,28 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 					sec.dataset.ga = "1"
 					gsap.set(sec, { opacity: 0, y: 28 })
 
-					const tween = gsap.to(sec, { opacity: 1, y: 0, duration: DUR_MED, ease: EASE_REVEAL, paused: true })
-					const exitTween = gsap.to(sec, { opacity: 0, y: -20, duration: DUR_FAST, ease: "power2.in", paused: true })
-
-					ScrollTrigger.create({
-						trigger: sec, start: "top 88%", end: "bottom 10%",
-						onEnter: () => { exitTween.pause(0); tween.restart() },
-						onLeave: () => { tween.pause(0); exitTween.restart() },
-						onEnterBack: () => { exitTween.pause(0); tween.restart() },
-						onLeaveBack: () => { tween.pause(0); gsap.set(sec, { opacity: 0, y: 28 }) }
+					gsap.to(sec, {
+						opacity: 1, y: 0, duration: DUR_MED, ease: EASE_REVEAL,
+						scrollTrigger: { trigger: sec, start: "top 98%", once: true }
 					})
+				})
+
+				// ── SAFETY REVEAL FOR BOTTOM SECTIONS ON MOBILE ──
+				const forceRevealBottom = () => {
+					const isNearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 300)
+					if (isNearBottom) {
+						container.querySelectorAll<HTMLElement>("#support, #support *, .animated-section").forEach(el => {
+							if (window.getComputedStyle(el).opacity === "0") {
+								gsap.to(el, { opacity: 1, y: 0, scale: 1, duration: 0.3 })
+							}
+						})
+					}
+				}
+				window.addEventListener("scroll", forceRevealBottom, { passive: true })
+				window.addEventListener("touchmove", forceRevealBottom, { passive: true })
+				cleanupRef.current.push(() => {
+					window.removeEventListener("scroll", forceRevealBottom)
+					window.removeEventListener("touchmove", forceRevealBottom)
 				})
 
 				// ── CUSTOM CURSOR ───────────────────────────────
@@ -542,8 +534,8 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 						cleanupRef.current.push(() => document.removeEventListener("mousemove", move))
 
 						container.querySelectorAll("a, button, .project-card, .stat-card").forEach(el => {
-							const onIn = () => gsap.to(cursor, { scale: 2.5, background: "rgba(255,20,147,0.7)", duration: 0.2 })
-							const onOut = () => gsap.to(cursor, { scale: 1, background: "rgba(0,255,255,0.4)", duration: 0.2 })
+							const onIn = () => gsap.to(cursor, { scale: 2.2, background: "rgba(56,189,248,0.6)", duration: 0.2 })
+							const onOut = () => gsap.to(cursor, { scale: 1, background: "rgba(56,189,248,0.35)", duration: 0.2 })
 							el.addEventListener("mouseenter", onIn)
 							el.addEventListener("mouseleave", onOut)
 							cleanupRef.current.push(() => {
@@ -578,12 +570,12 @@ export default function AnimatedSections({ children }: { children: React.ReactNo
 		<div ref={containerRef} className="relative">
 			<div
 				ref={cursorRef}
-				className="fixed w-4 h-4 rounded-full pointer-events-none z-50 mix-blend-screen hidden lg:block"
+				className="fixed top-0 left-0 w-4 h-4 rounded-full pointer-events-none z-50 mix-blend-screen hidden lg:block"
 				style={{
-					backgroundColor: "rgba(0,255,255,0.4)",
+					backgroundColor: "rgba(56,189,248,0.35)",
 					transform: "translate(-50%,-50%)",
 					backdropFilter: "blur(2px)",
-					boxShadow: "0 0 20px rgba(0,255,255,0.5)",
+					boxShadow: "0 0 15px rgba(56,189,248,0.4)",
 					willChange: "transform"
 				}}
 			/>

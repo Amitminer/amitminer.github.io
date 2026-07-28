@@ -20,26 +20,25 @@ const TYPING_DELAY = 2; // ms between characters for the first paragraph
 const SECOND_TYPING_DELAY = 2; // ms between characters for the second paragraph
 const CURSOR_BLINK_DELAY = 500; // ms between cursor blinks
 const LOADING_DELAY = 400; // ms for the loading state before animations begin
-const PARTICLE_COUNT = 5; // Number of floating particles in the background
 
 // === Skeleton Loading Component ===
 const SkeletonLoader = () => (
-	<div className="max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-xs border border-pink-500/10">
+	<div className="max-w-3xl mx-auto bg-slate-900/40 rounded-xl p-6 md:p-8 backdrop-blur-xs border border-slate-800">
 		{/* Title Skeleton */}
-		<div className="h-8 w-48 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded-lg animate-pulse mb-8 mx-auto" />
+		<div className="h-8 w-48 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded-lg animate-pulse mb-8 mx-auto" />
 
 		{/* First Paragraph Skeleton */}
 		<div className="space-y-3 mb-6">
-			<div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-3/4" />
-			<div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
-			<div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-5/6" />
+			<div className="h-4 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded animate-pulse w-3/4" />
+			<div className="h-4 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
+			<div className="h-4 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded animate-pulse w-5/6" />
 		</div>
 
 		{/* Second Paragraph Skeleton */}
 		<div className="space-y-3">
-			<div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-2/3" />
-			<div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
-			<div className="h-4 bg-linear-to-r from-pink-500/20 to-cyan-500/20 rounded animate-pulse w-4/5" />
+			<div className="h-4 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded animate-pulse w-2/3" />
+			<div className="h-4 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded animate-pulse w-full" />
+			<div className="h-4 bg-gradient-to-r from-sky-500/20 to-cyan-500/20 rounded animate-pulse w-4/5" />
 		</div>
 	</div>
 );
@@ -144,7 +143,7 @@ const About = () => {
 
 			let className = 'transition-all duration-300 ';
 			if (isRevealed) {
-				className += isHighlighted ? 'text-pink-500 font-bold opacity-100' : 'text-foreground opacity-100';
+				className += isHighlighted ? 'text-sky-400 font-bold opacity-100' : 'text-foreground opacity-100';
 			} else {
 				className += 'text-muted-foreground/30 opacity-50';
 			}
@@ -174,23 +173,6 @@ const About = () => {
 			ref={aboutRef}
 			className="py-20 w-full relative overflow-hidden"
 		>
-			{/* Floating Particles Background */}
-			<div className="absolute inset-0 pointer-events-none">
-				{[...Array(PARTICLE_COUNT)].map((_, i) => (
-					<div
-						key={i}
-						className={`absolute w-1 h-1 bg-linear-to-r from-pink-500 to-cyan-500 rounded-full
-              ${isVisible ? 'animate-bounce' : 'opacity-0'}`}
-						style={{
-							left: `${20 + i * 15}%`,
-							top: `${30 + i * 10}%`,
-							animationDelay: `${i * 0.2}s`,
-							animationDuration: '2s'
-						}}
-					/>
-				))}
-			</div>
-
 			<div className="container mx-auto px-4 md:px-6 relative z-10">
 				{/* Section Title with Gradient Effect */}
 				<h2
@@ -205,9 +187,9 @@ const About = () => {
 					<SkeletonLoader />
 				) : (
 					<div
-						className={`max-w-3xl mx-auto bg-secondary/30 rounded-xl p-6 md:p-8 backdrop-blur-xs
-              border border-pink-500/10 hover:border-pink-500/30 transition-all duration-500
-              hover:shadow-2xl hover:shadow-pink-500/5 transform ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+						className={`max-w-3xl mx-auto bg-slate-900/60 rounded-2xl p-6 md:p-8 backdrop-blur-md
+              border border-slate-800 hover:border-slate-700 transition-all duration-500
+              transform ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
 							}`}
 						style={{ transitionDelay: '0.2s' }}
 					>
@@ -215,7 +197,7 @@ const About = () => {
 						<div className="text-base leading-relaxed relative">
 							{renderTextWithTypewriter(AboutContent.firstParagraph, typewriterState.currentIndex)}
 							{showFirstCursor && (
-								<span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>
+								<span className="text-sky-400 font-bold animate-pulse ml-1">|</span>
 							)}
 						</div>
 
@@ -223,49 +205,10 @@ const About = () => {
 						<div className="text-base leading-relaxed relative mt-4">
 							{renderTextWithTypewriter(AboutContent.secondParagraph, typewriterState.secondIndex)}
 							{showSecondCursor && (
-								<span className="text-cyan-500 font-bold animate-pulse ml-1">|</span>
+								<span className="text-sky-400 font-bold animate-pulse ml-1">|</span>
 							)}
 						</div>
-
-						{/* Completion Indicator */}
-						{isFirstParagraphComplete && isSecondParagraphComplete && (
-							<div className="mt-6 flex justify-center animate-fade-in">
-								<div className="flex space-x-1">
-									{[...Array(3)].map((_, i) => (
-										<div
-											key={i}
-											className="w-2 h-2 bg-linear-to-r from-pink-500 to-cyan-500 rounded-full animate-pulse"
-											style={{ animationDelay: `${i * 0.1}s` }}
-										/>
-									))}
-								</div>
-							</div>
-						)}
 					</div>
-				)}
-
-				{/* Decorative Elements */}
-				{isVisible && (
-					<>
-						{/* Spinning Circle */}
-						<div
-							className="absolute top-1/4 left-10 w-6 h-6 border-2 border-pink-500/30 rounded-full
-                animate-spin transition-all duration-700 transform"
-							style={{ transitionDelay: '0.5s', animationDuration: '6s' }}
-						/>
-						{/* Pulsing Dot */}
-						<div
-							className="absolute bottom-1/4 right-10 w-4 h-4 bg-cyan-500/20 rounded-full
-                animate-ping transition-all duration-700"
-							style={{ transitionDelay: '0.6s', animationDuration: '2s' }}
-						/>
-						{/* Rotating Square */}
-						<div
-							className="absolute top-1/2 right-20 w-8 h-8 border border-cyan-500/20
-                rotate-45 animate-pulse transition-all duration-700"
-							style={{ transitionDelay: '0.7s', animationDuration: '1.5s' }}
-						/>
-					</>
 				)}
 			</div>
 		</section>

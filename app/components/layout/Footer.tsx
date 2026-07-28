@@ -11,7 +11,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
 import { GitHubIcon } from '../icons/index';
 import { CurrentGithubLink, Name } from '@/app/utils/config';
 import VisitorCounter from '../ui/VisitorCounter';
@@ -46,38 +45,32 @@ const Footer = () => {
 	}, []);
 
 	return (
-		<footer className="w-full bg-secondary/70 mt-16">
-			<div className="container mx-auto px-4 md:px-6 relative">
-				<div className="flex flex-col items-center space-y-4">
-					<Link href="/" className="text-xl font-bold gradient-text block text-center">
+		<footer className="w-full bg-slate-950/80 border-t border-slate-900/80 mt-8 sm:mt-12 py-4 sm:py-6">
+			<div className="container mx-auto px-4 md:px-6">
+				<div className="flex flex-col items-center justify-center space-y-2">
+					<Link href="/" className="text-lg sm:text-xl font-bold gradient-text block text-center">
 						{Name}
 					</Link>
 
-					{/* Show counter only if user is on desktop and scrolled to bottom */}
-					{isDesktop && showCounter && (
-						<div className="absolute top-1.5 right-2 scale-[0.8]">
-							<VisitorCounter />
-						</div>
-					)}
-
-					<div className="flex items-center space-x-2 text-sm text-gray-400">
-						<span>Made with</span>
-						<Heart className="w-4 h-4 text-[#FF1493] animate-pulse" />
-					</div>
-
-					<div className="flex items-center space-x-4">
+					<div className="flex items-center space-x-3 text-xs sm:text-sm text-slate-400">
 						<a
 							href={CurrentGithubLink}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="flex items-center space-x-2 text-sm text-gray-400 hover:text-[#00FFFF] transition-colors duration-300"
+							className="flex items-center space-x-1.5 hover:text-sky-400 transition-colors duration-300"
 						>
-							<GitHubIcon className="w-5 h-5" />
+							<GitHubIcon className="w-3.5 h-3.5" />
 							<span>Open Source</span>
 						</a>
-						<span className="text-gray-600">•</span>
-						<span className="text-sm text-gray-400">© {currentYear}</span>
+						<span className="text-slate-700">•</span>
+						<span>© {currentYear}</span>
 					</div>
+
+					{isDesktop && showCounter && (
+						<div className="pt-1">
+							<VisitorCounter />
+						</div>
+					)}
 				</div>
 			</div>
 		</footer>

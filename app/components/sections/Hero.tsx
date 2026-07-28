@@ -21,6 +21,7 @@ import { GitHubIcon, LinkedinIcon } from "../icons/index"
 import { Name, HeroRoles, GithubLink, LinkedinLink } from "@/app/utils/config"
 import type { ThrottleOptions } from "@/app/lib/types"
 import Image from "next/image"
+import Link from "next/link"
 
 // Throttle utility
 const throttle = <T extends (...args: unknown[]) => unknown>(
@@ -239,7 +240,7 @@ const Hero = () => {
 						</div>
 
 						{/* Subtle glow effect */}
-						<div className="absolute inset-0 bg-linear-to-r from-[#FF1493]/10 to-[#00FFFF]/10 rounded-full blur-md animate-pulse" />
+						<div className="absolute inset-0 bg-linear-to-r from-sky-500/10 to-cyan-400/10 rounded-full blur-md animate-pulse" />
 					</div>
 
 					{/* Name */}
@@ -249,7 +250,7 @@ const Hero = () => {
 					<p
 						className="text-sm sm:text-base md:text-lg lg:text-xl mb-8 min-h-6 sm:min-h-7 flex items-center justify-center px-2 sm:px-0 font-medium"
 						style={{
-							background: "linear-gradient(90deg, #FFFFFF, #FF1493, #FF0000)",
+							background: "linear-gradient(90deg, #FFFFFF, #38BDF8, #22D3EE)",
 							WebkitBackgroundClip: "text",
 							WebkitTextFillColor: "transparent",
 							backgroundClip: "text",
@@ -258,81 +259,92 @@ const Hero = () => {
 						<span>{displayedText}</span>
 						<span
 							className="ml-0.5 inline-block w-0.5 h-[1em] align-middle animate-pulse"
-							style={{ background: "#FF1493", WebkitTextFillColor: "initial" }}
+							style={{ background: "#38BDF8", WebkitTextFillColor: "initial" }}
 							aria-hidden="true"
 						/>
 					</p>
 
 					{/* Action Buttons */}
-					<div className="flex flex-col sm:flex-row gap-4 mt-4">
-						{/* About Me Button */}
+					<div className="flex flex-col sm:flex-row items-center gap-4 mt-6">
+						{/* About Me Button - Glassmorphism Primary CTA */}
 						<Button
-							className="bg-linear-to-r from-[#FF1493]/70 to-[#00FFFF]/70 hover:from-[#FF1493]/60 hover:to-[#00FFFF]/60 text-white font-medium px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-[#FF1493]/20 hover:shadow-[#00FFFF]/30 backdrop-blur-[2px]"
+							size="lg"
+							className="group relative inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-sky-400/90 via-cyan-400/90 to-blue-500/90 backdrop-blur-md text-slate-950 font-bold px-7 py-3.5 rounded-full hover:from-sky-300 hover:via-cyan-300 hover:to-blue-400 active:scale-[0.97] transition-all duration-300 border border-white/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.5)]"
 							onClick={scrollToAbout}
-							style={{ filter: "saturate(0.9) brightness(0.95)" }}
 						>
-							About Me
+							<span className="tracking-tight font-bold">About Me</span>
+							<span className="w-6 h-6 rounded-full bg-slate-950/20 backdrop-blur-xs border border-white/20 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:translate-y-0.5">
+								<ChevronDown className="w-3.5 h-3.5 text-slate-950" />
+							</span>
 						</Button>
 
-						{/* Contact Button */}
+						{/* Contact Button - Emerald Glass CTA */}
 						<Button
 							variant="outline"
-							className="border-[#00FFFF]/30 text-white hover:bg-[#00FFFF]/10 hover:border-[#00FFFF] shadow-lg shadow-[#00FFFF]/10 hover:shadow-[#00FFFF]/20 transition-all duration-300"
+							size="lg"
+							className="rounded-full border-emerald-400/40 bg-emerald-950/50 backdrop-blur-md text-emerald-300 hover:bg-emerald-900/70 hover:border-emerald-400/70 hover:text-emerald-100 active:scale-[0.97] transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]"
 							asChild
 						>
-							<a href="#contact">Contact Me</a>
+							<Link href="/#contact">Contact Me</Link>
 						</Button>
 
-						{/* Profile Options Button */}
+						{/* Profile Options Button - Amber Glass CTA */}
 						<div className="relative w-full sm:w-auto" ref={profileOptionsRef}>
 							<Button
 								variant="outline"
-								className="w-full sm:w-auto border-[#FF1493]/30 text-white hover:bg-[#FF1493]/10 hover:border-[#FF1493] shadow-lg shadow-[#FF1493]/10 hover:shadow-[#FF1493]/20 transition-all duration-300 group"
+								size="lg"
+								className="w-full sm:w-auto rounded-full border-amber-400/40 bg-amber-950/50 backdrop-blur-md text-amber-300 hover:bg-amber-900/70 hover:border-amber-400/70 hover:text-amber-100 active:scale-[0.97] transition-all duration-300 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)] group"
 								onClick={() => setShowProfileOptions(!showProfileOptions)}
 							>
-								<div className="flex items-center gap-2">
-									<User className="w-4 h-4" />
-									Profiles
-									<ChevronDown
-										size={14}
-										className={`transition-transform duration-300 ${showProfileOptions ? "rotate-180" : ""}`}
-									/>
+								<div className="flex items-center gap-2.5">
+									<User className="w-4 h-4 text-amber-400 group-hover:text-amber-200 transition-colors" />
+									<span>Profiles</span>
+									<span className="w-5 h-5 rounded-full bg-amber-400/15 flex items-center justify-center">
+										<ChevronDown
+											size={12}
+											className={`transition-transform duration-300 ${showProfileOptions ? "rotate-180" : ""}`}
+										/>
+									</span>
 								</div>
 							</Button>
 
 							{/* Profile Options Dropdown */}
 							{showProfileOptions && (
-								<div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-44 sm:w-52 bg-[#0C0715]/95 backdrop-blur-md border border-[#FF1493]/30 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-									<div className="p-1 flex flex-col gap-0.5">
+								<div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-48 sm:w-56 bg-slate-950/95 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 p-1.5">
+									<div className="flex flex-col gap-1">
 										<a
 											href={GithubLink}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#FF1493]/10 transition-colors group"
+											className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/5 transition-all duration-200 group border border-transparent hover:border-slate-800"
 											onClick={() => setShowProfileOptions(false)}
 										>
-											<GitHubIcon className="w-4 h-4 text-[#FF1493]" />
-											<div className="flex flex-col items-start leading-tight">
-												<span className="text-xs font-semibold text-white">GitHub</span>
-												<span className="text-[9px] text-gray-400">Contributions</span>
+											<div className="w-7 h-7 rounded-lg bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+												<GitHubIcon className="w-4 h-4 text-cyan-400" />
 											</div>
-											<ExternalLink size={12} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+											<div className="flex flex-col items-start leading-tight">
+												<span className="text-xs font-semibold text-slate-100 group-hover:text-white">GitHub</span>
+												<span className="text-[10px] text-slate-400">Contributions</span>
+											</div>
+											<ExternalLink size={12} className="ml-auto text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all" />
 										</a>
 										<a
 											href={LinkedinLink}
 											target="_blank"
 											rel="noopener noreferrer"
-											className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#00FFFF]/10 transition-colors group"
+											className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-white/5 transition-all duration-200 group border border-transparent hover:border-slate-800"
 											onClick={() => setShowProfileOptions(false)}
 										>
-											<LinkedinIcon className="w-4 h-4 text-[#00FFFF]" />
-											<div className="flex flex-col items-start leading-tight">
-												<span className="text-xs font-semibold text-white">LinkedIn</span>
-												<span className="text-[9px] text-gray-400">Professional</span>
+											<div className="w-7 h-7 rounded-lg bg-sky-500/10 flex items-center justify-center group-hover:bg-sky-500/20 transition-colors">
+												<LinkedinIcon className="w-4 h-4 text-sky-400" />
 											</div>
-											<ExternalLink size={12} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+											<div className="flex flex-col items-start leading-tight">
+												<span className="text-xs font-semibold text-slate-100 group-hover:text-white">LinkedIn</span>
+												<span className="text-[10px] text-slate-400">Professional</span>
+											</div>
+											<ExternalLink size={12} className="ml-auto text-slate-500 group-hover:text-sky-400 group-hover:translate-x-0.5 transition-all" />
 										</a>
-									</div>
+										</div>
 								</div>
 							)}
 						</div>
