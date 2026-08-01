@@ -2,7 +2,6 @@
  * TechStack Component
  *
  * Tailored technology stack showcase focusing on:
- * - Systems Programming (Rust, C++, Tokio, Async Rust, IPC, Networking)
  * - Backend & Infra (Actix Web, Axum, Express, Firecracker, Docker, Cloudflare, AWS)
  * - Databases (PostgreSQL, Redis, SQLite)
  * - Operating Systems & Tools (Arch Linux, Windows, Neovim, Zed, tmux, SSH)
@@ -19,7 +18,7 @@ import {
 	SiDocker, SiCloudflare, SiGithubactions, SiNeovim,
 	SiGit, FaWindows, FaAws
 } from '../icons/index';
-import { Server, Cpu, Zap, Layers, Network, Radio, Terminal } from 'lucide-react';
+import { Server, Cpu, Zap, Terminal } from 'lucide-react';
 import { TechGroup, TechGroupProps, TechItemProps } from '@/app/lib/types';
 
 // Constants
@@ -72,16 +71,6 @@ const techGroups: TechGroup[] = [
 			{ name: 'AWS', icon: <FaAws />, color: 'text-amber-500' },
 			{ name: 'Cloudflare', icon: <SiCloudflare />, color: 'text-orange-400' },
 			{ name: 'Firecracker', icon: <Zap />, color: 'text-amber-400' },
-		]
-	},
-	{
-		title: "Systems Programming",
-		technologies: [
-			{ name: 'Tokio', icon: <Cpu />, color: 'text-amber-400' },
-			{ name: 'Async Rust', icon: <SiRust />, color: 'text-orange-400' },
-			{ name: 'Multithreading', icon: <Layers />, color: 'text-teal-400' },
-			{ name: 'IPC & Networking', icon: <Network />, color: 'text-cyan-400' },
-			{ name: 'gRPC & WebSockets', icon: <Radio />, color: 'text-emerald-400' },
 		]
 	},
 	{
